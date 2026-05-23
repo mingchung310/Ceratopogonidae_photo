@@ -422,10 +422,7 @@
     <div class="modal-body">
       <p class="modal-sci" id="mSci"></p>
       <div class="modal-tags" id="mTags"></div>
-      <div class="modal-section"><h4>棲息環境</h4><p id="mHabitat"></p></div>
-      <div class="modal-section"><h4>分布地區</h4><p id="mRange"></p></div>
-      <div class="modal-section"><h4>採集方式</h4><p id="mMethod"></p></div>
-      <div class="modal-section"><h4>備註</h4><p id="mNote"></p></div>
+      <div id="mSections"></div>
     </div>
   </div>
 </div>
@@ -527,12 +524,20 @@ function renderGrid() {
 }
 
 function openModal(d) {
+  const FIXED = new Set(['id','name','sciName','category','date','emoji','image']);
   document.getElementById('mName').textContent = d.name;
   document.getElementById('mSci').textContent = d.sciName || '';
-  document.getElementById('mHabitat').textContent = d.habitat || '—';
-  document.getElementById('mRange').textContent = d.range || '—';
-  document.getElementById('mMethod').textContent = d.method || '—';
-  document.getElementById('mNote').textContent = d.note || '—';
+
+  // 自動依 CSV 欄位產生 Modal 區塊，跳過固定欄位與空值
+  const sections = document.getElementById('mSections');
+  sections.innerHTML = '';
+  Object.keys(d).forEach(key => {
+    if (FIXED.has(key) || !d[key]) return;
+    const sec = document.createElement('div');
+    sec.className = 'modal-section';
+    sec.innerHTML = `<h4>${key}</h4><p>${d[key]}</p>`;
+    sections.appendChild(sec);
+  });
 
   const imgWrap = document.getElementById('mImgWrap');
   imgWrap.innerHTML = d.image
