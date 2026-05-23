@@ -572,7 +572,7 @@ function fillSelect(el, values, placeholder) {
 function initCategories() {
   fillSelect(categoryFilter, DATA.map(d => d.category),  '全部屬');
   fillSelect(subgenusFilter, DATA.map(d => d.subgenus),  '全部亞屬');
-  fillSelect(speciesFilter,  DATA.map(d => d.species),   '全部種');
+  fillSelect(speciesFilter,  DATA.map(d => d.species ? `${d.category} ${d.species}` : ''), '全部種');
 }
 
 function renderGrid() {
@@ -586,7 +586,7 @@ function renderGrid() {
     const matchQ   = !q   || d.name.toLowerCase().includes(q) || (d.sciName || '').toLowerCase().includes(q);
     const matchCat = !cat || d.category === cat;
     const matchSub = !sub || d.subgenus === sub;
-    const matchSp  = !sp  || d.species  === sp;
+    const matchSp  = !sp  || `${d.category} ${d.species}` === sp;
     return matchQ && matchCat && matchSub && matchSp;
   });
 
