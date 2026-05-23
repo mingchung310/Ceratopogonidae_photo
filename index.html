@@ -442,7 +442,8 @@
 // ══════════════════════════════════════
 
 function parseCSV(text) {
-  const lines = text.trim().split('\n');
+  // 移除 UTF-8 BOM（﻿）避免第一個欄位名稱帶入隱形字元
+  const lines = text.replace(/^﻿/, '').trim().split('\n');
   const headers = lines[0].split(',');
   return lines.slice(1).map(line => {
     // 支援欄位內含逗號（用雙引號包住）
