@@ -458,16 +458,16 @@
 
 <script>
 // ══════════════════════════════════════
-//  資料從 data.csv 載入，直接編輯那個檔案即可
-//  CSV 欄位順序：id,name,sciName,category,date,emoji,image,habitat,range,method,note
+//  資料來源：玻片標本清單 (slide mount).csv
+//  Cd + No. → number（圖片資料夾名）
+//  Genus + Subgenus + Species → 學名
 // ══════════════════════════════════════
 
 function parseCSV(text) {
-  // 移除 UTF-8 BOM（﻿）避免第一個欄位名稱帶入隱形字元
-  const lines = text.replace(/^﻿/, '').trim().split('\n');
+  // 移除 UTF-8 BOM 避免第一個欄位帶入隱形字元
+  const lines = text.replace(/^﻿/, '').trim().split(/\r?\n/);
   const headers = lines[0].split(',');
-  return lines.slice(1).map(line => {
-    // 支援欄位內含逗號（用雙引號包住）
+  return lines.slice(1).filter(l => l.trim()).map(line => {
     const cols = [];
     let cur = '', inQ = false;
     for (let i = 0; i < line.length; i++) {
@@ -481,6 +481,49 @@ function parseCSV(text) {
     headers.forEach((h, i) => { obj[h.trim()] = (cols[i] || '').trim(); });
     return obj;
   });
+}
+
+// 將原始 CSV 欄位轉換成網站用的格式
+function transformRow(r) {
+  const cd  = (r['Cd']   || '').trim();
+  const no  = (r['No.']  || '').trim();
+  const num = cd + no;  // e.g. "Cer13"
+
+  const genus    = (r['Genus']    || '').trim();
+  const subgenus = (r['Subgenus'] || '').trim();
+  const species  = (r['Species']  || '').trim();
+  const sciName  = [genus, subgenus ? `(${subgenus})` : '', species]
+                    .filter(Boolean).join(' ');
+
+  const lat = (r['LATDD'] || '').trim();
+  const lon = (r['LONDD'] || '').trim();
+
+  const obj = {
+    id:       num,
+    number:   num,
+    name:     (r['中文名'] || num).trim(),
+    sciName,
+    category: genus,
+    date:     (r['Col. Date'] || '').trim(),
+    emoji:    '🦟',
+    image:    num,   // 對應 manifest 資料夾名
+  };
+
+  // Modal 顯示欄位（空值自動略過）
+  const fields = {
+    '採集地':  r['Locality'],
+    '採集者':  r['Collector'],
+    'GPS':     lat && lon ? `${lat}, ${lon}` : '',
+    '性別':    r['sex'],
+    '數量':    r['total number'],
+    '寄主':    r['Host'],
+    'DNA編號': r['DNA編號'],
+    '備註':    r['ps.'],
+  };
+  Object.entries(fields).forEach(([k, v]) => {
+    if (v && v.trim()) obj[k] = v.trim();
+  });
+  return obj;
 }
 
 // ══════════════════════════════════════
@@ -560,7 +603,7 @@ function renderGrid() {
 }
 
 function openModal(d) {
-  const FIXED = new Set(['id','name','sciName','category','date','emoji','image']);
+  const FIXED = new Set(['id','name','sciName','category','date','emoji','image','number']);
   document.getElementById('mName').textContent = d.name;
   document.getElementById('mSci').textContent = d.sciName || '';
 
@@ -625,18 +668,31 @@ clearBtn.addEventListener('click', () => {
   renderGrid();
 });
 
-// 同時載入 manifest.json（可選）和 data.csv
+// 自動偵測 UTF-8 / Big5 編碼
+function decodeBuf(buf) {
+  const bytes = new Uint8Array(buf);
+  // UTF-8 BOM
+  if (bytes[0] === 0xEF && bytes[1] === 0xBB && bytes[2] === 0xBF)
+    return new TextDecoder('utf-8').decode(buf.slice(3));
+  // 嘗試嚴格 UTF-8
+  try { return new TextDecoder('utf-8', { fatal: true }).decode(buf); }
+  catch { return new TextDecoder('big5').decode(buf); }
+}
+
+const CSV_FILE = '玻片標本清單 (slide mount).csv';
+
 grid.innerHTML = '<div class="empty">載入中…</div>';
 const fetchManifest = fetch('manifest.json')
   .then(r => r.ok ? r.json() : {})
   .catch(() => ({}));
-const fetchCSV = fetch('data.csv')
-  .then(r => { if (!r.ok) throw new Error('無法載入 data.csv'); return r.text(); });
+const fetchCSV = fetch(CSV_FILE)
+  .then(r => { if (!r.ok) throw new Error(`無法載入 ${CSV_FILE}`); return r.arrayBuffer(); })
+  .then(buf => decodeBuf(buf));
 
 Promise.all([fetchManifest, fetchCSV])
   .then(([manifest, csvText]) => {
     MANIFEST = manifest;
-    DATA = parseCSV(csvText);
+    DATA = parseCSV(csvText).map(transformRow);
     initCategories();
     renderGrid();
   })
