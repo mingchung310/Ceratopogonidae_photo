@@ -501,7 +501,7 @@ function transformRow(r) {
   const obj = {
     id:       num,
     number:   num,
-    name:     (r['中文名'] || num).trim(),
+    name:     `${(r['中文名'] || '').trim()} ${num}`.trim(),
     sciName,
     category: genus,
     date:     (r['Col. Date'] || '').trim(),
