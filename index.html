@@ -495,6 +495,16 @@ const resultsInfo = document.getElementById('resultsInfo');
 const overlay = document.getElementById('modalOverlay');
 
 let DATA = [];
+let MANIFEST = {}; // { "資料夾名稱": ["images/資料夾/01.jpg", ...] }
+
+// 取得某筆資料的圖片陣列
+// 優先查 manifest（image 欄填資料夾名），其次直接解析 | 分隔路徑
+function getImages(d) {
+  if (!d.image) return [];
+  const key = d.image.trim();
+  if (MANIFEST[key]) return MANIFEST[key];
+  return key.split('|').map(s => s.trim()).filter(Boolean);
+}
 
 function initCategories() {
   categoryFilter.innerHTML = '<option value="">全部類別</option>';
@@ -526,7 +536,8 @@ function renderGrid() {
   }
 
   filtered.forEach(d => {
-    const firstImg = d.image ? d.image.split('|')[0].trim() : '';
+    const imgs = getImages(d);
+    const firstImg = imgs[0] || '';
     const card = document.createElement('div');
     card.className = 'card';
     card.innerHTML = `
@@ -564,8 +575,8 @@ function openModal(d) {
     sections.appendChild(sec);
   });
 
-  // 多圖支援：image 欄用 | 分隔多張路徑
-  const images = d.image ? d.image.split('|').map(s => s.trim()).filter(Boolean) : [];
+  // 多圖支援：image 欄填資料夾名（查 manifest）或 | 分隔路徑
+  const images = getImages(d);
   const imgWrap = document.getElementById('mImgWrap');
   const thumbsWrap = document.getElementById('mThumbs');
 
@@ -614,12 +625,18 @@ clearBtn.addEventListener('click', () => {
   renderGrid();
 });
 
-// 載入 CSV
+// 同時載入 manifest.json（可選）和 data.csv
 grid.innerHTML = '<div class="empty">載入中…</div>';
-fetch('data.csv')
-  .then(r => { if (!r.ok) throw new Error('無法載入 data.csv'); return r.text(); })
-  .then(text => {
-    DATA = parseCSV(text);
+const fetchManifest = fetch('manifest.json')
+  .then(r => r.ok ? r.json() : {})
+  .catch(() => ({}));
+const fetchCSV = fetch('data.csv')
+  .then(r => { if (!r.ok) throw new Error('無法載入 data.csv'); return r.text(); });
+
+Promise.all([fetchManifest, fetchCSV])
+  .then(([manifest, csvText]) => {
+    MANIFEST = manifest;
+    DATA = parseCSV(csvText);
     initCategories();
     renderGrid();
   })
