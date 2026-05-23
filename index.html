@@ -91,7 +91,7 @@
 
     .filter-wrap { position: relative; }
 
-    #categoryFilter {
+    .filter-select {
       appearance: none;
       background: var(--navy3);
       border: 1px solid var(--border);
@@ -102,9 +102,10 @@
       cursor: pointer;
       outline: none;
       transition: border-color 0.2s;
+      max-width: 130px;
     }
 
-    #categoryFilter:focus { border-color: var(--gold); }
+    .filter-select:focus { border-color: var(--gold); }
 
     .filter-wrap::after {
       content: '▾';
@@ -415,7 +416,13 @@
         <input id="searchInput" type="text" placeholder="搜尋名稱…" />
       </div>
       <div class="filter-wrap">
-        <select id="categoryFilter"><option value="">全部類別</option></select>
+        <select id="categoryFilter" class="filter-select"><option value="">全部屬</option></select>
+      </div>
+      <div class="filter-wrap">
+        <select id="subgenusFilter" class="filter-select"><option value="">全部亞屬</option></select>
+      </div>
+      <div class="filter-wrap">
+        <select id="speciesFilter" class="filter-select"><option value="">全部種</option></select>
       </div>
       <button id="clearBtn" title="清除篩選">✕</button>
     </div>
@@ -504,6 +511,8 @@ function transformRow(r) {
     name:     `${(r['中文名'] || '').trim()} ${num}`.trim(),
     sciName,
     category: genus,
+    subgenus: subgenus,
+    species:  species,
     date:     (r['Col. Date'] || '').trim(),
     emoji:    '🦟',
     image:    num,   // 對應 manifest 資料夾名
@@ -532,7 +541,9 @@ function transformRow(r) {
 
 const grid = document.getElementById('grid');
 const searchInput = document.getElementById('searchInput');
-const categoryFilter = document.getElementById('categoryFilter');
+const categoryFilter  = document.getElementById('categoryFilter');
+const subgenusFilter  = document.getElementById('subgenusFilter');
+const speciesFilter   = document.getElementById('speciesFilter');
 const clearBtn = document.getElementById('clearBtn');
 const resultsInfo = document.getElementById('resultsInfo');
 const overlay = document.getElementById('modalOverlay');
@@ -549,27 +560,37 @@ function getImages(d) {
   return key.split('|').map(s => s.trim()).filter(Boolean);
 }
 
-function initCategories() {
-  categoryFilter.innerHTML = '<option value="">全部類別</option>';
-  [...new Set(DATA.map(d => d.category))].sort().forEach(cat => {
+function fillSelect(el, values, placeholder) {
+  el.innerHTML = `<option value="">${placeholder}</option>`;
+  [...new Set(values)].filter(Boolean).sort().forEach(v => {
     const opt = document.createElement('option');
-    opt.value = cat;
-    opt.textContent = cat;
-    categoryFilter.appendChild(opt);
+    opt.value = v; opt.textContent = v;
+    el.appendChild(opt);
   });
+}
+
+function initCategories() {
+  fillSelect(categoryFilter, DATA.map(d => d.category),  '全部屬');
+  fillSelect(subgenusFilter, DATA.map(d => d.subgenus),  '全部亞屬');
+  fillSelect(speciesFilter,  DATA.map(d => d.species),   '全部種');
 }
 
 function renderGrid() {
   const q = searchInput.value.trim().toLowerCase();
   const cat = categoryFilter.value;
 
+  const sub = subgenusFilter.value;
+  const sp  = speciesFilter.value;
+
   const filtered = DATA.filter(d => {
-    const matchQ = !q || d.name.toLowerCase().includes(q) || (d.sciName || '').toLowerCase().includes(q);
+    const matchQ   = !q   || d.name.toLowerCase().includes(q) || (d.sciName || '').toLowerCase().includes(q);
     const matchCat = !cat || d.category === cat;
-    return matchQ && matchCat;
+    const matchSub = !sub || d.subgenus === sub;
+    const matchSp  = !sp  || d.species  === sp;
+    return matchQ && matchCat && matchSub && matchSp;
   });
 
-  clearBtn.classList.toggle('visible', !!(q || cat));
+  clearBtn.classList.toggle('visible', !!(q || cat || sub || sp));
   resultsInfo.textContent = `共 ${filtered.length} 筆`;
   grid.innerHTML = '';
 
@@ -603,7 +624,7 @@ function renderGrid() {
 }
 
 function openModal(d) {
-  const FIXED = new Set(['id','name','sciName','category','date','emoji','image','number']);
+  const FIXED = new Set(['id','name','sciName','category','subgenus','species','date','emoji','image','number']);
   document.getElementById('mName').textContent = d.name;
   document.getElementById('mSci').textContent = d.sciName || '';
 
@@ -662,9 +683,13 @@ overlay.addEventListener('click', e => { if (e.target === overlay) closeModal();
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 searchInput.addEventListener('input', renderGrid);
 categoryFilter.addEventListener('change', renderGrid);
+subgenusFilter.addEventListener('change', renderGrid);
+speciesFilter.addEventListener('change', renderGrid);
 clearBtn.addEventListener('click', () => {
   searchInput.value = '';
   categoryFilter.value = '';
+  subgenusFilter.value = '';
+  speciesFilter.value  = '';
   renderGrid();
 });
 
