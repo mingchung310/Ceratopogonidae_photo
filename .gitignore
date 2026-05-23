@@ -1,0 +1,4 @@
+.claude/
+*.txt
+images/**/*.tif
+images/**/*.tiff
