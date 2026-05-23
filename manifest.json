@@ -1,31 +1,31 @@
 ﻿{
     "Cer46":  [
-                  "images/Cer46/0.Cer46 Head and Antenna.png",
+                  "images/Cer46/0.Cer46 Wings.png",
                   "images/Cer46/Cer46 Abdomen.png",
+                  "images/Cer46/Cer46 Head and Antenna.png",
                   "images/Cer46/Cer46 Legs 1.png",
                   "images/Cer46/Cer46 Legs 2.png",
                   "images/Cer46/Cer46 Lrgs 3.png",
-                  "images/Cer46/Cer46 Thorax.png",
-                  "images/Cer46/Cer46 Wings.png"
+                  "images/Cer46/Cer46 Thorax.png"
               ],
     "Cer13":  [
-                  "images/Cer13/0.Cer13 Head.png",
+                  "images/Cer13/0.Cer13 Wings.png",
                   "images/Cer13/Cer13 Abdomen.png",
+                  "images/Cer13/Cer13 Head.png",
                   "images/Cer13/Cer13 Legs 1.png",
                   "images/Cer13/Cer13 Legs 2.png",
                   "images/Cer13/Cer13 Legs 3.png",
-                  "images/Cer13/Cer13 Thorax 1.png",
-                  "images/Cer13/Cer13 Wings.png"
+                  "images/Cer13/Cer13 Thorax 1.png"
               ],
     "Cer42":  [
-                  "images/Cer42/0.Cer42 Head.png",
+                  "images/Cer42/0.Cer42 Wings.png",
                   "images/Cer42/Cer42 Abdonmen.png",
                   "images/Cer42/Cer42 Antenna 1.png",
                   "images/Cer42/Cer42 Antenna 2.png",
+                  "images/Cer42/Cer42 Head.png",
                   "images/Cer42/Cer42 Legs 1.png",
                   "images/Cer42/Cer42 Legs 2.png",
                   "images/Cer42/Cer42 Legs 3.png",
-                  "images/Cer42/Cer42 Thorax.png",
-                  "images/Cer42/Cer42 Wings.png"
+                  "images/Cer42/Cer42 Thorax.png"
               ]
 }
