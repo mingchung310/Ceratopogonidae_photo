@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>蠓科昆蟲標本圖鑑</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:   #0b0f1e;
+      --navy2:  #151b30;
+      --navy3:  #1e2740;
+      --gold:   #c9a84c;
+      --gold2:  #e8c96d;
+      --text:   #e8e4da;
+      --muted:  #8a9bb0;
+      --border: #2a3555;
+      --card-bg:#131929;
+    }
+
+    body {
+      background: var(--navy);
+      color: var(--text);
+      font-family: 'Noto Serif TC', 'Georgia', serif;
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      background: var(--navy2);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      height: 64px;
+    }
+
+    .site-title {
+      font-size: 1.2rem;
+      color: var(--gold);
+      letter-spacing: 0.1em;
+      white-space: nowrap;
+      text-decoration: none;
+    }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex: 1;
+      justify-content: flex-end;
+    }
+
+    .search-wrap {
+      position: relative;
+    }
+
+    .search-wrap svg {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      pointer-events: none;
+    }
+
+    #searchInput {
+      background: var(--navy3);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 6px;
+      padding: 0.4rem 0.75rem 0.4rem 2.2rem;
+      font-size: 0.9rem;
+      width: 200px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    #searchInput:focus { border-color: var(--gold); }
+
+    .filter-wrap { position: relative; }
+
+    #categoryFilter {
+      appearance: none;
+      background: var(--navy3);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 6px;
+      padding: 0.4rem 2rem 0.4rem 0.75rem;
+      font-size: 0.9rem;
+      cursor: pointer;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    #categoryFilter:focus { border-color: var(--gold); }
+
+    .filter-wrap::after {
+      content: '▾';
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      pointer-events: none;
+      font-size: 0.8rem;
+    }
+
+    #clearBtn {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      border-radius: 6px;
+      padding: 0.4rem 0.6rem;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: border-color 0.2s, color 0.2s;
+      display: none;
+    }
+
+    #clearBtn:hover { border-color: var(--gold); color: var(--gold); }
+    #clearBtn.visible { display: block; }
+
+    /* ── Hero ── */
+    .hero {
+      text-align: center;
+      padding: 3.5rem 1rem 2rem;
+    }
+
+    .hero h1 {
+      font-size: 2.2rem;
+      color: var(--gold);
+      letter-spacing: 0.15em;
+      margin-bottom: 0.6rem;
+    }
+
+    .hero p {
+      color: var(--muted);
+      font-size: 1rem;
+      letter-spacing: 0.05em;
+    }
+
+    /* ── Grid ── */
+    .grid-section {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1rem 2rem 4rem;
+    }
+
+    .results-info {
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1.25rem;
+    }
+
+    /* ── Card ── */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .card:hover {
+      transform: translateY(-3px);
+      border-color: var(--gold);
+      box-shadow: 0 6px 24px rgba(201,168,76,0.15);
+    }
+
+    .card-img {
+      width: 100%;
+      aspect-ratio: 4/3;
+      object-fit: cover;
+      background: var(--navy3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      font-size: 2.5rem;
+    }
+
+    .card-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .card-body {
+      padding: 0.9rem 1rem 1rem;
+    }
+
+    .card-name {
+      font-size: 1.05rem;
+      color: var(--text);
+      margin-bottom: 0.25rem;
+    }
+
+    .card-sci {
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-style: italic;
+      margin-bottom: 0.5rem;
+    }
+
+    .card-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 0.6rem;
+    }
+
+    .tag {
+      background: var(--navy3);
+      border: 1px solid var(--border);
+      color: var(--gold);
+      font-size: 0.72rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      letter-spacing: 0.03em;
+    }
+
+    .card-date {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    /* ── Empty state ── */
+    .empty {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 4rem 0;
+      color: var(--muted);
+    }
+
+    /* ── Modal ── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(5,8,18,0.85);
+      backdrop-filter: blur(4px);
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s;
+    }
+
+    .modal-overlay.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .modal {
+      background: var(--navy2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      max-width: 640px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      transform: translateY(16px);
+      transition: transform 0.25s;
+    }
+
+    .modal-overlay.open .modal { transform: translateY(0); }
+
+    .modal-header {
+      padding: 1.25rem 1.5rem 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .modal-header h2 {
+      font-size: 1.5rem;
+      color: var(--gold);
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 1.5rem;
+      cursor: pointer;
+      line-height: 1;
+      padding: 0.25rem;
+      transition: color 0.2s;
+    }
+
+    .modal-close:hover { color: var(--text); }
+
+    .modal-img {
+      width: 100%;
+      aspect-ratio: 16/9;
+      object-fit: cover;
+      background: var(--navy3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      font-size: 4rem;
+      margin: 1rem 0 0;
+    }
+
+    .modal-img img { width: 100%; height: 100%; object-fit: cover; }
+
+    .modal-body { padding: 1.25rem 1.5rem 1.75rem; }
+
+    .modal-sci {
+      font-style: italic;
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+    }
+
+    .modal-tags {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.2rem;
+    }
+
+    .modal-section { margin-bottom: 1rem; }
+
+    .modal-section h4 {
+      color: var(--gold);
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 0.4rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.3rem;
+    }
+
+    .modal-section p {
+      font-size: 0.93rem;
+      line-height: 1.8;
+      color: var(--text);
+    }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center;
+      padding: 1.5rem;
+      color: var(--muted);
+      font-size: 0.8rem;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 600px) {
+      .header-inner { flex-wrap: wrap; height: auto; padding: 0.75rem 0; }
+      #searchInput { width: 150px; }
+      .hero h1 { font-size: 1.6rem; }
+      .grid-section { padding: 1rem 1rem 4rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Header ── -->
+<header>
+  <div class="header-inner">
+    <a class="site-title" href="#">標本圖鑑</a>
+    <div class="header-controls">
+      <div class="search-wrap">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input id="searchInput" type="text" placeholder="搜尋名稱…" />
+      </div>
+      <div class="filter-wrap">
+        <select id="categoryFilter"><option value="">全部類別</option></select>
+      </div>
+      <button id="clearBtn" title="清除篩選">✕</button>
+    </div>
+  </div>
+</header>
+
+<!-- ── Hero ── -->
+<div class="hero">
+  <h1>標本圖鑑</h1>
+  <p>每一個標本，都值得被記錄</p>
+</div>
+
+<!-- ── Grid ── -->
+<section class="grid-section">
+  <p class="results-info" id="resultsInfo"></p>
+  <div class="grid" id="grid"></div>
+</section>
+
+<!-- ── Modal ── -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <h2 id="mName"></h2>
+      <button class="modal-close" id="modalClose">×</button>
+    </div>
+    <div class="modal-img" id="mImgWrap"></div>
+    <div class="modal-body">
+      <p class="modal-sci" id="mSci"></p>
+      <div class="modal-tags" id="mTags"></div>
+      <div class="modal-section"><h4>棲息環境</h4><p id="mHabitat"></p></div>
+      <div class="modal-section"><h4>分布地區</h4><p id="mRange"></p></div>
+      <div class="modal-section"><h4>採集方式</h4><p id="mMethod"></p></div>
+      <div class="modal-section"><h4>備註</h4><p id="mNote"></p></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Footer ── -->
+<footer>
+  標本圖鑑 © 作者名稱 · 持續收錄中
+</footer>
+
+<script>
+// ══════════════════════════════════════
+//  資料從 data.csv 載入，直接編輯那個檔案即可
+//  CSV 欄位順序：id,name,sciName,category,date,emoji,image,habitat,range,method,note
+// ══════════════════════════════════════
+
+function parseCSV(text) {
+  const lines = text.trim().split('\n');
+  const headers = lines[0].split(',');
+  return lines.slice(1).map(line => {
+    // 支援欄位內含逗號（用雙引號包住）
+    const cols = [];
+    let cur = '', inQ = false;
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      if (ch === '"') { inQ = !inQ; }
+      else if (ch === ',' && !inQ) { cols.push(cur); cur = ''; }
+      else { cur += ch; }
+    }
+    cols.push(cur);
+    const obj = {};
+    headers.forEach((h, i) => { obj[h.trim()] = (cols[i] || '').trim(); });
+    return obj;
+  });
+}
+
+// ══════════════════════════════════════
+//  以下為程式邏輯，通常不需更動
+// ══════════════════════════════════════
+
+const grid = document.getElementById('grid');
+const searchInput = document.getElementById('searchInput');
+const categoryFilter = document.getElementById('categoryFilter');
+const clearBtn = document.getElementById('clearBtn');
+const resultsInfo = document.getElementById('resultsInfo');
+const overlay = document.getElementById('modalOverlay');
+
+let DATA = [];
+
+function initCategories() {
+  categoryFilter.innerHTML = '<option value="">全部類別</option>';
+  [...new Set(DATA.map(d => d.category))].sort().forEach(cat => {
+    const opt = document.createElement('option');
+    opt.value = cat;
+    opt.textContent = cat;
+    categoryFilter.appendChild(opt);
+  });
+}
+
+function renderGrid() {
+  const q = searchInput.value.trim().toLowerCase();
+  const cat = categoryFilter.value;
+
+  const filtered = DATA.filter(d => {
+    const matchQ = !q || d.name.toLowerCase().includes(q) || (d.sciName || '').toLowerCase().includes(q);
+    const matchCat = !cat || d.category === cat;
+    return matchQ && matchCat;
+  });
+
+  clearBtn.classList.toggle('visible', !!(q || cat));
+  resultsInfo.textContent = `共 ${filtered.length} 筆`;
+  grid.innerHTML = '';
+
+  if (filtered.length === 0) {
+    grid.innerHTML = '<div class="empty">找不到符合的標本</div>';
+    return;
+  }
+
+  filtered.forEach(d => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <div class="card-img">
+        ${d.image
+          ? `<img src="${d.image}" alt="${d.name}" loading="lazy" />`
+          : d.emoji || '📦'}
+      </div>
+      <div class="card-body">
+        <div class="card-name">${d.name}</div>
+        <div class="card-sci">${d.sciName || ''}</div>
+        <div class="card-meta">
+          <span class="tag">${d.category}</span>
+          <span class="card-date">${d.date || ''}</span>
+        </div>
+      </div>`;
+    card.addEventListener('click', () => openModal(d));
+    grid.appendChild(card);
+  });
+}
+
+function openModal(d) {
+  document.getElementById('mName').textContent = d.name;
+  document.getElementById('mSci').textContent = d.sciName || '';
+  document.getElementById('mHabitat').textContent = d.habitat || '—';
+  document.getElementById('mRange').textContent = d.range || '—';
+  document.getElementById('mMethod').textContent = d.method || '—';
+  document.getElementById('mNote').textContent = d.note || '—';
+
+  const imgWrap = document.getElementById('mImgWrap');
+  imgWrap.innerHTML = d.image
+    ? `<img src="${d.image}" alt="${d.name}" />`
+    : d.emoji || '📦';
+
+  document.getElementById('mTags').innerHTML =
+    `<span class="tag">${d.category}</span><span class="tag">${d.date || ''}</span>`;
+
+  overlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  overlay.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.getElementById('modalClose').addEventListener('click', closeModal);
+overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+searchInput.addEventListener('input', renderGrid);
+categoryFilter.addEventListener('change', renderGrid);
+clearBtn.addEventListener('click', () => {
+  searchInput.value = '';
+  categoryFilter.value = '';
+  renderGrid();
+});
+
+// 載入 CSV
+grid.innerHTML = '<div class="empty">載入中…</div>';
+fetch('data.csv')
+  .then(r => { if (!r.ok) throw new Error('無法載入 data.csv'); return r.text(); })
+  .then(text => {
+    DATA = parseCSV(text);
+    initCategories();
+    renderGrid();
+  })
+  .catch(err => {
+    grid.innerHTML = `<div class="empty">資料載入失敗：${err.message}</div>`;
+  });
+</script>
+</body>
+</html>
