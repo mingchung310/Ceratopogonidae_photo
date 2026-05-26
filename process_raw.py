@@ -7,8 +7,8 @@ RAW 圖片處理流程
 步驟：
   1. 掃描 RAW image/ 下每個子資料夾（子資料夾名稱 = 標本編號，如 Cer7）
   2. 對每張圖片：
-       a. 計算感知雜湊，與 images/ 中所有圖片比對（重複則跳過）
-       b. 壓縮成 PNG，檔案大小 ≤ 600 KB
+       a. 計算感知雜湊，與同資料夾既有圖片比對（重複則跳過）
+       b. 轉成 PNG；本身已 < 200 KB 則不壓縮，否則壓縮至 ≤ 200 KB
        c. 存到 images/<標本ID>/
   3. 自動執行 build.ps1 更新 manifest.json 與 data.js
 
@@ -27,7 +27,7 @@ IMG_DIR  = BASE / "images"
 BUILD_PS = BASE / "build.ps1"
 
 SKIP_FILES = {"IMG_7000.JPG"}        # 比例尺參考圖，跳過
-MAX_BYTES  = 600 * 1024              # 600 KB
+MAX_BYTES  = 200 * 1024              # 200 KB
 RAW_EXTS   = {".jpg", ".jpeg", ".png", ".tif", ".tiff"}
 
 DRY_RUN = "--dry-run" in sys.argv
@@ -42,20 +42,28 @@ def phash(img: Image.Image) -> int:
 def hamming(a: int, b: int) -> int:
     return bin(a ^ b).count("1")
 
-def load_existing_hashes() -> dict:
-    """讀取 images/ 中所有 PNG 的感知雜湊"""
+def load_folder_hashes(folder_name: str) -> dict:
+    """讀取 images/<folder_name>/ 中所有 PNG 的感知雜湊（只比對同一資料夾）"""
     hashes = {}
-    for p in IMG_DIR.rglob("*.png"):
-        try:
-            hashes[p] = phash(Image.open(p))
-        except Exception:
-            pass
+    folder = IMG_DIR / folder_name
+    if folder.exists():
+        for p in sorted(folder.glob("*.png")):
+            try:
+                hashes[p] = phash(Image.open(p))
+            except Exception:
+                pass
     return hashes
 
-# ── PNG 壓縮，確保 ≤ 600 KB ─────────────────────────
+# ── PNG 壓縮，目標 ≤ 200 KB；本身已 < 200 KB 則不動 ──
 def compress_to_limit(img: Image.Image) -> bytes:
     img = img.convert("RGB")
     w, h = img.size
+    # 先試原尺寸，不做量化
+    buf = io.BytesIO()
+    img.save(buf, "PNG", optimize=True)
+    if buf.tell() <= MAX_BYTES:
+        return buf.getvalue()          # 已在 200 KB 以內，直接回傳
+    # 超過才開始量化 + 縮圖
     while True:
         buf = io.BytesIO()
         try:
@@ -77,80 +85,81 @@ print("=" * 56)
 print("  RAW 圖片處理流程" + ("  [DRY-RUN 預覽模式]" if DRY_RUN else ""))
 print("=" * 56)
 
-# 掃描既有圖片雜湊
-print("\n掃描 images/ 既有圖片雜湊值…")
-existing_hashes = load_existing_hashes()
-print(f"  找到 {len(existing_hashes)} 張既有圖片")
-
-# 收集 RAW 子資料夾中的圖片
-raw_images = []
+# 收集 RAW 子資料夾中的圖片（依資料夾分組）
+raw_by_folder: dict[str, list] = {}
 for folder in sorted(RAW_DIR.iterdir()):
     if not folder.is_dir() or folder.name == "output":
         continue
-    for p in sorted(folder.iterdir()):
-        if p.suffix.lower() in RAW_EXTS and p.name not in SKIP_FILES:
-            raw_images.append((folder.name, p))
+    imgs = [p for p in sorted(folder.iterdir())
+            if p.suffix.lower() in RAW_EXTS and p.name not in SKIP_FILES]
+    if imgs:
+        raw_by_folder[folder.name] = imgs
 
-if not raw_images:
+total = sum(len(v) for v in raw_by_folder.values())
+if not total:
     print("\n⚠ 沒有找到要處理的圖片。")
-    print(f"  請將圖片放在 RAW image/<標本ID>/ 子資料夾中，例如：")
-    print(f"  RAW image\\Cer7\\photo.jpg")
+    print("  請將圖片放在 RAW image/<標本ID>/ 子資料夾中，例如：")
+    print("  RAW image\\Cer7\\photo.jpg")
     sys.exit(0)
 
-print(f"\n找到 {len(raw_images)} 張 RAW 圖片，開始處理…\n")
+print(f"\n找到 {total} 張 RAW 圖片（{len(raw_by_folder)} 個資料夾），開始處理…\n")
 
 ok_count = dup_count = skip_count = err_count = 0
 
-for specimen_id, raw_path in raw_images:
-    out_folder = IMG_DIR / specimen_id
-    out_name   = raw_path.stem + ".png"
-    out_path   = out_folder / out_name
-    tag        = f"{specimen_id}/{out_name}"
+for specimen_id, raw_paths in raw_by_folder.items():
+    # 載入該資料夾既有圖片的雜湊（只在同資料夾內比對）
+    folder_hashes = load_folder_hashes(specimen_id)
 
-    # 已存在則跳過
-    if out_path.exists():
-        print(f"  SKIP  {tag}  (已存在)")
-        skip_count += 1
-        continue
+    for raw_path in raw_paths:
+        out_folder = IMG_DIR / specimen_id
+        out_name   = raw_path.stem + ".png"
+        out_path   = out_folder / out_name
+        tag        = f"{specimen_id}/{out_name}"
 
-    # 讀取圖片
-    try:
-        img = Image.open(raw_path)
-        new_h = phash(img)
-    except Exception as e:
-        print(f"  ERR   {raw_path.name}: {e}")
-        err_count += 1
-        continue
+        # 已存在則跳過
+        if out_path.exists():
+            print(f"  SKIP  {tag}  (已存在)")
+            skip_count += 1
+            continue
 
-    # 重複偵測
-    dup_path = None
-    for ex_path, ex_h in existing_hashes.items():
-        if hamming(new_h, ex_h) < 5:
-            dup_path = ex_path
-            break
-    if dup_path:
-        print(f"  DUP   {tag}")
-        print(f"        ≈ {dup_path.relative_to(BASE)}")
-        dup_count += 1
-        continue
-
-    # 壓縮與儲存
-    if not DRY_RUN:
+        # 讀取圖片
         try:
-            out_folder.mkdir(parents=True, exist_ok=True)
-            data = compress_to_limit(img)
-            out_path.write_bytes(data)
-            existing_hashes[out_path] = new_h
-            size_kb = len(data) / 1024
-            print(f"  OK    {tag}  ({size_kb:.0f} KB)")
+            img = Image.open(raw_path)
+            new_h = phash(img)
         except Exception as e:
-            print(f"  ERR   {tag}: {e}")
+            print(f"  ERR   {raw_path.name}: {e}")
             err_count += 1
             continue
-    else:
-        orig_kb = raw_path.stat().st_size / 1024
-        print(f"  [DRY] {tag}  (原始 {orig_kb:.0f} KB)")
-    ok_count += 1
+
+        # 重複偵測（只和同資料夾比）
+        dup_path = None
+        for ex_path, ex_h in folder_hashes.items():
+            if hamming(new_h, ex_h) < 5:
+                dup_path = ex_path
+                break
+        if dup_path:
+            print(f"  DUP   {tag}")
+            print(f"        ≈ {dup_path.relative_to(BASE)}")
+            dup_count += 1
+            continue
+
+        # 壓縮與儲存
+        if not DRY_RUN:
+            try:
+                out_folder.mkdir(parents=True, exist_ok=True)
+                data = compress_to_limit(img)
+                out_path.write_bytes(data)
+                folder_hashes[out_path] = new_h   # 加入同資料夾雜湊，避免本批次內重複
+                size_kb = len(data) / 1024
+                print(f"  OK    {tag}  ({size_kb:.0f} KB)")
+            except Exception as e:
+                print(f"  ERR   {tag}: {e}")
+                err_count += 1
+                continue
+        else:
+            orig_kb = raw_path.stat().st_size / 1024
+            print(f"  [DRY] {tag}  (原始 {orig_kb:.0f} KB)")
+        ok_count += 1
 
 # 結果摘要
 print()
