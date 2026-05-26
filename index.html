@@ -706,20 +706,20 @@ function decodeBuf(buf) {
   catch { return new TextDecoder('big5').decode(buf); }
 }
 
-const CSV_FILE = '玻片標本清單 (slide mount).csv';
+// Google Sheets 公開 CSV 匯出網址
+const GS_CSV_URL = 'https://docs.google.com/spreadsheets/d/1n8A-wMmJxdwwFjKDfL1jsj-Llcz3QQDXrHnJ2fNMNJ8/export?format=csv';
 
 grid.innerHTML = '<div class="empty">載入中…</div>';
 
 // 優先使用 data.js 嵌入資料（支援 file:// 直接開啟）
-// 若無則透過 fetch 載入（GitHub Pages / 本地伺服器）
+// 若無則從 Google Sheets 抓最新資料（GitHub Pages / 本地伺服器）
 let dataReady;
 if (window.EMBEDDED_DATA) {
-  // data.js 已嵌入純文字 CSV 與 manifest，直接使用
   dataReady = Promise.resolve([window.EMBEDDED_DATA.manifest, window.EMBEDDED_DATA.csv]);
 } else {
   const fetchManifest = fetch('manifest.json').then(r => r.ok ? r.json() : {}).catch(() => ({}));
-  const fetchCSV = fetch(CSV_FILE)
-    .then(r => { if (!r.ok) throw new Error(`無法載入 ${CSV_FILE}`); return r.arrayBuffer(); })
+  const fetchCSV = fetch(GS_CSV_URL)
+    .then(r => { if (!r.ok) throw new Error('無法載入 Google Sheets 資料'); return r.arrayBuffer(); })
     .then(buf => decodeBuf(buf));
   dataReady = Promise.all([fetchManifest, fetchCSV]);
 }
