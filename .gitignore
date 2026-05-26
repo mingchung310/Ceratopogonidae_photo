@@ -2,3 +2,7 @@
 *.txt
 images/**/*.tif
 images/**/*.tiff
+RAW image/
+detect_scale.py
+detect_scale2.py
+add_scalebar.py
