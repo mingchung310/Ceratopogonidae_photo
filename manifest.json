@@ -18,19 +18,19 @@
                  "images/Cer7/Cer7 Wings.png"
              ],
     "Cer32":  [
-                  "images/Cer32/IMG_7015.JPG"
+                  "images/Cer32/IMG_7015.png"
               ],
     "Cer59":  [
-                  "images/Cer59/IMG_7010.JPG"
+                  "images/Cer59/IMG_7010.png"
               ],
     "Cer25":  [
-                  "images/Cer25/IMG_7013.JPG"
+                  "images/Cer25/IMG_7013.png"
               ],
     "Cer6":  [
-                 "images/Cer6/IMG_7012.JPG"
+                 "images/Cer6/IMG_7012.png"
              ],
     "Cer47":  [
-                  "images/Cer47/IMG_7008.JPG"
+                  "images/Cer47/IMG_7008.png"
               ],
     "Cer15":  [
                   "images/Cer15/Cer15 Abdomen.png",
@@ -65,7 +65,6 @@
                   "images/Cer48/Cer48 Legs 1.png",
                   "images/Cer48/Cer48 Legs 2.png",
                   "images/Cer48/Cer48 Legs 3.png",
-                  "images/Cer48/Cer48 Thorax.png",
                   "images/Cer48/Cer48 Wings.png"
               ],
     "Cer21":  [
@@ -88,7 +87,7 @@
                   "images/Cer11/Cer11 Wings.png"
               ],
     "Cer35":  [
-                  "images/Cer35/IMG_6999.JPG"
+                  "images/Cer35/IMG_6999.png"
               ],
     "Cer17":  [
                   "images/Cer17/Cer17 Head.png",
@@ -99,7 +98,7 @@
                   "images/Cer17/Cer17 Wings.png"
               ],
     "Cer40":  [
-                  "images/Cer40/IMG_7014.JPG"
+                  "images/Cer40/IMG_7014.png"
               ],
     "Cer45":  [
                   "images/Cer45/Cer45 Abdomen.png",
@@ -139,13 +138,13 @@
                   "images/Cer19/Cer19 Wings.png"
               ],
     "Cer31":  [
-                  "images/Cer31/IMG_7003.JPG"
+                  "images/Cer31/IMG_7003.png"
               ],
     "Cer61":  [
-                  "images/Cer61/IMG_7001.JPG"
+                  "images/Cer61/IMG_7001.png"
               ],
     "Cer51":  [
-                  "images/Cer51/IMG_7017.JPG"
+                  "images/Cer51/IMG_7017.png"
               ],
     "Cer27":  [
                   "images/Cer27/Cer27 Abdomen.png",
@@ -157,7 +156,7 @@
                   "images/Cer27/Cer27 Wings.png"
               ],
     "Cer60":  [
-                  "images/Cer60/IMG_7009.JPG"
+                  "images/Cer60/IMG_7009.png"
               ],
     "Cer13":  [
                   "images/Cer13/0.Cer13 Wings.png",
@@ -171,7 +170,7 @@
                   "images/Cer13/Cer13 Wings.png"
               ],
     "Cer43":  [
-                  "images/Cer43/IMG_7002.JPG"
+                  "images/Cer43/IMG_7002.png"
               ],
     "Cer10":  [
                   "images/Cer10/Cer10 Abdomen.png",
@@ -204,7 +203,7 @@
                   "images/Cer14/Cer14 Wings.png"
               ],
     "Cer38":  [
-                  "images/Cer38/IMG_7016.JPG"
+                  "images/Cer38/IMG_7016.png"
               ],
     "Cer44":  [
                   "images/Cer44/Cer44 Abdomen.png",
@@ -241,6 +240,6 @@
                   "images/Cer42/Cer42 Wings.png"
               ],
     "Cer9":  [
-                 "images/Cer9/IMG_7011.JPG"
+                 "images/Cer9/IMG_7011.png"
              ]
 }
