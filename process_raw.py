@@ -8,10 +8,8 @@ RAW 圖片處理流程
   1. 掃描 RAW image/ 下每個子資料夾（子資料夾名稱 = 標本編號，如 Cer7）
   2. 對每張圖片：
        a. 計算感知雜湊，與 images/ 中所有圖片比對（重複則跳過）
-       b. 旋轉 180°
-       c. 加右下角 1mm 比例尺
-       d. 壓縮成 PNG，檔案大小 ≤ 600 KB
-       e. 存到 images/<標本ID>/
+       b. 壓縮成 PNG，檔案大小 ≤ 600 KB
+       c. 存到 images/<標本ID>/
   3. 自動執行 build.ps1 更新 manifest.json 與 data.js
 
 用法：
@@ -20,7 +18,7 @@ RAW 圖片處理流程
 """
 
 import pathlib, io, sys, subprocess
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image
 
 # ── 設定 ────────────────────────────────────────────────
 BASE     = pathlib.Path(__file__).parent
@@ -32,14 +30,9 @@ SKIP_FILES = {"IMG_7000.JPG"}        # 比例尺參考圖，跳過
 MAX_BYTES  = 600 * 1024              # 600 KB
 RAW_EXTS   = {".jpg", ".jpeg", ".png", ".tif", ".tiff"}
 
-# 比例尺參數（參考圖 6960px 寬，1mm = 1114px）
-REF_WIDTH   = 6960
-PX_PER_MM   = 1114
-SCALE_LABEL = "1 mm"
-
 DRY_RUN = "--dry-run" in sys.argv
 
-# ── 感知雜湊（64-bit average hash）────────────────────
+# ── 感知雜湊（64-bit average hash）─────────────────────
 def phash(img: Image.Image) -> int:
     small = img.convert("L").resize((8, 8), Image.LANCZOS)
     pixels = list(small.getdata())
@@ -59,48 +52,9 @@ def load_existing_hashes() -> dict:
             pass
     return hashes
 
-# ── 比例尺繪製 ───────────────────────────────────────
-def draw_scalebar(img: Image.Image) -> Image.Image:
-    img = img.convert("RGBA").rotate(180)
-    w, h = img.size
-    px_1mm  = round(PX_PER_MM * w / REF_WIDTH)
-    margin  = max(10, round(w * 0.03))
-    bar_h   = max(4,  round(w * 0.006))
-    font_sz = max(12, round(w * 0.022))
-
-    try:
-        font = ImageFont.truetype("arial.ttf", font_sz)
-    except Exception:
-        try:
-            font = ImageFont.truetype(r"C:\Windows\Fonts\calibri.ttf", font_sz)
-        except Exception:
-            font = ImageFont.load_default()
-
-    dummy = ImageDraw.Draw(Image.new("RGB", (1, 1)))
-    bbox  = dummy.textbbox((0, 0), SCALE_LABEL, font=font)
-    txt_w, txt_h = bbox[2] - bbox[0], bbox[3] - bbox[1]
-    gap = max(4, round(font_sz * 0.2))
-    pad = max(6, round(font_sz * 0.3))
-
-    total_w = max(px_1mm, txt_w) + pad * 2
-    total_h = bar_h + gap + txt_h + pad * 2
-    box_x   = w - margin - total_w
-    box_y   = h - margin - total_h
-
-    draw = ImageDraw.Draw(img, "RGBA")
-    draw.rectangle([box_x, box_y, box_x + total_w, box_y + total_h], fill=(0, 0, 0, 160))
-    bar_x = box_x + (total_w - px_1mm) // 2
-    bar_y = box_y + pad
-    draw.rectangle([bar_x, bar_y, bar_x + px_1mm, bar_y + bar_h], fill=(255, 255, 255, 255))
-    end_h = bar_h * 2
-    draw.rectangle([bar_x,              bar_y - end_h//2, bar_x + 2,          bar_y + bar_h + end_h//2], fill=(255,255,255,255))
-    draw.rectangle([bar_x + px_1mm - 2, bar_y - end_h//2, bar_x + px_1mm,     bar_y + bar_h + end_h//2], fill=(255,255,255,255))
-    draw.text((box_x + (total_w - txt_w) // 2, bar_y + bar_h + gap),
-              SCALE_LABEL, fill=(255, 255, 255, 255), font=font)
-    return img.convert("RGB")
-
 # ── PNG 壓縮，確保 ≤ 600 KB ─────────────────────────
 def compress_to_limit(img: Image.Image) -> bytes:
+    img = img.convert("RGB")
     w, h = img.size
     while True:
         buf = io.BytesIO()
@@ -180,12 +134,11 @@ for specimen_id, raw_path in raw_images:
         dup_count += 1
         continue
 
-    # 處理與儲存
+    # 壓縮與儲存
     if not DRY_RUN:
         try:
             out_folder.mkdir(parents=True, exist_ok=True)
-            processed = draw_scalebar(img)
-            data = compress_to_limit(processed)
+            data = compress_to_limit(img)
             out_path.write_bytes(data)
             existing_hashes[out_path] = new_h
             size_kb = len(data) / 1024
