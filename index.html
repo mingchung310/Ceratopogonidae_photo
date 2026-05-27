@@ -424,6 +424,12 @@
       <div class="filter-wrap">
         <select id="speciesFilter" class="filter-select"><option value="">全部種</option></select>
       </div>
+      <div class="filter-wrap">
+        <select id="wholeshotFilter" class="filter-select">
+          <option value="">全身照</option>
+          <option value="有">有全身照</option>
+        </select>
+      </div>
       <button id="clearBtn" title="清除篩選">✕</button>
     </div>
   </div>
@@ -518,6 +524,7 @@ function transformRow(r) {
     date:     (r['Col. Date'] || '').trim(),
     emoji:    '🦟',
     image:    num,   // 對應 manifest 資料夾名
+    全身照:   (r['全身照'] || '').trim(),
   };
 
   // Modal 顯示欄位（空值自動略過）
@@ -528,7 +535,7 @@ function transformRow(r) {
     '性別':    r['sex'],
     '數量':    r['total number'],
     '寄主':    r['Host'],
-    'DNA編號': r['DNA編號'],
+    'DNA_Coi': r['DNA_Coi'],
     '備註':    r['ps.'],
   };
   Object.entries(fields).forEach(([k, v]) => {
@@ -546,6 +553,7 @@ const searchInput = document.getElementById('searchInput');
 const categoryFilter  = document.getElementById('categoryFilter');
 const subgenusFilter  = document.getElementById('subgenusFilter');
 const speciesFilter   = document.getElementById('speciesFilter');
+const wholeshotFilter = document.getElementById('wholeshotFilter');
 const clearBtn = document.getElementById('clearBtn');
 const resultsInfo = document.getElementById('resultsInfo');
 const overlay = document.getElementById('modalOverlay');
@@ -578,21 +586,22 @@ function initCategories() {
 }
 
 function renderGrid() {
-  const q = searchInput.value.trim().toLowerCase();
+  const q  = searchInput.value.trim().toLowerCase();
   const cat = categoryFilter.value;
-
   const sub = subgenusFilter.value;
   const sp  = speciesFilter.value;
+  const ws  = wholeshotFilter.value;
 
   const filtered = DATA.filter(d => {
     const matchQ   = !q   || d.name.toLowerCase().includes(q) || (d.sciName || '').toLowerCase().includes(q);
     const matchCat = !cat || d.category === cat;
     const matchSub = !sub || d.subgenus === sub;
     const matchSp  = !sp  || `${d.category} ${d.species}` === sp;
-    return matchQ && matchCat && matchSub && matchSp;
+    const matchWS  = !ws  || (d.全身照 && d.全身照 !== '');
+    return matchQ && matchCat && matchSub && matchSp && matchWS;
   });
 
-  clearBtn.classList.toggle('visible', !!(q || cat || sub || sp));
+  clearBtn.classList.toggle('visible', !!(q || cat || sub || sp || ws));
   resultsInfo.textContent = `共 ${filtered.length} 筆`;
   grid.innerHTML = '';
 
@@ -626,7 +635,7 @@ function renderGrid() {
 }
 
 function openModal(d) {
-  const FIXED = new Set(['id','name','sciName','category','subgenus','species','date','emoji','image','number']);
+  const FIXED = new Set(['id','name','sciName','category','subgenus','species','date','emoji','image','number','全身照']);
   document.getElementById('mName').textContent = d.name;
   document.getElementById('mSci').textContent = d.sciName || '';
 
@@ -688,12 +697,14 @@ categoryFilter.addEventListener('change', renderGrid);
 subgenusFilter.addEventListener('change', renderGrid);
 speciesFilter.addEventListener('change', renderGrid);
 clearBtn.addEventListener('click', () => {
-  searchInput.value = '';
+  searchInput.value    = '';
   categoryFilter.value = '';
   subgenusFilter.value = '';
   speciesFilter.value  = '';
+  wholeshotFilter.value = '';
   renderGrid();
 });
+wholeshotFilter.addEventListener('change', renderGrid);
 
 // 自動偵測 UTF-8 / Big5 編碼
 function decodeBuf(buf) {
