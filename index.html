@@ -125,7 +125,9 @@
       border-radius: 6px;
       padding: 0.4rem 0.6rem;
       cursor: pointer;
-      font-size: 0.85rem;
+      font-size: 0.82rem;
+      width: 100%;
+      margin-top: 0.4rem;
       transition: border-color 0.2s, color 0.2s;
       display: none;
     }
@@ -152,11 +154,50 @@
       letter-spacing: 0.05em;
     }
 
-    /* ── Grid ── */
-    .grid-section {
+    /* ── Content layout ── */
+    .content-wrap {
       max-width: 1200px;
       margin: 0 auto;
       padding: 1rem 2rem 4rem;
+      display: flex;
+      gap: 1.5rem;
+      align-items: flex-start;
+    }
+
+    /* ── Filter sidebar ── */
+    .filter-panel {
+      width: 148px;
+      flex-shrink: 0;
+      position: sticky;
+      top: 80px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .filter-title {
+      color: var(--gold);
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding-bottom: 0.4rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 0.15rem;
+    }
+
+    .filter-label {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 0.3rem;
+    }
+
+    .filter-panel .filter-wrap { position: relative; }
+    .filter-panel .filter-select { width: 100%; max-width: 100%; }
+
+    /* ── Grid ── */
+    .grid-section {
+      flex: 1;
+      min-width: 0;
     }
 
     .results-info {
@@ -394,11 +435,22 @@
     }
 
     /* ── Responsive ── */
-    @media (max-width: 600px) {
+    @media (max-width: 700px) {
       .header-inner { flex-wrap: wrap; height: auto; padding: 0.75rem 0; }
       #searchInput { width: 150px; }
       .hero h1 { font-size: 1.6rem; }
-      .grid-section { padding: 1rem 1rem 4rem; }
+      .content-wrap { flex-direction: column; padding: 1rem 1rem 4rem; gap: 1rem; }
+      .filter-panel {
+        width: 100%;
+        position: static;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+      .filter-title { width: 100%; }
+      .filter-label { display: none; }
+      .filter-panel .filter-wrap { flex: 1; min-width: 120px; }
+      #clearBtn { width: auto; margin-top: 0; }
     }
   </style>
 </head>
@@ -415,22 +467,6 @@
         </svg>
         <input id="searchInput" type="text" placeholder="搜尋名稱…" />
       </div>
-      <div class="filter-wrap">
-        <select id="categoryFilter" class="filter-select"><option value="">全部屬</option></select>
-      </div>
-      <div class="filter-wrap">
-        <select id="subgenusFilter" class="filter-select"><option value="">全部亞屬</option></select>
-      </div>
-      <div class="filter-wrap">
-        <select id="speciesFilter" class="filter-select"><option value="">全部種</option></select>
-      </div>
-      <div class="filter-wrap">
-        <select id="wholeshotFilter" class="filter-select">
-          <option value="">全身照</option>
-          <option value="有">有全身照</option>
-        </select>
-      </div>
-      <button id="clearBtn" title="清除篩選">✕</button>
     </div>
   </div>
 </header>
@@ -441,11 +477,42 @@
   <p>台灣大學寄生蟲實驗室</p>
 </div>
 
-<!-- ── Grid ── -->
-<section class="grid-section">
-  <p class="results-info" id="resultsInfo"></p>
-  <div class="grid" id="grid"></div>
-</section>
+<!-- ── Content ── -->
+<div class="content-wrap">
+  <aside class="filter-panel">
+    <p class="filter-title">篩選</p>
+
+    <span class="filter-label">屬</span>
+    <div class="filter-wrap">
+      <select id="categoryFilter" class="filter-select"><option value="">全部</option></select>
+    </div>
+
+    <span class="filter-label">亞屬</span>
+    <div class="filter-wrap">
+      <select id="subgenusFilter" class="filter-select"><option value="">全部</option></select>
+    </div>
+
+    <span class="filter-label">種</span>
+    <div class="filter-wrap">
+      <select id="speciesFilter" class="filter-select"><option value="">全部</option></select>
+    </div>
+
+    <span class="filter-label">全身照</span>
+    <div class="filter-wrap">
+      <select id="wholeshotFilter" class="filter-select">
+        <option value="">全部</option>
+        <option value="Y">有全身照</option>
+      </select>
+    </div>
+
+    <button id="clearBtn" title="清除篩選">✕ 清除篩選</button>
+  </aside>
+
+  <section class="grid-section">
+    <p class="results-info" id="resultsInfo"></p>
+    <div class="grid" id="grid"></div>
+  </section>
+</div>
 
 <!-- ── Modal ── -->
 <div class="modal-overlay" id="modalOverlay">
@@ -597,7 +664,7 @@ function renderGrid() {
     const matchCat = !cat || d.category === cat;
     const matchSub = !sub || d.subgenus === sub;
     const matchSp  = !sp  || `${d.category} ${d.species}` === sp;
-    const matchWS  = !ws  || (d.全身照 && d.全身照 !== '');
+    const matchWS  = !ws  || d.全身照 === 'Y';
     return matchQ && matchCat && matchSub && matchSp && matchWS;
   });
 
