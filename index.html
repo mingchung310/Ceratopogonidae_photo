@@ -597,7 +597,7 @@ function transformRow(r) {
     emoji:    '🦟',
     image:    num,   // 對應 manifest 資料夾名
     全身照:   (r['全身照'] || '').trim(),
-    性別:     (r['sex']    || '').trim(),
+    _sex:     (r['sex']    || '').trim(),  // 供篩選用，不直接顯示
   };
 
   // Modal 顯示欄位（空值自動略過）
@@ -656,7 +656,7 @@ function initCategories() {
   fillSelect(categoryFilter, DATA.map(d => d.category),  '全部屬');
   fillSelect(subgenusFilter, DATA.map(d => d.subgenus),  '全部亞屬');
   fillSelect(speciesFilter,  DATA.map(d => d.species ? `${d.category} ${d.species}` : ''), '全部種');
-  fillSelect(genderFilter,   DATA.map(d => d.性別),      '全部');
+  fillSelect(genderFilter,   DATA.map(d => d._sex),      '全部');
 }
 
 function renderGrid() {
@@ -673,7 +673,7 @@ function renderGrid() {
     const matchSub = !sub || d.subgenus === sub;
     const matchSp  = !sp  || `${d.category} ${d.species}` === sp;
     const matchWS  = !ws  || d.全身照 === 'Y';
-    const matchGen = !gen || d.性別 === gen;
+    const matchGen = !gen || d._sex === gen;
     return matchQ && matchCat && matchSub && matchSp && matchWS && matchGen;
   });
 
@@ -711,7 +711,7 @@ function renderGrid() {
 }
 
 function openModal(d) {
-  const FIXED = new Set(['id','name','sciName','category','subgenus','species','date','emoji','image','number','全身照','性別']);
+  const FIXED = new Set(['id','name','sciName','category','subgenus','species','date','emoji','image','number','全身照','_sex']);
   document.getElementById('mName').textContent = d.name;
   document.getElementById('mSci').textContent = d.sciName || '';
 
