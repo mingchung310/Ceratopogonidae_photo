@@ -79,7 +79,8 @@ class App(tk.Tk):
         super().__init__()
         self.title("蠓科標本影像維護工具")
         self.minsize(560, 540)
-        self._files: list[pathlib.Path] = []
+        self._files:   list[pathlib.Path] = []   # 單一資料夾模式
+        self._batches: dict[str, list]    = {}   # 批次模式 {spec_id: [files]}
         self._build_ui()
 
     def _build_ui(self):
@@ -102,9 +103,13 @@ class App(tk.Tk):
         top.pack(fill="x")
         ttk.Label(top, text="目標資料夾：").pack(side="left")
         self.spec_var = tk.StringVar()
-        ttk.Entry(top, textvariable=self.spec_var, width=10).pack(side="left", padx=6)
+        self.spec_entry = ttk.Entry(top, textvariable=self.spec_var, width=10)
+        self.spec_entry.pack(side="left", padx=6)
         ttk.Label(top, text="（如 Cer55）", foreground="gray").pack(side="left")
-        ttk.Button(top, text="選取照片資料夾", command=self._pick_folder).pack(side="right")
+        ttk.Button(top, text="批次（上層資料夾）",
+                   command=self._pick_parent).pack(side="right", padx=(4, 0))
+        ttk.Button(top, text="選取照片資料夾",
+                   command=self._pick_folder).pack(side="right")
 
         self.folder_lbl = ttk.Label(f2, text="尚未選取", foreground="gray")
         self.folder_lbl.pack(anchor="w", pady=4)
@@ -188,6 +193,7 @@ class App(tk.Tk):
     # ── 2. 壓縮照片 ──────────────────────────────────────────────────────────
 
     def _pick_folder(self):
+        """單一資料夾模式"""
         folder = filedialog.askdirectory(title="選取包含照片的資料夾")
         if not folder:
             return
@@ -196,9 +202,11 @@ class App(tk.Tk):
         if not files:
             messagebox.showwarning("無圖片", "資料夾中找不到 JPG / PNG / TIF 圖片")
             return
-        self._files = files
+        self._files   = files
+        self._batches = {}
         if not self.spec_var.get():
             self.spec_var.set(folder.name)
+        self.spec_entry.config(state="normal")
         self.folder_lbl.config(
             text=f"{folder.name}/  （{len(files)} 張）", foreground="black")
         self.listbox.delete(0, "end")
@@ -207,20 +215,51 @@ class App(tk.Tk):
         self._set_state(self.compress_btn, "normal")
         self._log(f"▶ 已選取：{folder}（{len(files)} 張）")
 
-    def _compress(self):
-        spec_id = self.spec_var.get().strip()
-        if not spec_id:
-            messagebox.showerror("缺少名稱", "請輸入目標資料夾名稱（例如 Cer55）")
+    def _pick_parent(self):
+        """批次模式：選上層資料夾，每個子資料夾視為一個標本"""
+        parent = filedialog.askdirectory(title="選取上層資料夾（每個子資料夾為一個標本）")
+        if not parent:
+            return
+        parent = pathlib.Path(parent)
+        batches = {}
+        for sub in sorted(parent.iterdir()):
+            if not sub.is_dir() or sub.name.lower() == "output":
+                continue
+            files = sorted(f for f in sub.iterdir() if f.suffix.lower() in IMG_EXTS)
+            if files:
+                batches[sub.name] = files
+
+        if not batches:
+            messagebox.showwarning("無子資料夾", "所選資料夾中找不到含圖片的子資料夾")
             return
 
-        self._log(f"\n▶ 壓縮照片 → images/{spec_id}/")
-        self._set_state(self.compress_btn, "disabled")
+        self._batches = batches
+        self._files   = []
+        self.spec_var.set("")
+        self.spec_entry.config(state="disabled")   # 批次模式不需輸入 ID
 
+        total = sum(len(v) for v in batches.values())
+        self.folder_lbl.config(
+            text=f"批次：{parent.name}/  （{len(batches)} 個標本，共 {total} 張）",
+            foreground="black")
+        self.listbox.delete(0, "end")
+        for spec_id, files in batches.items():
+            self.listbox.insert("end", f"── {spec_id}/ ──")
+            for f in files:
+                self.listbox.insert("end", f"   {f.name}")
+        self._set_state(self.compress_btn, "normal")
+        self._log(f"▶ 批次選取：{parent}（{len(batches)} 個標本，共 {total} 張）")
+
+    # ── 壓縮核心（單一標本）────────────────────────────────────────────────────
+
+    def _do_compress_one(self, spec_id: str, files: list) -> int:
+        """壓縮並放入 images/<spec_id>/，回傳新增數量"""
+        self._log(f"\n  ── {spec_id} ──")
         hashes     = existing_hashes(spec_id)
         out_folder = IMG_DIR / spec_id
         ok = dup = skip = err = 0
 
-        for raw in self._files:
+        for raw in files:
             out_name = raw.stem + ".png"
             out_path = out_folder / out_name
             tag      = f"{spec_id}/{out_name}"
@@ -254,11 +293,33 @@ class App(tk.Tk):
                 self._log(f"  ERR   {tag}: {e}")
                 err += 1
 
-        self._log(f"\n  新增 {ok}  |  重複跳過 {dup}  |  已存在跳過 {skip}  |  錯誤 {err}")
+        self._log(f"  新增 {ok}  |  重複跳過 {dup}  |  已存在跳過 {skip}  |  錯誤 {err}")
+        return ok
 
-        if ok > 0:
+    def _compress(self):
+        self._set_state(self.compress_btn, "disabled")
+
+        if self._batches:
+            # ── 批次模式 ────────────────────────────────────────────────
+            self._log(f"\n▶ 批次壓縮 {len(self._batches)} 個標本 …")
+            total_ok = sum(
+                self._do_compress_one(spec_id, files)
+                for spec_id, files in self._batches.items()
+            )
+        else:
+            # ── 單一模式 ────────────────────────────────────────────────
+            spec_id = self.spec_var.get().strip()
+            if not spec_id:
+                self.after(0, lambda: messagebox.showerror(
+                    "缺少名稱", "請輸入目標資料夾名稱（例如 Cer55）"))
+                self._set_state(self.compress_btn, "normal")
+                return
+            self._log(f"\n▶ 壓縮照片 → images/{spec_id}/")
+            total_ok = self._do_compress_one(spec_id, self._files)
+
+        if total_ok > 0:
             n = rebuild_manifest()
-            self._log(f"  manifest.json 已更新（{n} 個資料夾）")
+            self._log(f"\n  manifest.json 已更新（{n} 個資料夾）")
             self._log("✓ 完成，可前往步驟 3 同步到 GitHub")
 
         self._set_state(self.compress_btn, "normal")
