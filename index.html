@@ -285,6 +285,12 @@
       color: var(--muted);
     }
 
+    .tag-whole {
+      background: var(--navy3);
+      border-color: var(--gold2);
+      color: var(--gold2);
+    }
+
     /* ── Empty state ── */
     .empty {
       grid-column: 1 / -1;
@@ -693,6 +699,7 @@ function renderGrid() {
         <div class="card-sci">${d.sciName || ''}</div>
         <div class="card-meta">
           <span class="tag">${d.category}</span>
+          ${d.全身照 === 'Y' ? '<span class="tag tag-whole">全身照</span>' : ''}
           <span class="card-date">${d.date || ''}</span>
         </div>
       </div>`;
