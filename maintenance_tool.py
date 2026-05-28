@@ -184,11 +184,12 @@ class App(tk.Tk):
 
     def _set_progress(self, value: int, total: int, msg: str = ""):
         """切換為確定進度並更新值"""
+        pct = round(value / total * 100) if total else 0
         def _():
             self.progress.stop()
             self.progress.config(mode="determinate", maximum=total, value=value)
-            if msg:
-                self.status_lbl.config(text=msg, foreground="#c9a84c")
+            label = f"{msg}  {pct}%" if msg else f"{value}/{total}  {pct}%"
+            self.status_lbl.config(text=label, foreground="#c9a84c")
         self.after(0, _)
 
     def _idle(self, msg: str = "待命"):
