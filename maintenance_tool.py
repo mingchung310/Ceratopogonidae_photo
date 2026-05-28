@@ -225,7 +225,10 @@ class App(tk.Tk):
         for sub in sorted(parent.iterdir()):
             if not sub.is_dir() or sub.name.lower() == "output":
                 continue
-            files = sorted(f for f in sub.iterdir() if f.suffix.lower() in IMG_EXTS)
+            try:
+                files = sorted(f for f in sub.iterdir() if f.suffix.lower() in IMG_EXTS)
+            except PermissionError:
+                continue
             if files:
                 batches[sub.name] = files
 
