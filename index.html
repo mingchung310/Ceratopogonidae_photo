@@ -497,6 +497,11 @@
       <select id="speciesFilter" class="filter-select"><option value="">全部</option></select>
     </div>
 
+    <span class="filter-label">性別</span>
+    <div class="filter-wrap">
+      <select id="genderFilter" class="filter-select"><option value="">全部</option></select>
+    </div>
+
     <span class="filter-label">全身照</span>
     <div class="filter-wrap">
       <select id="wholeshotFilter" class="filter-select">
@@ -592,18 +597,18 @@ function transformRow(r) {
     emoji:    '🦟',
     image:    num,   // 對應 manifest 資料夾名
     全身照:   (r['全身照'] || '').trim(),
+    性別:     (r['sex']    || '').trim(),
   };
 
   // Modal 顯示欄位（空值自動略過）
   const fields = {
-    '採集地':  r['Locality'],
-    '採集者':  r['Collector'],
-    'GPS':     lat && lon ? `${lat}, ${lon}` : '',
-    '性別':    r['sex'],
-    '數量':    r['total number'],
-    '寄主':    r['Host'],
-    'DNA_Coi': r['DNA_Coi'],
-    '備註':    r['ps.'],
+    '採集地':    r['Locality'],
+    '採集者':    r['Collector'],
+    'GPS':       lat && lon ? `${lat}, ${lon}` : '',
+    '寄主':      r['Host'],
+    'DNA_Coi':   r['DNA_Coi'],
+    '性別':      r['sex'],
+    '鑑定者':    r['det.'],
   };
   Object.entries(fields).forEach(([k, v]) => {
     if (v && v.trim()) obj[k] = v.trim();
@@ -620,6 +625,7 @@ const searchInput = document.getElementById('searchInput');
 const categoryFilter  = document.getElementById('categoryFilter');
 const subgenusFilter  = document.getElementById('subgenusFilter');
 const speciesFilter   = document.getElementById('speciesFilter');
+const genderFilter    = document.getElementById('genderFilter');
 const wholeshotFilter = document.getElementById('wholeshotFilter');
 const clearBtn = document.getElementById('clearBtn');
 const resultsInfo = document.getElementById('resultsInfo');
@@ -650,6 +656,7 @@ function initCategories() {
   fillSelect(categoryFilter, DATA.map(d => d.category),  '全部屬');
   fillSelect(subgenusFilter, DATA.map(d => d.subgenus),  '全部亞屬');
   fillSelect(speciesFilter,  DATA.map(d => d.species ? `${d.category} ${d.species}` : ''), '全部種');
+  fillSelect(genderFilter,   DATA.map(d => d.性別),      '全部');
 }
 
 function renderGrid() {
@@ -658,6 +665,7 @@ function renderGrid() {
   const sub = subgenusFilter.value;
   const sp  = speciesFilter.value;
   const ws  = wholeshotFilter.value;
+  const gen = genderFilter.value;
 
   const filtered = DATA.filter(d => {
     const matchQ   = !q   || d.name.toLowerCase().includes(q) || (d.sciName || '').toLowerCase().includes(q);
@@ -665,10 +673,11 @@ function renderGrid() {
     const matchSub = !sub || d.subgenus === sub;
     const matchSp  = !sp  || `${d.category} ${d.species}` === sp;
     const matchWS  = !ws  || d.全身照 === 'Y';
-    return matchQ && matchCat && matchSub && matchSp && matchWS;
+    const matchGen = !gen || d.性別 === gen;
+    return matchQ && matchCat && matchSub && matchSp && matchWS && matchGen;
   });
 
-  clearBtn.classList.toggle('visible', !!(q || cat || sub || sp || ws));
+  clearBtn.classList.toggle('visible', !!(q || cat || sub || sp || ws || gen));
   resultsInfo.textContent = `共 ${filtered.length} 筆`;
   grid.innerHTML = '';
 
@@ -702,7 +711,7 @@ function renderGrid() {
 }
 
 function openModal(d) {
-  const FIXED = new Set(['id','name','sciName','category','subgenus','species','date','emoji','image','number','全身照']);
+  const FIXED = new Set(['id','name','sciName','category','subgenus','species','date','emoji','image','number','全身照','性別']);
   document.getElementById('mName').textContent = d.name;
   document.getElementById('mSci').textContent = d.sciName || '';
 
@@ -769,9 +778,11 @@ clearBtn.addEventListener('click', () => {
   subgenusFilter.value = '';
   speciesFilter.value  = '';
   wholeshotFilter.value = '';
+  genderFilter.value    = '';
   renderGrid();
 });
 wholeshotFilter.addEventListener('change', renderGrid);
+genderFilter.addEventListener('change', renderGrid);
 
 // 自動偵測 UTF-8 / Big5 編碼
 function decodeBuf(buf) {
