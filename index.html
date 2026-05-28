@@ -796,10 +796,11 @@ const GS_CSV_URL = 'https://docs.google.com/spreadsheets/d/1n8A-wMmJxdwwFjKDfL1j
 
 grid.innerHTML = '<div class="empty">載入中…</div>';
 
-// 優先使用 data.js 嵌入資料（支援 file:// 直接開啟）
-// 若無則從 Google Sheets 抓最新資料（GitHub Pages / 本地伺服器）
+// file:// 離線開啟 → 使用 data.js 嵌入資料
+// 線上（GitHub Pages / 本地伺服器）→ 直接從 Google Sheets 抓最新資料
+const isOffline = window.location.protocol === 'file:';
 let dataReady;
-if (window.EMBEDDED_DATA) {
+if (isOffline && window.EMBEDDED_DATA) {
   dataReady = Promise.resolve([window.EMBEDDED_DATA.manifest, window.EMBEDDED_DATA.csv]);
 } else {
   const fetchManifest = fetch('manifest.json').then(r => r.ok ? r.json() : {}).catch(() => ({}));
