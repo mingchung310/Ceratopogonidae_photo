@@ -136,6 +136,14 @@ class App(tk.Tk):
                    command=lambda: self._bg(self._sync_github)
                    ).pack(anchor="w", pady=(8, 0))
 
+        # ── 進度 ─────────────────────────────────────────────────────────
+        pf = ttk.Frame(self)
+        pf.pack(fill="x", padx=12, pady=(0, 2))
+        self.status_lbl = ttk.Label(pf, text="待命", foreground="gray", font=("", 9))
+        self.status_lbl.pack(anchor="w")
+        self.progress = ttk.Progressbar(pf, mode="indeterminate")
+        self.progress.pack(fill="x", pady=(2, 0))
+
         # ── 日誌 ─────────────────────────────────────────────────────────
         lf2 = ttk.LabelFrame(self, text=" 執行日誌 ", padding=6)
         lf2.pack(fill="both", expand=True, **P)
@@ -166,6 +174,31 @@ class App(tk.Tk):
     def _set_state(self, btn, state):
         self.after(0, lambda: btn.config(state=state))
 
+    def _busy(self, msg: str):
+        """開始不定進度（跑馬燈）"""
+        def _():
+            self.status_lbl.config(text=msg, foreground="#c9a84c")
+            self.progress.config(mode="indeterminate")
+            self.progress.start(12)
+        self.after(0, _)
+
+    def _set_progress(self, value: int, total: int, msg: str = ""):
+        """切換為確定進度並更新值"""
+        def _():
+            self.progress.stop()
+            self.progress.config(mode="determinate", maximum=total, value=value)
+            if msg:
+                self.status_lbl.config(text=msg, foreground="#c9a84c")
+        self.after(0, _)
+
+    def _idle(self, msg: str = "待命"):
+        """操作結束，重置進度條"""
+        def _():
+            self.progress.stop()
+            self.progress.config(mode="determinate", value=0)
+            self.status_lbl.config(text=msg, foreground="gray")
+        self.after(0, _)
+
     def _run_ps(self) -> bool:
         r = subprocess.run(
             ["powershell", "-ExecutionPolicy", "Bypass", "-File", str(BUILD_PS)],
@@ -186,9 +219,11 @@ class App(tk.Tk):
     # ── 1. Google Sheets 同步 ────────────────────────────────────────────────
 
     def _sync_sheets(self):
+        self._busy("同步 Google Sheets 中…")
         self._log("\n▶ 同步 Google Sheets …")
         ok = self._run_ps()
         self._log("✓ 完成，本機離線版已更新" if ok else "✗ 失敗，請確認網路連線")
+        self._idle("✓ 同步完成" if ok else "✗ 同步失敗")
 
     # ── 2. 壓縮照片 ──────────────────────────────────────────────────────────
 
@@ -255,14 +290,16 @@ class App(tk.Tk):
 
     # ── 壓縮核心（單一標本）────────────────────────────────────────────────────
 
-    def _do_compress_one(self, spec_id: str, files: list) -> int:
+    def _do_compress_one(self, spec_id: str, files: list, on_progress=None) -> int:
         """壓縮並放入 images/<spec_id>/，回傳新增數量"""
         self._log(f"\n  ── {spec_id} ──")
         hashes     = existing_hashes(spec_id)
         out_folder = IMG_DIR / spec_id
         ok = dup = skip = err = 0
 
-        for raw in files:
+        for i, raw in enumerate(files):
+            if on_progress:
+                on_progress(spec_id, i)
             out_name = raw.stem + ".png"
             out_path = out_folder / out_name
             tag      = f"{spec_id}/{out_name}"
@@ -304,9 +341,15 @@ class App(tk.Tk):
 
         if self._batches:
             # ── 批次模式 ────────────────────────────────────────────────
-            self._log(f"\n▶ 批次壓縮 {len(self._batches)} 個標本 …")
+            total_files = sum(len(v) for v in self._batches.values())
+            self._log(f"\n▶ 批次壓縮 {len(self._batches)} 個標本（共 {total_files} 張）…")
+            done = [0]
+            def on_progress(spec_id, i):
+                done[0] += 1
+                self._set_progress(done[0], total_files,
+                                   f"壓縮中：{spec_id}  {done[0]}/{total_files}")
             total_ok = sum(
-                self._do_compress_one(spec_id, files)
+                self._do_compress_one(spec_id, files, on_progress)
                 for spec_id, files in self._batches.items()
             )
         else:
@@ -317,19 +360,29 @@ class App(tk.Tk):
                     "缺少名稱", "請輸入目標資料夾名稱（例如 Cer55）"))
                 self._set_state(self.compress_btn, "normal")
                 return
-            self._log(f"\n▶ 壓縮照片 → images/{spec_id}/")
-            total_ok = self._do_compress_one(spec_id, self._files)
+            total_files = len(self._files)
+            self._log(f"\n▶ 壓縮照片 → images/{spec_id}/（共 {total_files} 張）")
+            done = [0]
+            def on_progress(sid, i):
+                done[0] += 1
+                self._set_progress(done[0], total_files,
+                                   f"壓縮中：{sid}  {done[0]}/{total_files}")
+            total_ok = self._do_compress_one(spec_id, self._files, on_progress)
 
         if total_ok > 0:
             n = rebuild_manifest()
             self._log(f"\n  manifest.json 已更新（{n} 個資料夾）")
             self._log("✓ 完成，可前往步驟 3 同步到 GitHub")
+            self._idle("✓ 壓縮完成")
+        else:
+            self._idle("完成（無新增）")
 
         self._set_state(self.compress_btn, "normal")
 
     # ── 3. 同步到 GitHub ─────────────────────────────────────────────────────
 
     def _sync_github(self):
+        self._busy("同步到 GitHub 中…")
         self._log("\n▶ 同步 images/ 到 GitHub …")
 
         # 更新 manifest 確保與磁碟一致（含刪除）
@@ -351,6 +404,7 @@ class App(tk.Tk):
         ok = self._git("push")
         self._log("✓ 同步完成！網站約 1～2 分鐘後更新。"
                   if ok else "✗ push 失敗，請確認網路與 git 設定")
+        self._idle("✓ 同步完成" if ok else "✗ push 失敗")
 
 
 if __name__ == "__main__":
