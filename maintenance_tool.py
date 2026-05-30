@@ -212,8 +212,10 @@ class App(tk.Tk):
 
     def _git(self, *args) -> bool:
         r = subprocess.run(["git"] + list(args), capture_output=True,
-                           text=True, cwd=str(BASE))
-        for line in (r.stdout + r.stderr).strip().splitlines():
+                           text=True, encoding="utf-8", errors="replace",
+                           cwd=str(BASE))
+        out = (r.stdout or "") + (r.stderr or "")
+        for line in out.strip().splitlines():
             self._log(f"  {line}")
         return r.returncode == 0
 
@@ -383,29 +385,64 @@ class App(tk.Tk):
     # ── 3. 同步到 GitHub ─────────────────────────────────────────────────────
 
     def _sync_github(self):
-        self._busy("同步到 GitHub 中…")
-        self._log("\n▶ 同步 images/ 到 GitHub …")
+        TOTAL  = 4
+        result = ["待命"]   # finally 用
 
-        # 更新 manifest 確保與磁碟一致（含刪除）
-        n = rebuild_manifest()
-        self._log(f"  manifest.json 已更新（{n} 個資料夾）")
+        try:
+            # ── 1. 更新 manifest（25%）──────────────────────────────────
+            self._set_progress(1, TOTAL, "1/4 更新索引…")
+            self._log("\n▶ 同步 images/ 到 GitHub …")
+            n = rebuild_manifest()
+            self._log(f"  manifest.json 已更新（{n} 個資料夾）")
 
-        # -A 同時 stage 新增與刪除
-        self._git("add", "-A", "images/", "manifest.json", "data.js")
+            # ── 2. 暫存所有變更（50%）──────────────────────────────────
+            self._set_progress(2, TOTAL, "2/4 暫存變更…")
+            self._log("  暫存 images/ manifest.json data.js …")
+            self._git("add", "-A", "images/", "manifest.json", "data.js")
 
-        # 確認有需要 commit 的變更
-        has_changes = subprocess.run(
-            ["git", "diff", "--cached", "--quiet"], cwd=str(BASE)).returncode != 0
-        if not has_changes:
-            self._log("  沒有需要同步的變更")
-            return
+            # 顯示已暫存清單（方便診斷）
+            r = subprocess.run(
+                ["git", "status", "--short"],
+                capture_output=True, text=True, cwd=str(BASE))
+            staged_lines = [ln for ln in r.stdout.strip().splitlines()
+                            if not ln.startswith("??")]
+            if staged_lines:
+                self._log("  已暫存的變更：")
+                for ln in staged_lines:
+                    self._log(f"    {ln}")
+            else:
+                self._log("  （無暫存變更）")
 
-        if not self._git("commit", "-m", "同步 images 到 GitHub"):
-            return
-        ok = self._git("push")
-        self._log("✓ 同步完成！網站約 1～2 分鐘後更新。"
-                  if ok else "✗ push 失敗，請確認網路與 git 設定")
-        self._idle("✓ 同步完成" if ok else "✗ push 失敗")
+            # ── 3. 確認並提交（75%）────────────────────────────────────
+            self._set_progress(3, TOTAL, "3/4 提交中…")
+            self._log("  確認是否有需要提交的內容…")
+            has_changes = subprocess.run(
+                ["git", "diff", "--cached", "--quiet"], cwd=str(BASE)).returncode != 0
+            if not has_changes:
+                self._log("  沒有需要同步的變更")
+                result[0] = "無需同步"
+                return
+
+            if not self._git("commit", "-m", "同步 images 到 GitHub"):
+                result[0] = "✗ commit 失敗"
+                return
+
+            # ── 4. 推送（時間不定 → 跑馬燈）──────────────────────────
+            self._busy("4/4 推送到 GitHub 中…")
+            self._log("  推送到 GitHub（視網路速度需數秒）…")
+            ok = self._git("push")
+            if ok:
+                self._log("✓ 同步完成！網站約 1～2 分鐘後更新。")
+                result[0] = "✓ 同步完成"
+            else:
+                self._log("✗ push 失敗，請確認網路與 git 設定")
+                result[0] = "✗ push 失敗"
+
+        except Exception as e:
+            self._log(f"  [未預期錯誤] {e}")
+            result[0] = "✗ 發生錯誤"
+        finally:
+            self._idle(result[0])   # 無論如何都會重置進度條
 
 
 if __name__ == "__main__":

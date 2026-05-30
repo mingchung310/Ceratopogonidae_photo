@@ -702,6 +702,7 @@ function renderGrid() {
         <div class="card-sci">${d.sciName || ''}</div>
         <div class="card-meta">
           <span class="tag">${d.category}</span>
+          ${d._sex ? `<span class="tag">${d._sex}</span>` : ''}
           <span class="card-date">${d.date || ''}</span>
         </div>
       </div>`;
