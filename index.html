@@ -22,11 +22,11 @@
     body {
       background: var(--navy);
       color: var(--text);
-      font-family: 'Noto Serif TC', 'Georgia', serif;
+      font-family: 'Noto Serif TC', Georgia, serif;
       min-height: 100vh;
     }
 
-    /* ── Header ── */
+    /* ── Header ─────────────────────────────────────────────────── */
     header {
       background: var(--navy2);
       border-bottom: 1px solid var(--border);
@@ -41,55 +41,336 @@
       margin: 0 auto;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 1rem;
-      height: 64px;
+      gap: 1.5rem;
+      height: 56px;
     }
 
     .site-title {
-      font-size: 1.2rem;
+      font-size: 1rem;
       color: var(--gold);
-      letter-spacing: 0.1em;
+      letter-spacing: 0.08em;
       white-space: nowrap;
       text-decoration: none;
+      flex-shrink: 0;
+      cursor: pointer;
     }
 
-    .header-controls {
+    /* ── Tab nav ─────────────────────────────────────────────────── */
+    .tab-nav {
+      display: flex;
+      overflow-x: auto;
+      scrollbar-width: none;
+      height: 56px;
+    }
+    .tab-nav::-webkit-scrollbar { display: none; }
+
+    .tab-btn {
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      color: var(--muted);
+      padding: 0 1rem;
+      height: 56px;
+      font-size: 0.92rem;
+      cursor: pointer;
+      white-space: nowrap;
+      font-family: inherit;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .tab-btn:hover  { color: var(--text); }
+    .tab-btn.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+    /* ── Pages ───────────────────────────────────────────────────── */
+    .page         { display: none; }
+    .page.active  { display: block; }
+
+    /* ── Page hero ───────────────────────────────────────────────── */
+    .page-hero {
+      text-align: center;
+      padding: 4rem 1.5rem 2.5rem;
+      background: linear-gradient(180deg, var(--navy2) 0%, var(--navy) 100%);
+      border-bottom: 1px solid var(--border);
+    }
+    .page-hero h1 {
+      font-size: 2.4rem;
+      color: var(--gold);
+      letter-spacing: 0.15em;
+      margin-bottom: 0.7rem;
+    }
+    .page-hero h1 em { font-style: italic; }
+    .page-hero .subtitle {
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 2;
+    }
+
+    /* ── Page content ────────────────────────────────────────────── */
+    .page-content {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 3rem 2rem 5rem;
+    }
+
+    .section { margin-bottom: 3.5rem; }
+
+    .section-title {
+      font-size: 1.3rem;
+      color: var(--gold);
+      letter-spacing: 0.06em;
+      margin-bottom: 0.3rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .section-subtitle {
+      font-size: 0.78rem;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-style: italic;
+      margin-bottom: 1.2rem;
+    }
+    .section p {
+      font-size: 0.97rem;
+      line-height: 1.9;
+      color: var(--text);
+      margin-bottom: 0.9rem;
+    }
+
+    /* ── Placeholder ─────────────────────────────────────────────── */
+    .placeholder {
+      background: var(--navy2);
+      border: 1px dashed var(--border);
+      border-radius: 8px;
+      padding: 2.5rem 2rem;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.8;
+    }
+
+    /* ── Comparison table ────────────────────────────────────────── */
+    .table-scroll { overflow-x: auto; margin-top: 1rem; }
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.91rem;
+    }
+    .compare-table th {
+      background: var(--navy3);
+      color: var(--gold);
+      padding: 0.65rem 1rem;
+      text-align: left;
+      border: 1px solid var(--border);
+      font-weight: normal;
+      letter-spacing: 0.04em;
+    }
+    .compare-table td {
+      padding: 0.6rem 1rem;
+      border: 1px solid var(--border);
+      color: var(--text);
+      vertical-align: top;
+      line-height: 1.65;
+    }
+    .compare-table tr:nth-child(even) td { background: var(--navy2); }
+    .compare-table em { font-style: italic; color: var(--muted); }
+
+    /* ── Taxonomy tree ───────────────────────────────────────────── */
+    .taxon-tree { margin: 1rem 0; }
+    .taxon-row {
+      display: flex;
+      align-items: baseline;
+      padding: 0.45rem 1rem;
+      border-left: 2px solid var(--border);
+      transition: background 0.15s;
+    }
+    .taxon-row:hover { background: var(--navy2); }
+    .taxon-row.highlight { border-left-color: var(--gold); }
+    .taxon-rank {
+      font-size: 0.72rem;
+      color: var(--muted);
+      width: 80px;
+      flex-shrink: 0;
+      letter-spacing: 0.07em;
+    }
+    .taxon-name          { font-size: 0.95rem; color: var(--text); }
+    .taxon-name em       { font-style: italic; color: var(--gold2); }
+    .taxon-row.highlight .taxon-name em { color: var(--gold); font-size: 1.02rem; }
+
+    /* ── Feature grid ────────────────────────────────────────────── */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    .feature-card {
+      background: var(--navy2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+    .feature-card:hover { border-color: var(--gold); }
+    .feature-img-slot {
+      width: 100%;
+      aspect-ratio: 4/3;
+      background: var(--navy3);
       display: flex;
       align-items: center;
-      gap: 0.75rem;
-      flex: 1;
-      justify-content: flex-end;
-    }
-
-    .search-wrap {
-      position: relative;
-    }
-
-    .search-wrap svg {
-      position: absolute;
-      left: 10px;
-      top: 50%;
-      transform: translateY(-50%);
+      justify-content: center;
       color: var(--muted);
-      pointer-events: none;
+      font-size: 0.78rem;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--border);
     }
+    .feature-img-slot img { width: 100%; height: 100%; object-fit: contain; }
+    .feature-body   { padding: 0.85rem 1rem; }
+    .feature-name   { font-size: 0.95rem; color: var(--gold); margin-bottom: 0.3rem; }
+    .feature-desc   { font-size: 0.82rem; color: var(--muted); line-height: 1.7; }
 
-    #searchInput {
+    /* ── Subgenus cards ──────────────────────────────────────────── */
+    .subgenus-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    .sg-card {
+      background: var(--navy2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem 1.2rem;
+      transition: border-color 0.2s;
+    }
+    .sg-card:hover    { border-color: var(--gold); }
+    .sg-card-name     { font-size: 0.97rem; font-style: italic; color: var(--gold); margin-bottom: 0.25rem; }
+    .sg-card-note     { font-size: 0.8rem; color: var(--muted); line-height: 1.65; }
+
+    /* ── Interactive key ─────────────────────────────────────────── */
+    .key-wrap {
+      background: var(--navy2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+      max-width: 700px;
+      margin: 1rem auto 0;
+    }
+    .key-history {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+      margin-bottom: 1.2rem;
+    }
+    .key-crumb {
+      font-size: 0.72rem;
+      background: var(--navy3);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 0.18rem 0.55rem;
+      border-radius: 4px;
+    }
+    .key-step-label {
+      font-size: 0.75rem;
+      color: var(--gold);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+    .key-question {
+      font-size: 1.08rem;
+      color: var(--text);
+      line-height: 1.5;
+      margin-bottom: 0.4rem;
+    }
+    .key-note {
+      font-size: 0.82rem;
+      color: var(--muted);
+      font-style: italic;
+      line-height: 1.6;
+      margin-bottom: 1.4rem;
+    }
+    .key-choices { display: flex; flex-direction: column; gap: 0.6rem; }
+    .key-choice {
       background: var(--navy3);
       border: 1px solid var(--border);
       color: var(--text);
+      padding: 0.85rem 1.2rem;
+      border-radius: 8px;
+      cursor: pointer;
+      text-align: left;
+      font-size: 0.93rem;
+      font-family: inherit;
+      line-height: 1.6;
+      transition: border-color 0.2s, background 0.15s;
+    }
+    .key-choice:hover { border-color: var(--gold); background: var(--navy2); }
+    .key-choice strong { color: var(--gold); margin-right: 0.5rem; }
+    .key-nav  { display: flex; gap: 0.5rem; margin-top: 1.4rem; }
+    .key-btn  {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 0.38rem 0.9rem;
       border-radius: 6px;
-      padding: 0.4rem 0.75rem 0.4rem 2.2rem;
+      cursor: pointer;
+      font-size: 0.82rem;
+      font-family: inherit;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .key-btn:hover { border-color: var(--gold); color: var(--gold); }
+    .key-result { text-align: center; padding: 0.75rem 0; }
+    .key-result-label {
+      font-size: 0.75rem;
+      color: var(--muted);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+    }
+    .key-result-name { font-size: 1.6rem; color: var(--gold); font-style: italic; margin-bottom: 0.3rem; }
+    .key-result-zh   { font-size: 0.92rem; color: var(--muted); margin-bottom: 1rem; }
+    .key-result-desc {
       font-size: 0.9rem;
-      width: 200px;
-      outline: none;
-      transition: border-color 0.2s;
+      line-height: 1.8;
+      color: var(--text);
+      text-align: left;
+      background: var(--navy3);
+      padding: 1rem 1.25rem;
+      border-radius: 8px;
     }
 
-    #searchInput:focus { border-color: var(--gold); }
+    /* ── Specimen page ───────────────────────────────────────────── */
+    .content-wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1.5rem 2rem 4rem;
+      display: flex;
+      gap: 1.5rem;
+      align-items: flex-start;
+    }
+
+    .filter-panel {
+      width: 148px;
+      flex-shrink: 0;
+      position: sticky;
+      top: 72px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+    .filter-title {
+      color: var(--gold);
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding-bottom: 0.4rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 0.15rem;
+    }
+    .filter-label { font-size: 0.78rem; color: var(--muted); margin-top: 0.3rem; }
 
     .filter-wrap { position: relative; }
+    .filter-panel .filter-wrap { position: relative; }
+    .filter-panel .filter-select { width: 100%; max-width: 100%; }
 
     .filter-select {
       appearance: none;
@@ -102,11 +383,9 @@
       cursor: pointer;
       outline: none;
       transition: border-color 0.2s;
-      max-width: 130px;
+      width: 100%;
     }
-
     .filter-select:focus { border-color: var(--gold); }
-
     .filter-wrap::after {
       content: '▾';
       position: absolute;
@@ -131,80 +410,40 @@
       transition: border-color 0.2s, color 0.2s;
       display: none;
     }
-
     #clearBtn:hover { border-color: var(--gold); color: var(--gold); }
     #clearBtn.visible { display: block; }
 
-    /* ── Hero ── */
-    .hero {
-      text-align: center;
-      padding: 3.5rem 1rem 2rem;
-    }
+    .grid-section { flex: 1; min-width: 0; }
 
-    .hero h1 {
-      font-size: 2.2rem;
-      color: var(--gold);
-      letter-spacing: 0.15em;
-      margin-bottom: 0.6rem;
-    }
-
-    .hero p {
-      color: var(--muted);
-      font-size: 1rem;
-      letter-spacing: 0.05em;
-    }
-
-    /* ── Content layout ── */
-    .content-wrap {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 1rem 2rem 4rem;
+    .specimen-toolbar {
       display: flex;
-      gap: 1.5rem;
-      align-items: flex-start;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
     }
-
-    /* ── Filter sidebar ── */
-    .filter-panel {
-      width: 148px;
-      flex-shrink: 0;
-      position: sticky;
-      top: 80px;
-      display: flex;
-      flex-direction: column;
-      gap: 0.35rem;
-    }
-
-    .filter-title {
-      color: var(--gold);
-      font-size: 0.75rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      padding-bottom: 0.4rem;
-      border-bottom: 1px solid var(--border);
-      margin-bottom: 0.15rem;
-    }
-
-    .filter-label {
-      font-size: 0.78rem;
+    .search-wrap { position: relative; }
+    .search-wrap svg {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
       color: var(--muted);
-      margin-top: 0.3rem;
+      pointer-events: none;
     }
-
-    .filter-panel .filter-wrap { position: relative; }
-    .filter-panel .filter-select { width: 100%; max-width: 100%; }
-
-    /* ── Grid ── */
-    .grid-section {
-      flex: 1;
-      min-width: 0;
+    #searchInput {
+      background: var(--navy3);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 6px;
+      padding: 0.4rem 0.75rem 0.4rem 2.2rem;
+      font-size: 0.9rem;
+      width: 220px;
+      outline: none;
+      transition: border-color 0.2s;
     }
+    #searchInput:focus { border-color: var(--gold); }
 
-    .results-info {
-      color: var(--muted);
-      font-size: 0.85rem;
-      margin-bottom: 1.2rem;
-    }
+    .results-info { color: var(--muted); font-size: 0.85rem; margin-bottom: 1.2rem; }
 
     .grid {
       display: grid;
@@ -212,7 +451,7 @@
       gap: 1.25rem;
     }
 
-    /* ── Card ── */
+    /* ── Card ─────────────────────────────────────────────────────── */
     .card {
       background: var(--card-bg);
       border: 1px solid var(--border);
@@ -221,17 +460,14 @@
       cursor: pointer;
       transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
     }
-
     .card:hover {
       transform: translateY(-3px);
       border-color: var(--gold);
       box-shadow: 0 6px 24px rgba(201,168,76,0.15);
     }
-
     .card-img {
       width: 100%;
       aspect-ratio: 4/3;
-      object-fit: cover;
       background: var(--navy3);
       display: flex;
       align-items: center;
@@ -239,37 +475,18 @@
       color: var(--muted);
       font-size: 2.5rem;
     }
-
-    .card-img img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-    }
-
-    .card-body {
-      padding: 0.9rem 1rem 1rem;
-    }
-
-    .card-name {
-      font-size: 1.05rem;
-      color: var(--text);
-      margin-bottom: 0.25rem;
-    }
-
-    .card-sci {
-      font-size: 0.78rem;
-      color: var(--muted);
-      font-style: italic;
-      margin-bottom: 0.5rem;
-    }
-
-    .card-meta {
+    .card-img img { width: 100%; height: 100%; object-fit: contain; }
+    .card-body    { padding: 0.9rem 1rem 1rem; }
+    .card-name    { font-size: 1.05rem; color: var(--text); margin-bottom: 0.25rem; }
+    .card-sci     { font-size: 0.78rem; color: var(--muted); font-style: italic; margin-bottom: 0.5rem; }
+    .card-meta    {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      flex-wrap: wrap;
+      gap: 0.3rem;
       margin-top: 0.6rem;
     }
-
     .tag {
       background: var(--navy3);
       border: 1px solid var(--border);
@@ -279,13 +496,7 @@
       border-radius: 4px;
       letter-spacing: 0.03em;
     }
-
-    .card-date {
-      font-size: 0.75rem;
-      color: var(--muted);
-    }
-
-    /* ── Empty state ── */
+    .card-date { font-size: 0.75rem; color: var(--muted); }
     .empty {
       grid-column: 1 / -1;
       text-align: center;
@@ -293,7 +504,7 @@
       color: var(--muted);
     }
 
-    /* ── Modal ── */
+    /* ── Modal ───────────────────────────────────────────────────── */
     .modal-overlay {
       position: fixed;
       inset: 0;
@@ -308,12 +519,7 @@
       pointer-events: none;
       transition: opacity 0.25s;
     }
-
-    .modal-overlay.open {
-      opacity: 1;
-      pointer-events: all;
-    }
-
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
     .modal {
       background: var(--navy2);
       border: 1px solid var(--border);
@@ -325,21 +531,14 @@
       transform: translateY(16px);
       transition: transform 0.25s;
     }
-
     .modal-overlay.open .modal { transform: translateY(0); }
-
     .modal-header {
       padding: 1.25rem 1.5rem 0;
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
     }
-
-    .modal-header h2 {
-      font-size: 1.5rem;
-      color: var(--gold);
-    }
-
+    .modal-header h2 { font-size: 1.5rem; color: var(--gold); }
     .modal-close {
       background: none;
       border: none;
@@ -350,9 +549,7 @@
       padding: 0.25rem;
       transition: color 0.2s;
     }
-
     .modal-close:hover { color: var(--text); }
-
     .modal-img {
       width: 100%;
       aspect-ratio: 16/9;
@@ -365,9 +562,7 @@
       margin: 1rem 0 0;
       overflow: hidden;
     }
-
     .modal-img img { width: 100%; height: 100%; object-fit: contain; display: block; }
-
     .modal-thumbs {
       display: flex;
       gap: 0.4rem;
@@ -375,7 +570,6 @@
       overflow-x: auto;
       background: var(--navy3);
     }
-
     .modal-thumbs img {
       width: 72px;
       height: 52px;
@@ -387,28 +581,12 @@
       transition: border-color 0.2s, opacity 0.2s;
       opacity: 0.65;
     }
-
     .modal-thumbs img.active,
     .modal-thumbs img:hover { border-color: var(--gold); opacity: 1; }
-
-    .modal-body { padding: 1.25rem 1.5rem 1.75rem; }
-
-    .modal-sci {
-      font-style: italic;
-      color: var(--muted);
-      font-size: 0.9rem;
-      margin-bottom: 1rem;
-    }
-
-    .modal-tags {
-      display: flex;
-      gap: 0.5rem;
-      flex-wrap: wrap;
-      margin-bottom: 1.2rem;
-    }
-
+    .modal-body    { padding: 1.25rem 1.5rem 1.75rem; }
+    .modal-sci     { font-style: italic; color: var(--muted); font-size: 0.9rem; margin-bottom: 1rem; }
+    .modal-tags    { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.2rem; }
     .modal-section { margin-bottom: 1rem; }
-
     .modal-section h4 {
       color: var(--gold);
       font-size: 0.8rem;
@@ -418,14 +596,9 @@
       border-bottom: 1px solid var(--border);
       padding-bottom: 0.3rem;
     }
+    .modal-section p { font-size: 0.93rem; line-height: 1.8; color: var(--text); }
 
-    .modal-section p {
-      font-size: 0.93rem;
-      line-height: 1.8;
-      color: var(--text);
-    }
-
-    /* ── Footer ── */
+    /* ── Footer ──────────────────────────────────────────────────── */
     footer {
       text-align: center;
       padding: 1.5rem;
@@ -434,12 +607,18 @@
       border-top: 1px solid var(--border);
     }
 
-    /* ── Responsive ── */
+    /* ── Responsive ──────────────────────────────────────────────── */
     @media (max-width: 700px) {
-      .header-inner { flex-wrap: wrap; height: auto; padding: 0.75rem 0; }
-      #searchInput { width: 150px; }
-      .hero h1 { font-size: 1.6rem; }
-      .content-wrap { flex-direction: column; padding: 1rem 1rem 4rem; gap: 1rem; }
+      .header-inner { gap: 0.75rem; }
+      .site-title   { font-size: 0.88rem; }
+      .tab-btn      { padding: 0 0.65rem; font-size: 0.85rem; }
+      .page-hero h1 { font-size: 1.7rem; }
+      .page-content { padding: 2rem 1rem 4rem; }
+      .content-wrap {
+        flex-direction: column;
+        padding: 1rem 1rem 4rem;
+        gap: 1rem;
+      }
       .filter-panel {
         width: 100%;
         position: static;
@@ -456,79 +635,279 @@
 </head>
 <body>
 
-<!-- ── Header ── -->
+<!-- ── Header ─────────────────────────────────────────────────────── -->
 <header>
   <div class="header-inner">
-    <a class="site-title" href="#">庫蠓標本影像：臺灣大學昆蟲學系寄生蟲實驗室</a>
-    <div class="header-controls">
-      <div class="search-wrap">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-        </svg>
-        <input id="searchInput" type="text" placeholder="搜尋名稱…" />
-      </div>
-    </div>
+    <span class="site-title" onclick="switchTab('intro')">庫蠓標本影像</span>
+    <nav class="tab-nav">
+      <button class="tab-btn active" data-tab="intro">認識庫蠓</button>
+      <button class="tab-btn" data-tab="taxonomy">分類與鑑定</button>
+      <button class="tab-btn" data-tab="specimens">標本影像</button>
+    </nav>
   </div>
 </header>
 
-<!-- ── Hero ── -->
-<div class="hero">
-  <h1>庫蠓標本影像</h1>
-  <p>Image Collection of <em>Culicoides</em> Specimens</p>
-  <p style="margin-top:0.35rem">臺灣大學昆蟲學系寄生蟲實驗室<br>
-  <span style="font-size:0.85rem">Parasitology Laboratory, Department of Entomology, National Taiwan University</span></p>
-</div>
 
-<!-- ── Content ── -->
-<div class="content-wrap">
-  <aside class="filter-panel">
-    <p class="filter-title">篩選</p>
+<!-- ════════════════════════════════════════════════════════════════
+     PAGE 1  認識庫蠓
+     ════════════════════════════════════════════════════════════════ -->
+<div class="page active" id="page-intro">
 
-    <span class="filter-label">屬</span>
-    <div class="filter-wrap">
-      <select id="categoryFilter" class="filter-select"><option value="">全部</option></select>
+  <div class="page-hero">
+    <h1><em>Culicoides</em> 庫蠓</h1>
+    <p class="subtitle">
+      Image Collection of <em>Culicoides</em> Specimens<br>
+      臺灣大學昆蟲學系寄生蟲實驗室<br>
+      <span style="font-size:0.82rem">Parasitology Laboratory · Department of Entomology · National Taiwan University</span>
+    </p>
+  </div>
+
+  <div class="page-content">
+
+    <div class="section">
+      <h2 class="section-title">什麼是庫蠓？</h2>
+      <p class="section-subtitle">About <em>Culicoides</em></p>
+      <div class="placeholder">
+        ✏️ 文案建構中<br><br>
+        待補充：庫蠓的基本介紹、生態習性、醫學與獸醫學重要性
+      </div>
     </div>
 
-    <span class="filter-label">亞屬</span>
-    <div class="filter-wrap">
-      <select id="subgenusFilter" class="filter-select"><option value="">全部</option></select>
+    <div class="section">
+      <h2 class="section-title">庫蠓與小黑蚊的差異</h2>
+      <p class="section-subtitle"><em>Culicoides</em> vs. 台灣鋏蠓（小黑蚊）<em>Forcipomyia taiwana</em></p>
+      <div class="placeholder" style="margin-bottom:1rem">
+        ✏️ 文案建構中 — 以下表格為框架，待補充詳細比較內容
+      </div>
+      <div class="table-scroll">
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th>特徵</th>
+              <th>庫蠓 <em>Culicoides</em></th>
+              <th>台灣鋏蠓（小黑蚊）<em>Forcipomyia taiwana</em></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>分類</td>
+              <td>蠓科 Ceratopogonidae<br><em>Culicoides</em> 屬</td>
+              <td>蠓科 Ceratopogonidae<br><em>Forcipomyia</em> 屬</td>
+            </tr>
+            <tr>
+              <td>翅面斑紋</td>
+              <td>多數具明顯淡色斑與暗色斑</td>
+              <td>翅面近乎均勻，無明顯斑紋</td>
+            </tr>
+            <tr>
+              <td>吸血對象</td>
+              <td>多種脊椎動物（鳥類、牛羊等哺乳類）</td>
+              <td>以人類為主，好發於山區、郊區</td>
+            </tr>
+            <tr>
+              <td>醫學 / 獸醫重要性</td>
+              <td>藍舌病、赤羽病、血蟲病等媒介昆蟲</td>
+              <td>局部地區重要的騷擾性吸血昆蟲</td>
+            </tr>
+            <tr>
+              <td>體型</td>
+              <td>約 1–3 mm</td>
+              <td>約 1–1.5 mm</td>
+            </tr>
+            <tr>
+              <td>台灣種數</td>
+              <td>待補充</td>
+              <td>主要 1 種（<em>F. taiwana</em>）</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
-    <span class="filter-label">種</span>
-    <div class="filter-wrap">
-      <select id="speciesFilter" class="filter-select"><option value="">全部</option></select>
+    <div class="section">
+      <h2 class="section-title">形態特徵圖</h2>
+      <p class="section-subtitle">Morphological illustrations</p>
+      <div class="placeholder">
+        📷 照片與插圖區塊（待新增）
+      </div>
     </div>
 
-    <span class="filter-label">性別</span>
-    <div class="filter-wrap">
-      <select id="genderFilter" class="filter-select"><option value="">全部</option></select>
+  </div>
+</div><!-- /page-intro -->
+
+
+<!-- ════════════════════════════════════════════════════════════════
+     PAGE 2  分類與鑑定
+     ════════════════════════════════════════════════════════════════ -->
+<div class="page" id="page-taxonomy">
+  <div class="page-content" style="max-width:960px">
+
+    <!-- 分類位置 -->
+    <div class="section">
+      <h2 class="section-title">分類位置</h2>
+      <p class="section-subtitle">Taxonomic placement</p>
+      <div class="taxon-tree">
+        <div class="taxon-row"><span class="taxon-rank">Kingdom</span><span class="taxon-name">Animalia 動物界</span></div>
+        <div class="taxon-row" style="margin-left:1rem"><span class="taxon-rank">Phylum</span><span class="taxon-name">Arthropoda 節肢動物門</span></div>
+        <div class="taxon-row" style="margin-left:2rem"><span class="taxon-rank">Class</span><span class="taxon-name">Insecta 昆蟲綱</span></div>
+        <div class="taxon-row" style="margin-left:3rem"><span class="taxon-rank">Order</span><span class="taxon-name">Diptera 雙翅目</span></div>
+        <div class="taxon-row" style="margin-left:4rem"><span class="taxon-rank">Family</span><span class="taxon-name"><em>Ceratopogonidae</em> 蠓科</span></div>
+        <div class="taxon-row" style="margin-left:5rem"><span class="taxon-rank">Subfamily</span><span class="taxon-name"><em>Culicoidinae</em></span></div>
+        <div class="taxon-row highlight" style="margin-left:6rem">
+          <span class="taxon-rank">Genus</span>
+          <span class="taxon-name"><em>Culicoides</em> Latreille, 1809 — 庫蠓屬</span>
+        </div>
+      </div>
     </div>
 
-    <span class="filter-label">全身照</span>
-    <div class="filter-wrap">
-      <select id="wholeshotFilter" class="filter-select">
-        <option value="">全部</option>
-        <option value="Y">有全身照</option>
-      </select>
+    <!-- 屬級識別特徵 -->
+    <div class="section">
+      <h2 class="section-title">屬級識別特徵</h2>
+      <p class="section-subtitle">Genus-level diagnostic characters</p>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="feature-img-slot">翅（Wing）照片區</div>
+          <div class="feature-body">
+            <div class="feature-name">翅（Wing）</div>
+            <div class="feature-desc">前翅具特徵性斑紋，由淡色區與暗色區交錯形成；翅脈 R5 延伸至翅頂附近。待補充詳細說明。</div>
+          </div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-img-slot">觸鬚（Palp）照片區</div>
+          <div class="feature-body">
+            <div class="feature-name">觸鬚（Palp）</div>
+            <div class="feature-desc">五節，第三節通常最長，具感覺窩（palpal pit）。觸鬚比（PR）為重要鑑別特徵。</div>
+          </div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-img-slot">觸角（Antenna）照片區</div>
+          <div class="feature-body">
+            <div class="feature-name">觸角（Antenna）</div>
+            <div class="feature-desc">15 節；雌蟲觸角節輪毛稀疏，雄蟲具明顯輪毛。觸角比（AR）為輔助特徵。</div>
+          </div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-img-slot">生殖器（Genitalia）照片區</div>
+          <div class="feature-body">
+            <div class="feature-name">生殖器（Genitalia）</div>
+            <div class="feature-desc">雌蟲受精囊形態及數量、雄蟲抱握器形態，均為種級鑑定的重要依據。</div>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <button id="clearBtn" title="清除篩選">✕ 清除篩選</button>
-  </aside>
+    <!-- 亞屬概況 -->
+    <div class="section">
+      <h2 class="section-title">亞屬概況</h2>
+      <p class="section-subtitle">Subgenera recorded or expected in Taiwan</p>
+      <div class="subgenus-grid">
+        <div class="sg-card">
+          <div class="sg-card-name">Avaritia</div>
+          <div class="sg-card-note">全球種數最多的亞屬之一，台灣已記錄多種。翅面具明顯斑紋，觸鬚感覺窩大型，PR 通常 > 2.5。多種為藍舌病等動物疾病的媒介。</div>
+        </div>
+        <div class="sg-card">
+          <div class="sg-card-name">Culicoides s.str.</div>
+          <div class="sg-card-note">指名亞屬。特徵與台灣記錄待補充。</div>
+        </div>
+        <div class="sg-card">
+          <div class="sg-card-name">Oecacta</div>
+          <div class="sg-card-note">特徵與台灣記錄待補充。</div>
+        </div>
+        <div class="sg-card">
+          <div class="sg-card-name">Beltranmyia</div>
+          <div class="sg-card-note">特徵與台灣記錄待補充。</div>
+        </div>
+        <div class="sg-card">
+          <div class="sg-card-name">Meijerehelea</div>
+          <div class="sg-card-note">特徵與台灣記錄待補充。</div>
+        </div>
+        <div class="sg-card">
+          <div class="sg-card-name">Silvaticulicoides</div>
+          <div class="sg-card-note">特徵與台灣記錄待補充。</div>
+        </div>
+      </div>
+    </div>
 
-  <section class="grid-section">
-    <p class="results-info" id="resultsInfo"></p>
-    <div class="grid" id="grid"></div>
-  </section>
-</div>
+    <!-- 互動式亞屬檢索表 -->
+    <div class="section">
+      <h2 class="section-title">互動式亞屬檢索表</h2>
+      <p class="section-subtitle">Interactive key to subgenera — 初稿，持續更新中</p>
+      <p style="font-size:0.87rem;color:var(--muted);line-height:1.75;margin-bottom:1rem">
+        依序點選與標本相符的描述，逐步縮小鑑定範圍。<br>
+        ⚠️ 本檢索表目前為框架版本，部分步驟待正式特徵補入後更新。
+      </p>
+      <div class="key-wrap" id="key-wrap"><!-- JS 渲染 --></div>
+    </div>
 
-<!-- ── Modal ── -->
+  </div>
+</div><!-- /page-taxonomy -->
+
+
+<!-- ════════════════════════════════════════════════════════════════
+     PAGE 3  標本影像
+     ════════════════════════════════════════════════════════════════ -->
+<div class="page" id="page-specimens">
+  <div class="content-wrap">
+
+    <aside class="filter-panel">
+      <p class="filter-title">篩選</p>
+
+      <span class="filter-label">屬</span>
+      <div class="filter-wrap">
+        <select id="categoryFilter" class="filter-select"><option value="">全部</option></select>
+      </div>
+
+      <span class="filter-label">亞屬</span>
+      <div class="filter-wrap">
+        <select id="subgenusFilter" class="filter-select"><option value="">全部</option></select>
+      </div>
+
+      <span class="filter-label">種</span>
+      <div class="filter-wrap">
+        <select id="speciesFilter" class="filter-select"><option value="">全部</option></select>
+      </div>
+
+      <span class="filter-label">性別</span>
+      <div class="filter-wrap">
+        <select id="genderFilter" class="filter-select"><option value="">全部</option></select>
+      </div>
+
+      <span class="filter-label">全身照</span>
+      <div class="filter-wrap">
+        <select id="wholeshotFilter" class="filter-select">
+          <option value="">全部</option>
+          <option value="Y">有全身照</option>
+        </select>
+      </div>
+
+      <button id="clearBtn" title="清除篩選">✕ 清除篩選</button>
+    </aside>
+
+    <section class="grid-section">
+      <div class="specimen-toolbar">
+        <div class="search-wrap">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input id="searchInput" type="text" placeholder="搜尋名稱…" />
+        </div>
+      </div>
+      <p class="results-info" id="resultsInfo"></p>
+      <div class="grid" id="grid"></div>
+    </section>
+
+  </div>
+</div><!-- /page-specimens -->
+
+
+<!-- ── Modal ───────────────────────────────────────────────────────── -->
 <div class="modal-overlay" id="modalOverlay">
-  <div class="modal" id="modal">
+  <div class="modal">
     <div class="modal-header">
       <h2 id="mName"></h2>
       <button class="modal-close" id="modalClose">×</button>
     </div>
-    <div class="modal-img" id="mImgWrap"></div>
+    <div class="modal-img"    id="mImgWrap"></div>
     <div class="modal-thumbs" id="mThumbs" style="display:none"></div>
     <div class="modal-body">
       <p class="modal-sci" id="mSci"></p>
@@ -538,22 +917,175 @@
   </div>
 </div>
 
-<!-- ── Footer ── -->
+<!-- ── Footer ──────────────────────────────────────────────────────── -->
 <footer>
   庫蠓標本影像 © 臺灣大學昆蟲學系寄生蟲實驗室 · 持續收錄中
 </footer>
 
-<!-- 本地離線用：build.ps1 自動產生 data.js，讓 file:// 直接開啟也能讀資料 -->
 <script src="data.js"></script>
 <script>
-// ══════════════════════════════════════
-//  資料來源：玻片標本清單 (slide mount).csv
-//  Cd + No. → number（圖片資料夾名）
-//  Genus + Subgenus + Species → 學名
-// ══════════════════════════════════════
+'use strict';
+
+// ══════════════════════════════════════════════════════════════════════
+//  TAB NAVIGATION
+// ══════════════════════════════════════════════════════════════════════
+
+const TABS = ['intro', 'taxonomy', 'specimens'];
+
+function switchTab(tab) {
+  if (!TABS.includes(tab)) tab = 'intro';
+  TABS.forEach(t => {
+    document.getElementById(`page-${t}`).classList.toggle('active', t === tab);
+  });
+  document.querySelectorAll('.tab-btn').forEach(btn =>
+    btn.classList.toggle('active', btn.dataset.tab === tab));
+  history.replaceState(null, '', `#${tab}`);
+  if (tab === 'taxonomy' && !keyReady) initKey();
+}
+
+document.querySelectorAll('.tab-btn').forEach(btn =>
+  btn.addEventListener('click', () => switchTab(btn.dataset.tab)));
+
+const _initTab = TABS.includes(location.hash.slice(1)) ? location.hash.slice(1) : 'intro';
+if (_initTab !== 'intro') switchTab(_initTab);
+
+
+// ══════════════════════════════════════════════════════════════════════
+//  INTERACTIVE DICHOTOMOUS KEY  互動式亞屬檢索表
+// ══════════════════════════════════════════════════════════════════════
+
+let keyReady   = false;
+let keyHistory = [];
+let keyCurrent = 1;
+
+// 每個節點：lead = 問題，note = 說明，a/b = 兩個選項
+// go: 跳到另一節點；result: 終點（亞屬 ID）
+const KEY_NODES = {
+  1: {
+    lead: '翅面斑紋（Wing pattern）',
+    note: '對光觀察前翅，注意是否有深淺對比明顯的斑塊分布。',
+    a: { text: '翅面具明顯淡色斑與暗色斑（Wing with distinct pale and dark spots）', go: 2 },
+    b: { text: '翅面近乎均勻，無明顯斑紋（Wing without distinct spots）', go: 5 }
+  },
+  2: {
+    lead: '第三觸鬚節感覺窩（Palpal pit on segment III）',
+    note: '以高倍鏡觀察第三節觸鬚，注意感覺窩的相對大小。',
+    a: { text: '感覺窩大，佔第三節明顯比例（Pit large and conspicuous）', go: 3 },
+    b: { text: '感覺窩小或不明顯（Pit small or indistinct）', go: 4 }
+  },
+  3: {
+    lead: '觸鬚比（Palpal ratio, PR）',
+    note: 'PR = 第三節觸鬚長度 ÷（第四節 + 第五節）長度',
+    a: { text: 'PR > 2.5', result: 'avaritia' },
+    b: { text: 'PR ≤ 2.5', result: 'culicoides_ss' }
+  },
+  4: {
+    lead: '【初稿】翅斑有、感覺窩小類群——特徵待確認',
+    note: '本步驟尚在整理中，以下為暫定分支。',
+    a: { text: '（特徵 A — 待補充）', result: 'oecacta' },
+    b: { text: '（特徵 B — 待補充）', result: 'beltranmyia' }
+  },
+  5: {
+    lead: '【初稿】翅面無明顯斑紋類群——特徵待確認',
+    note: '本步驟尚在整理中，以下為暫定分支。',
+    a: { text: '（特徵 A — 待補充）', result: 'meijerehelea' },
+    b: { text: '（特徵 B — 待補充）', result: 'other' }
+  }
+};
+
+const KEY_RESULTS = {
+  avaritia:      { name: 'Avaritia',         zh: '',          desc: '全球分布最廣、種數最多的亞屬之一，台灣已有多種記錄。翅面具明顯斑紋，觸鬚感覺窩大型，PR 通常 > 2.5。多種雌蟲具吸血習性，部分種類為藍舌病、赤羽病等動物疾病的媒介昆蟲。' },
+  culicoides_ss: { name: 'Culicoides s.str.', zh: '（指名亞屬）', desc: '指名亞屬。詳細特徵與台灣記錄待補充。' },
+  oecacta:       { name: 'Oecacta',          zh: '',          desc: '特徵與台灣記錄待補充。' },
+  beltranmyia:   { name: 'Beltranmyia',      zh: '',          desc: '特徵與台灣記錄待補充。' },
+  meijerehelea:  { name: 'Meijerehelea',     zh: '',          desc: '特徵與台灣記錄待補充。' },
+  other:         { name: '（其他亞屬）',      zh: '',          desc: '詳細亞屬檢索表建構中，請聯繫實驗室確認鑑定。' }
+};
+
+function _breadcrumb() {
+  if (!keyHistory.length) return '';
+  return `<div class="key-history">${
+    keyHistory.map((h, i) => {
+      const label = KEY_NODES[h.id][h.ch].text.split('（')[0].trim();
+      return `<span class="key-crumb">${i + 1}. ${label}</span>`;
+    }).join(' › ')
+  }</div>`;
+}
+
+function _navBtns() {
+  return keyHistory.length ? `
+    <div class="key-nav">
+      <button class="key-btn" onclick="keyBack()">← 上一步</button>
+      <button class="key-btn" onclick="keyReset()">重新開始</button>
+    </div>` : '';
+}
+
+function renderKey() {
+  const wrap = document.getElementById('key-wrap');
+  const node = KEY_NODES[keyCurrent];
+  wrap.innerHTML = `
+    ${_breadcrumb()}
+    <div class="key-step-label">步驟 ${keyHistory.length + 1}</div>
+    <div class="key-question">${node.lead}</div>
+    ${node.note ? `<div class="key-note">${node.note}</div>` : ''}
+    <div class="key-choices">
+      <button class="key-choice" onclick="keyChoose('a')"><strong>a.</strong> ${node.a.text}</button>
+      <button class="key-choice" onclick="keyChoose('b')"><strong>b.</strong> ${node.b.text}</button>
+    </div>
+    ${_navBtns()}`;
+}
+
+function renderResult(id) {
+  const r    = KEY_RESULTS[id];
+  const wrap = document.getElementById('key-wrap');
+  wrap.innerHTML = `
+    ${_breadcrumb()}
+    <div class="key-result">
+      <div class="key-result-label">鑑定結果 Result</div>
+      <div class="key-result-name">Culicoides (${r.name})</div>
+      ${r.zh ? `<div class="key-result-zh">${r.zh}</div>` : ''}
+      <div class="key-result-desc">${r.desc}</div>
+    </div>
+    <div class="key-nav">
+      <button class="key-btn" onclick="keyBack()">← 上一步</button>
+      <button class="key-btn" onclick="keyReset()">重新開始</button>
+    </div>`;
+}
+
+function keyChoose(ch) {
+  const sel = KEY_NODES[keyCurrent][ch];
+  keyHistory.push({ id: keyCurrent, ch });
+  if (sel.result) { renderResult(sel.result); }
+  else            { keyCurrent = sel.go; renderKey(); }
+}
+
+function keyBack() {
+  if (!keyHistory.length) return;
+  const prev = keyHistory.pop();
+  keyCurrent = prev.id;
+  renderKey();
+}
+
+function keyReset() {
+  keyHistory = [];
+  keyCurrent = 1;
+  renderKey();
+}
+
+function initKey() {
+  keyReady = true;
+  renderKey();
+}
+
+// 若直接進入 taxonomy 頁面（從 hash）立即初始化
+if (_initTab === 'taxonomy') initKey();
+
+
+// ══════════════════════════════════════════════════════════════════════
+//  SPECIMEN GALLERY  標本影像（原有程式碼）
+// ══════════════════════════════════════════════════════════════════════
 
 function parseCSV(text) {
-  // 移除 UTF-8 BOM 避免第一個欄位帶入隱形字元
   const lines = text.replace(/^﻿/, '').trim().split(/\r?\n/);
   const headers = lines[0].split(',');
   return lines.slice(1).filter(l => l.trim()).map(line => {
@@ -572,45 +1104,40 @@ function parseCSV(text) {
   });
 }
 
-// 將原始 CSV 欄位轉換成網站用的格式
 function transformRow(r) {
   const cd  = (r['Cd']   || '').trim();
   const no  = (r['No.']  || '').trim();
-  const num = cd + no;  // e.g. "Cer13"
+  const num = cd + no;
 
   const genus    = (r['Genus']    || '').trim();
   const subgenus = (r['Subgenus'] || '').trim();
   const species  = (r['Species']  || '').trim();
-  const sciName  = [genus, subgenus ? `(${subgenus})` : '', species]
-                    .filter(Boolean).join(' ');
+  const sciName  = [genus, subgenus ? `(${subgenus})` : '', species].filter(Boolean).join(' ');
 
   const lat = (r['LATDD'] || '').trim();
   const lon = (r['LONDD'] || '').trim();
 
   const obj = {
-    id:       num,
-    number:   num,
+    id: num, number: num,
     name:     `${(r['中文名'] || '').trim()} ${num}`.trim(),
     sciName,
     category: genus,
-    subgenus: subgenus,
-    species:  species,
+    subgenus, species,
     date:     (r['Col. Date'] || '').trim(),
     emoji:    '🦟',
-    image:    num,   // 對應 manifest 資料夾名
+    image:    num,
     全身照:   (r['全身照'] || '').trim(),
-    _sex:     (r['sex']    || '').trim(),  // 供篩選用，不直接顯示
+    _sex:     (r['sex']    || '').trim(),
   };
 
-  // Modal 顯示欄位（空值自動略過）
   const fields = {
-    '採集地':    r['Locality'],
-    '採集者':    r['Collector'],
-    'GPS':       lat && lon ? `${lat}, ${lon}` : '',
-    '寄主':      r['Host'],
-    'DNA_Coi':   r['DNA_Coi'],
-    '性別':      r['sex'],
-    '鑑定者':    r['det.'],
+    '採集地': r['Locality'],
+    '採集者': r['Collector'],
+    'GPS':    lat && lon ? `${lat}, ${lon}` : '',
+    '寄主':   r['Host'],
+    'DNA_Coi': r['DNA_Coi'],
+    '性別':   r['sex'],
+    '鑑定者': r['det.'],
   };
   Object.entries(fields).forEach(([k, v]) => {
     if (v && v.trim()) obj[k] = v.trim();
@@ -618,26 +1145,19 @@ function transformRow(r) {
   return obj;
 }
 
-// ══════════════════════════════════════
-//  以下為程式邏輯，通常不需更動
-// ══════════════════════════════════════
-
-const grid = document.getElementById('grid');
-const searchInput = document.getElementById('searchInput');
+const grid            = document.getElementById('grid');
+const searchInput     = document.getElementById('searchInput');
 const categoryFilter  = document.getElementById('categoryFilter');
 const subgenusFilter  = document.getElementById('subgenusFilter');
 const speciesFilter   = document.getElementById('speciesFilter');
 const genderFilter    = document.getElementById('genderFilter');
 const wholeshotFilter = document.getElementById('wholeshotFilter');
-const clearBtn = document.getElementById('clearBtn');
-const resultsInfo = document.getElementById('resultsInfo');
-const overlay = document.getElementById('modalOverlay');
+const clearBtn        = document.getElementById('clearBtn');
+const resultsInfo     = document.getElementById('resultsInfo');
+const overlay         = document.getElementById('modalOverlay');
 
-let DATA = [];
-let MANIFEST = {}; // { "資料夾名稱": ["images/資料夾/01.jpg", ...] }
+let DATA = [], MANIFEST = {};
 
-// 取得某筆資料的圖片陣列
-// 優先查 manifest（image 欄填資料夾名），其次直接解析 | 分隔路徑
 function getImages(d) {
   if (!d.image) return [];
   const key = d.image.trim();
@@ -662,7 +1182,7 @@ function initCategories() {
 }
 
 function renderGrid() {
-  const q  = searchInput.value.trim().toLowerCase();
+  const q   = searchInput.value.trim().toLowerCase();
   const cat = categoryFilter.value;
   const sub = subgenusFilter.value;
   const sp  = speciesFilter.value;
@@ -670,7 +1190,7 @@ function renderGrid() {
   const gen = genderFilter.value;
 
   const filtered = DATA.filter(d => {
-    const matchQ   = !q   || d.name.toLowerCase().includes(q) || (d.sciName || '').toLowerCase().includes(q);
+    const matchQ   = !q   || d.name.toLowerCase().includes(q) || (d.sciName||'').toLowerCase().includes(q);
     const matchCat = !cat || d.category === cat;
     const matchSub = !sub || d.subgenus === sub;
     const matchSp  = !sp  || `${d.category} ${d.species}` === sp;
@@ -683,21 +1203,18 @@ function renderGrid() {
   resultsInfo.textContent = `共 ${filtered.length} 筆`;
   grid.innerHTML = '';
 
-  if (filtered.length === 0) {
+  if (!filtered.length) {
     grid.innerHTML = '<div class="empty">找不到符合的標本</div>';
     return;
   }
 
   filtered.forEach(d => {
     const imgs = getImages(d);
-    const firstImg = imgs[0] || '';
     const card = document.createElement('div');
     card.className = 'card';
     card.innerHTML = `
       <div class="card-img">
-        ${firstImg
-          ? `<img src="${firstImg}" alt="${d.name}" loading="lazy" />`
-          : d.emoji || '📦'}
+        ${imgs[0] ? `<img src="${imgs[0]}" alt="${d.name}" loading="lazy">` : d.emoji || '📦'}
       </div>
       <div class="card-body">
         <div class="card-name">${d.name}</div>
@@ -714,11 +1231,11 @@ function renderGrid() {
 }
 
 function openModal(d) {
-  const FIXED = new Set(['id','name','sciName','category','subgenus','species','date','emoji','image','number','全身照','_sex']);
+  const FIXED = new Set(['id','name','sciName','category','subgenus','species',
+                         'date','emoji','image','number','全身照','_sex']);
   document.getElementById('mName').textContent = d.name;
-  document.getElementById('mSci').textContent = d.sciName || '';
+  document.getElementById('mSci').textContent  = d.sciName || '';
 
-  // 自動依 CSV 欄位產生 Modal 區塊，跳過固定欄位與空值
   const sections = document.getElementById('mSections');
   sections.innerHTML = '';
   Object.keys(d).forEach(key => {
@@ -729,26 +1246,25 @@ function openModal(d) {
     sections.appendChild(sec);
   });
 
-  // 多圖支援：image 欄填資料夾名（查 manifest）或 | 分隔路徑
-  const images = getImages(d);
-  const imgWrap = document.getElementById('mImgWrap');
+  const images     = getImages(d);
+  const imgWrap    = document.getElementById('mImgWrap');
   const thumbsWrap = document.getElementById('mThumbs');
 
-  if (images.length === 0) {
-    imgWrap.innerHTML = d.emoji || '📦';
+  if (!images.length) {
+    imgWrap.innerHTML        = d.emoji || '📦';
     thumbsWrap.style.display = 'none';
   } else {
-    imgWrap.innerHTML = `<img src="${images[0]}" alt="${d.name}" />`;
+    imgWrap.innerHTML = `<img src="${images[0]}" alt="${d.name}">`;
     if (images.length > 1) {
       thumbsWrap.style.display = 'flex';
       thumbsWrap.innerHTML = images.map((src, i) =>
-        `<img src="${src}" class="thumb${i === 0 ? ' active' : ''}" data-src="${src}" />`
+        `<img src="${src}" class="thumb${i === 0 ? ' active' : ''}" data-src="${src}">`
       ).join('');
-      thumbsWrap.querySelectorAll('.thumb').forEach(thumb => {
-        thumb.addEventListener('click', () => {
-          imgWrap.innerHTML = `<img src="${thumb.dataset.src}" alt="${d.name}" />`;
-          thumbsWrap.querySelectorAll('.thumb').forEach(t => t.classList.remove('active'));
-          thumb.classList.add('active');
+      thumbsWrap.querySelectorAll('.thumb').forEach(t => {
+        t.addEventListener('click', () => {
+          imgWrap.innerHTML = `<img src="${t.dataset.src}" alt="${d.name}">`;
+          thumbsWrap.querySelectorAll('.thumb').forEach(x => x.classList.remove('active'));
+          t.classList.add('active');
         });
       });
     } else {
@@ -771,46 +1287,40 @@ function closeModal() {
 document.getElementById('modalClose').addEventListener('click', closeModal);
 overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
 searchInput.addEventListener('input', renderGrid);
-categoryFilter.addEventListener('change', renderGrid);
-subgenusFilter.addEventListener('change', renderGrid);
-speciesFilter.addEventListener('change', renderGrid);
+[categoryFilter, subgenusFilter, speciesFilter, wholeshotFilter, genderFilter]
+  .forEach(el => el.addEventListener('change', renderGrid));
+
 clearBtn.addEventListener('click', () => {
-  searchInput.value    = '';
-  categoryFilter.value = '';
-  subgenusFilter.value = '';
-  speciesFilter.value  = '';
-  wholeshotFilter.value = '';
-  genderFilter.value    = '';
+  searchInput.value = '';
+  [categoryFilter, subgenusFilter, speciesFilter, wholeshotFilter, genderFilter]
+    .forEach(el => { el.value = ''; });
   renderGrid();
 });
-wholeshotFilter.addEventListener('change', renderGrid);
-genderFilter.addEventListener('change', renderGrid);
 
-// 自動偵測 UTF-8 / Big5 編碼
+// ── 資料載入 ──────────────────────────────────────────────────────────
+
 function decodeBuf(buf) {
-  const bytes = new Uint8Array(buf);
-  // UTF-8 BOM
-  if (bytes[0] === 0xEF && bytes[1] === 0xBB && bytes[2] === 0xBF)
+  const b = new Uint8Array(buf);
+  if (b[0] === 0xEF && b[1] === 0xBB && b[2] === 0xBF)
     return new TextDecoder('utf-8').decode(buf.slice(3));
-  // 嘗試嚴格 UTF-8
-  try { return new TextDecoder('utf-8', { fatal: true }).decode(buf); }
+  try   { return new TextDecoder('utf-8', { fatal: true }).decode(buf); }
   catch { return new TextDecoder('big5').decode(buf); }
 }
 
-// Google Sheets 公開 CSV 匯出網址
-const GS_CSV_URL = 'https://docs.google.com/spreadsheets/d/1n8A-wMmJxdwwFjKDfL1jsj-Llcz3QQDXrHnJ2fNMNJ8/export?format=csv';
+const GS_CSV_URL =
+  'https://docs.google.com/spreadsheets/d/1n8A-wMmJxdwwFjKDfL1jsj-Llcz3QQDXrHnJ2fNMNJ8/export?format=csv';
 
 grid.innerHTML = '<div class="empty">載入中…</div>';
 
-// file:// 離線開啟 → 使用 data.js 嵌入資料
-// 線上（GitHub Pages / 本地伺服器）→ 直接從 Google Sheets 抓最新資料
 const isOffline = window.location.protocol === 'file:';
 let dataReady;
 if (isOffline && window.EMBEDDED_DATA) {
   dataReady = Promise.resolve([window.EMBEDDED_DATA.manifest, window.EMBEDDED_DATA.csv]);
 } else {
-  const fetchManifest = fetch('manifest.json').then(r => r.ok ? r.json() : {}).catch(() => ({}));
+  const fetchManifest =
+    fetch('manifest.json').then(r => r.ok ? r.json() : {}).catch(() => ({}));
   const fetchCSV = fetch(GS_CSV_URL)
     .then(r => { if (!r.ok) throw new Error('無法載入 Google Sheets 資料'); return r.arrayBuffer(); })
     .then(buf => decodeBuf(buf));
@@ -820,13 +1330,14 @@ if (isOffline && window.EMBEDDED_DATA) {
 dataReady
   .then(([manifest, csvText]) => {
     MANIFEST = manifest;
-    DATA = parseCSV(csvText).map(transformRow);
+    DATA     = parseCSV(csvText).map(transformRow);
     initCategories();
     renderGrid();
   })
   .catch(err => {
     grid.innerHTML = `<div class="empty">資料載入失敗：${err.message}</div>`;
   });
+
 </script>
 </body>
 </html>
