@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>庫蠓標本影像：臺灣大學昆蟲學系寄生蟲實驗室</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:   #0b0f1e;
+      --navy2:  #151b30;
+      --navy3:  #1e2740;
+      --gold:   #c9a84c;
+      --gold2:  #e8c96d;
+      --text:   #e8e4da;
+      --muted:  #8a9bb0;
+      --border: #2a3555;
+      --card-bg:#131929;
+    }
+
+    body {
+      background: var(--navy);
+      color: var(--text);
+      font-family: 'Noto Serif TC', 'Georgia', serif;
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      background: var(--navy2);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      height: 64px;
+    }
+
+    .site-title {
+      font-size: 1.2rem;
+      color: var(--gold);
+      letter-spacing: 0.1em;
+      white-space: nowrap;
+      text-decoration: none;
+    }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex: 1;
+      justify-content: flex-end;
+    }
+
+    .search-wrap {
+      position: relative;
+    }
+
+    .search-wrap svg {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      pointer-events: none;
+    }
+
+    #searchInput {
+      background: var(--navy3);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 6px;
+      padding: 0.4rem 0.75rem 0.4rem 2.2rem;
+      font-size: 0.9rem;
+      width: 200px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    #searchInput:focus { border-color: var(--gold); }
+
+    .filter-wrap { position: relative; }
+
+    .filter-select {
+      appearance: none;
+      background: var(--navy3);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 6px;
+      padding: 0.4rem 2rem 0.4rem 0.75rem;
+      font-size: 0.9rem;
+      cursor: pointer;
+      outline: none;
+      transition: border-color 0.2s;
+      max-width: 130px;
+    }
+
+    .filter-select:focus { border-color: var(--gold); }
+
+    .filter-wrap::after {
+      content: '▾';
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      pointer-events: none;
+      font-size: 0.8rem;
+    }
+
+    #clearBtn {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      border-radius: 6px;
+      padding: 0.4rem 0.6rem;
+      cursor: pointer;
+      font-size: 0.82rem;
+      width: 100%;
+      margin-top: 0.4rem;
+      transition: border-color 0.2s, color 0.2s;
+      display: none;
+    }
+
+    #clearBtn:hover { border-color: var(--gold); color: var(--gold); }
+    #clearBtn.visible { display: block; }
+
+    /* ── Hero ── */
+    .hero {
+      text-align: center;
+      padding: 3.5rem 1rem 2rem;
+    }
+
+    .hero h1 {
+      font-size: 2.2rem;
+      color: var(--gold);
+      letter-spacing: 0.15em;
+      margin-bottom: 0.6rem;
+    }
+
+    .hero p {
+      color: var(--muted);
+      font-size: 1rem;
+      letter-spacing: 0.05em;
+    }
+
+    /* ── Content layout ── */
+    .content-wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1rem 2rem 4rem;
+      display: flex;
+      gap: 1.5rem;
+      align-items: flex-start;
+    }
+
+    /* ── Filter sidebar ── */
+    .filter-panel {
+      width: 148px;
+      flex-shrink: 0;
+      position: sticky;
+      top: 80px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .filter-title {
+      color: var(--gold);
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding-bottom: 0.4rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 0.15rem;
+    }
+
+    .filter-label {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 0.3rem;
+    }
+
+    .filter-panel .filter-wrap { position: relative; }
+    .filter-panel .filter-select { width: 100%; max-width: 100%; }
+
+    /* ── Grid ── */
+    .grid-section {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .results-info {
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1.25rem;
+    }
+
+    /* ── Card ── */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .card:hover {
+      transform: translateY(-3px);
+      border-color: var(--gold);
+      box-shadow: 0 6px 24px rgba(201,168,76,0.15);
+    }
+
+    .card-img {
+      width: 100%;
+      aspect-ratio: 4/3;
+      object-fit: cover;
+      background: var(--navy3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      font-size: 2.5rem;
+    }
+
+    .card-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .card-body {
+      padding: 0.9rem 1rem 1rem;
+    }
+
+    .card-name {
+      font-size: 1.05rem;
+      color: var(--text);
+      margin-bottom: 0.25rem;
+    }
+
+    .card-sci {
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-style: italic;
+      margin-bottom: 0.5rem;
+    }
+
+    .card-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 0.6rem;
+    }
+
+    .tag {
+      background: var(--navy3);
+      border: 1px solid var(--border);
+      color: var(--gold);
+      font-size: 0.72rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      letter-spacing: 0.03em;
+    }
+
+    .card-date {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    /* ── Empty state ── */
+    .empty {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 4rem 0;
+      color: var(--muted);
+    }
+
+    /* ── Modal ── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(5,8,18,0.85);
+      backdrop-filter: blur(4px);
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s;
+    }
+
+    .modal-overlay.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .modal {
+      background: var(--navy2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      max-width: 640px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      transform: translateY(16px);
+      transition: transform 0.25s;
+    }
+
+    .modal-overlay.open .modal { transform: translateY(0); }
+
+    .modal-header {
+      padding: 1.25rem 1.5rem 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .modal-header h2 {
+      font-size: 1.5rem;
+      color: var(--gold);
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 1.5rem;
+      cursor: pointer;
+      line-height: 1;
+      padding: 0.25rem;
+      transition: color 0.2s;
+    }
+
+    .modal-close:hover { color: var(--text); }
+
+    .modal-img {
+      width: 100%;
+      aspect-ratio: 16/9;
+      background: var(--navy3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      font-size: 4rem;
+      margin: 1rem 0 0;
+      overflow: hidden;
+    }
+
+    .modal-img img { width: 100%; height: 100%; object-fit: contain; display: block; }
+
+    .modal-thumbs {
+      display: flex;
+      gap: 0.4rem;
+      padding: 0.5rem 1.5rem;
+      overflow-x: auto;
+      background: var(--navy3);
+    }
+
+    .modal-thumbs img {
+      width: 72px;
+      height: 52px;
+      object-fit: contain;
+      border-radius: 4px;
+      cursor: pointer;
+      border: 2px solid transparent;
+      flex-shrink: 0;
+      transition: border-color 0.2s, opacity 0.2s;
+      opacity: 0.65;
+    }
+
+    .modal-thumbs img.active,
+    .modal-thumbs img:hover { border-color: var(--gold); opacity: 1; }
+
+    .modal-body { padding: 1.25rem 1.5rem 1.75rem; }
+
+    .modal-sci {
+      font-style: italic;
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+    }
+
+    .modal-tags {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.2rem;
+    }
+
+    .modal-section { margin-bottom: 1rem; }
+
+    .modal-section h4 {
+      color: var(--gold);
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 0.4rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.3rem;
+    }
+
+    .modal-section p {
+      font-size: 0.93rem;
+      line-height: 1.8;
+      color: var(--text);
+    }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center;
+      padding: 1.5rem;
+      color: var(--muted);
+      font-size: 0.8rem;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 700px) {
+      .header-inner { flex-wrap: wrap; height: auto; padding: 0.75rem 0; }
+      #searchInput { width: 150px; }
+      .hero h1 { font-size: 1.6rem; }
+      .content-wrap { flex-direction: column; padding: 1rem 1rem 4rem; gap: 1rem; }
+      .filter-panel {
+        width: 100%;
+        position: static;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+      .filter-title { width: 100%; }
+      .filter-label { display: none; }
+      .filter-panel .filter-wrap { flex: 1; min-width: 120px; }
+      #clearBtn { width: auto; margin-top: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Header ── -->
+<header>
+  <div class="header-inner">
+    <a class="site-title" href="#">庫蠓標本影像：臺灣大學昆蟲學系寄生蟲實驗室</a>
+    <div class="header-controls">
+      <div class="search-wrap">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input id="searchInput" type="text" placeholder="搜尋名稱…" />
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ── Hero ── -->
+<div class="hero">
+  <h1>庫蠓標本影像</h1>
+  <p>Image Collection of <em>Culicoides</em> Specimens</p>
+  <p style="margin-top:0.35rem">臺灣大學昆蟲學系寄生蟲實驗室<br>
+  <span style="font-size:0.85rem">Parasitology Laboratory, Department of Entomology, National Taiwan University</span></p>
+</div>
+
+<!-- ── Content ── -->
+<div class="content-wrap">
+  <aside class="filter-panel">
+    <p class="filter-title">篩選</p>
+
+    <span class="filter-label">屬</span>
+    <div class="filter-wrap">
+      <select id="categoryFilter" class="filter-select"><option value="">全部</option></select>
+    </div>
+
+    <span class="filter-label">亞屬</span>
+    <div class="filter-wrap">
+      <select id="subgenusFilter" class="filter-select"><option value="">全部</option></select>
+    </div>
+
+    <span class="filter-label">種</span>
+    <div class="filter-wrap">
+      <select id="speciesFilter" class="filter-select"><option value="">全部</option></select>
+    </div>
+
+    <span class="filter-label">性別</span>
+    <div class="filter-wrap">
+      <select id="genderFilter" class="filter-select"><option value="">全部</option></select>
+    </div>
+
+    <span class="filter-label">全身照</span>
+    <div class="filter-wrap">
+      <select id="wholeshotFilter" class="filter-select">
+        <option value="">全部</option>
+        <option value="Y">有全身照</option>
+      </select>
+    </div>
+
+    <button id="clearBtn" title="清除篩選">✕ 清除篩選</button>
+  </aside>
+
+  <section class="grid-section">
+    <p class="results-info" id="resultsInfo"></p>
+    <div class="grid" id="grid"></div>
+  </section>
+</div>
+
+<!-- ── Modal ── -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <h2 id="mName"></h2>
+      <button class="modal-close" id="modalClose">×</button>
+    </div>
+    <div class="modal-img" id="mImgWrap"></div>
+    <div class="modal-thumbs" id="mThumbs" style="display:none"></div>
+    <div class="modal-body">
+      <p class="modal-sci" id="mSci"></p>
+      <div class="modal-tags" id="mTags"></div>
+      <div id="mSections"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Footer ── -->
+<footer>
+  庫蠓標本影像 © 臺灣大學昆蟲學系寄生蟲實驗室 · 持續收錄中
+</footer>
+
+<!-- 本地離線用：build.ps1 自動產生 data.js，讓 file:// 直接開啟也能讀資料 -->
+<script src="data.js"></script>
+<script>
+// ══════════════════════════════════════
+//  資料來源：玻片標本清單 (slide mount).csv
+//  Cd + No. → number（圖片資料夾名）
+//  Genus + Subgenus + Species → 學名
+// ══════════════════════════════════════
+
+function parseCSV(text) {
+  // 移除 UTF-8 BOM 避免第一個欄位帶入隱形字元
+  const lines = text.replace(/^﻿/, '').trim().split(/\r?\n/);
+  const headers = lines[0].split(',');
+  return lines.slice(1).filter(l => l.trim()).map(line => {
+    const cols = [];
+    let cur = '', inQ = false;
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      if (ch === '"') { inQ = !inQ; }
+      else if (ch === ',' && !inQ) { cols.push(cur); cur = ''; }
+      else { cur += ch; }
+    }
+    cols.push(cur);
+    const obj = {};
+    headers.forEach((h, i) => { obj[h.trim()] = (cols[i] || '').trim(); });
+    return obj;
+  });
+}
+
+// 將原始 CSV 欄位轉換成網站用的格式
+function transformRow(r) {
+  const cd  = (r['Cd']   || '').trim();
+  const no  = (r['No.']  || '').trim();
+  const num = cd + no;  // e.g. "Cer13"
+
+  const genus    = (r['Genus']    || '').trim();
+  const subgenus = (r['Subgenus'] || '').trim();
+  const species  = (r['Species']  || '').trim();
+  const sciName  = [genus, subgenus ? `(${subgenus})` : '', species]
+                    .filter(Boolean).join(' ');
+
+  const lat = (r['LATDD'] || '').trim();
+  const lon = (r['LONDD'] || '').trim();
+
+  const obj = {
+    id:       num,
+    number:   num,
+    name:     `${(r['中文名'] || '').trim()} ${num}`.trim(),
+    sciName,
+    category: genus,
+    subgenus: subgenus,
+    species:  species,
+    date:     (r['Col. Date'] || '').trim(),
+    emoji:    '🦟',
+    image:    num,   // 對應 manifest 資料夾名
+    全身照:   (r['全身照'] || '').trim(),
+    _sex:     (r['sex']    || '').trim(),  // 供篩選用，不直接顯示
+  };
+
+  // Modal 顯示欄位（空值自動略過）
+  const fields = {
+    '採集地':    r['Locality'],
+    '採集者':    r['Collector'],
+    'GPS':       lat && lon ? `${lat}, ${lon}` : '',
+    '寄主':      r['Host'],
+    'DNA_Coi':   r['DNA_Coi'],
+    '性別':      r['sex'],
+    '鑑定者':    r['det.'],
+  };
+  Object.entries(fields).forEach(([k, v]) => {
+    if (v && v.trim()) obj[k] = v.trim();
+  });
+  return obj;
+}
+
+// ══════════════════════════════════════
+//  以下為程式邏輯，通常不需更動
+// ══════════════════════════════════════
+
+const grid = document.getElementById('grid');
+const searchInput = document.getElementById('searchInput');
+const categoryFilter  = document.getElementById('categoryFilter');
+const subgenusFilter  = document.getElementById('subgenusFilter');
+const speciesFilter   = document.getElementById('speciesFilter');
+const genderFilter    = document.getElementById('genderFilter');
+const wholeshotFilter = document.getElementById('wholeshotFilter');
+const clearBtn = document.getElementById('clearBtn');
+const resultsInfo = document.getElementById('resultsInfo');
+const overlay = document.getElementById('modalOverlay');
+
+let DATA = [];
+let MANIFEST = {}; // { "資料夾名稱": ["images/資料夾/01.jpg", ...] }
+
+// 取得某筆資料的圖片陣列
+// 優先查 manifest（image 欄填資料夾名），其次直接解析 | 分隔路徑
+function getImages(d) {
+  if (!d.image) return [];
+  const key = d.image.trim();
+  if (MANIFEST[key]) return MANIFEST[key];
+  return key.split('|').map(s => s.trim()).filter(Boolean);
+}
+
+function fillSelect(el, values, placeholder) {
+  el.innerHTML = `<option value="">${placeholder}</option>`;
+  [...new Set(values)].filter(Boolean).sort().forEach(v => {
+    const opt = document.createElement('option');
+    opt.value = v; opt.textContent = v;
+    el.appendChild(opt);
+  });
+}
+
+function initCategories() {
+  fillSelect(categoryFilter, DATA.map(d => d.category),  '全部屬');
+  fillSelect(subgenusFilter, DATA.map(d => d.subgenus),  '全部亞屬');
+  fillSelect(speciesFilter,  DATA.map(d => d.species ? `${d.category} ${d.species}` : ''), '全部種');
+  fillSelect(genderFilter,   DATA.map(d => d._sex),      '全部');
+}
+
+function renderGrid() {
+  const q  = searchInput.value.trim().toLowerCase();
+  const cat = categoryFilter.value;
+  const sub = subgenusFilter.value;
+  const sp  = speciesFilter.value;
+  const ws  = wholeshotFilter.value;
+  const gen = genderFilter.value;
+
+  const filtered = DATA.filter(d => {
+    const matchQ   = !q   || d.name.toLowerCase().includes(q) || (d.sciName || '').toLowerCase().includes(q);
+    const matchCat = !cat || d.category === cat;
+    const matchSub = !sub || d.subgenus === sub;
+    const matchSp  = !sp  || `${d.category} ${d.species}` === sp;
+    const matchWS  = !ws  || d.全身照 === 'Y';
+    const matchGen = !gen || d._sex === gen;
+    return matchQ && matchCat && matchSub && matchSp && matchWS && matchGen;
+  });
+
+  clearBtn.classList.toggle('visible', !!(q || cat || sub || sp || ws || gen));
+  resultsInfo.textContent = `共 ${filtered.length} 筆`;
+  grid.innerHTML = '';
+
+  if (filtered.length === 0) {
+    grid.innerHTML = '<div class="empty">找不到符合的標本</div>';
+    return;
+  }
+
+  filtered.forEach(d => {
+    const imgs = getImages(d);
+    const firstImg = imgs[0] || '';
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <div class="card-img">
+        ${firstImg
+          ? `<img src="${firstImg}" alt="${d.name}" loading="lazy" />`
+          : d.emoji || '📦'}
+      </div>
+      <div class="card-body">
+        <div class="card-name">${d.name}</div>
+        <div class="card-sci">${d.sciName || ''}</div>
+        <div class="card-meta">
+          <span class="tag">${d.category}</span>
+          ${d._sex ? `<span class="tag">${d._sex}</span>` : ''}
+          <span class="card-date">${d.date || ''}</span>
+        </div>
+      </div>`;
+    card.addEventListener('click', () => openModal(d));
+    grid.appendChild(card);
+  });
+}
+
+function openModal(d) {
+  const FIXED = new Set(['id','name','sciName','category','subgenus','species','date','emoji','image','number','全身照','_sex']);
+  document.getElementById('mName').textContent = d.name;
+  document.getElementById('mSci').textContent = d.sciName || '';
+
+  // 自動依 CSV 欄位產生 Modal 區塊，跳過固定欄位與空值
+  const sections = document.getElementById('mSections');
+  sections.innerHTML = '';
+  Object.keys(d).forEach(key => {
+    if (FIXED.has(key) || !d[key]) return;
+    const sec = document.createElement('div');
+    sec.className = 'modal-section';
+    sec.innerHTML = `<h4>${key}</h4><p>${d[key]}</p>`;
+    sections.appendChild(sec);
+  });
+
+  // 多圖支援：image 欄填資料夾名（查 manifest）或 | 分隔路徑
+  const images = getImages(d);
+  const imgWrap = document.getElementById('mImgWrap');
+  const thumbsWrap = document.getElementById('mThumbs');
+
+  if (images.length === 0) {
+    imgWrap.innerHTML = d.emoji || '📦';
+    thumbsWrap.style.display = 'none';
+  } else {
+    imgWrap.innerHTML = `<img src="${images[0]}" alt="${d.name}" />`;
+    if (images.length > 1) {
+      thumbsWrap.style.display = 'flex';
+      thumbsWrap.innerHTML = images.map((src, i) =>
+        `<img src="${src}" class="thumb${i === 0 ? ' active' : ''}" data-src="${src}" />`
+      ).join('');
+      thumbsWrap.querySelectorAll('.thumb').forEach(thumb => {
+        thumb.addEventListener('click', () => {
+          imgWrap.innerHTML = `<img src="${thumb.dataset.src}" alt="${d.name}" />`;
+          thumbsWrap.querySelectorAll('.thumb').forEach(t => t.classList.remove('active'));
+          thumb.classList.add('active');
+        });
+      });
+    } else {
+      thumbsWrap.style.display = 'none';
+    }
+  }
+
+  document.getElementById('mTags').innerHTML =
+    `<span class="tag">${d.category}</span><span class="tag">${d.date || ''}</span>`;
+
+  overlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  overlay.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.getElementById('modalClose').addEventListener('click', closeModal);
+overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+searchInput.addEventListener('input', renderGrid);
+categoryFilter.addEventListener('change', renderGrid);
+subgenusFilter.addEventListener('change', renderGrid);
+speciesFilter.addEventListener('change', renderGrid);
+clearBtn.addEventListener('click', () => {
+  searchInput.value    = '';
+  categoryFilter.value = '';
+  subgenusFilter.value = '';
+  speciesFilter.value  = '';
+  wholeshotFilter.value = '';
+  genderFilter.value    = '';
+  renderGrid();
+});
+wholeshotFilter.addEventListener('change', renderGrid);
+genderFilter.addEventListener('change', renderGrid);
+
+// 自動偵測 UTF-8 / Big5 編碼
+function decodeBuf(buf) {
+  const bytes = new Uint8Array(buf);
+  // UTF-8 BOM
+  if (bytes[0] === 0xEF && bytes[1] === 0xBB && bytes[2] === 0xBF)
+    return new TextDecoder('utf-8').decode(buf.slice(3));
+  // 嘗試嚴格 UTF-8
+  try { return new TextDecoder('utf-8', { fatal: true }).decode(buf); }
+  catch { return new TextDecoder('big5').decode(buf); }
+}
+
+// Google Sheets 公開 CSV 匯出網址
+const GS_CSV_URL = 'https://docs.google.com/spreadsheets/d/1n8A-wMmJxdwwFjKDfL1jsj-Llcz3QQDXrHnJ2fNMNJ8/export?format=csv';
+
+grid.innerHTML = '<div class="empty">載入中…</div>';
+
+// file:// 離線開啟 → 使用 data.js 嵌入資料
+// 線上（GitHub Pages / 本地伺服器）→ 直接從 Google Sheets 抓最新資料
+const isOffline = window.location.protocol === 'file:';
+let dataReady;
+if (isOffline && window.EMBEDDED_DATA) {
+  dataReady = Promise.resolve([window.EMBEDDED_DATA.manifest, window.EMBEDDED_DATA.csv]);
+} else {
+  const fetchManifest = fetch('manifest.json').then(r => r.ok ? r.json() : {}).catch(() => ({}));
+  const fetchCSV = fetch(GS_CSV_URL)
+    .then(r => { if (!r.ok) throw new Error('無法載入 Google Sheets 資料'); return r.arrayBuffer(); })
+    .then(buf => decodeBuf(buf));
+  dataReady = Promise.all([fetchManifest, fetchCSV]);
+}
+
+dataReady
+  .then(([manifest, csvText]) => {
+    MANIFEST = manifest;
+    DATA = parseCSV(csvText).map(transformRow);
+    initCategories();
+    renderGrid();
+  })
+  .catch(err => {
+    grid.innerHTML = `<div class="empty">資料載入失敗：${err.message}</div>`;
+  });
+</script>
+</body>
+</html>
