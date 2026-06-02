@@ -16,26 +16,6 @@ IMG_EXTS  = {".jpg", ".jpeg", ".png", ".tif", ".tiff"}
 
 # ── 影像工具 ──────────────────────────────────────────────────────────────────
 
-def phash(img):
-    small  = img.convert("L").resize((8, 8), Image.LANCZOS)
-    pixels = list(small.getdata())
-    avg    = sum(pixels) / len(pixels)
-    return int("".join("1" if p > avg else "0" for p in pixels), 2)
-
-def hamming(a, b):
-    return bin(a ^ b).count("1")
-
-def existing_hashes(spec_id):
-    hashes = {}
-    folder = IMG_DIR / spec_id
-    if folder.exists():
-        for p in sorted(folder.glob("*.png")):
-            try:
-                hashes[p] = phash(Image.open(p))
-            except Exception:
-                pass
-    return hashes
-
 def compress(img):
     img  = img.convert("RGB")
     w, h = img.size
@@ -71,6 +51,67 @@ def rebuild_manifest():
         json.dumps(manifest, ensure_ascii=False, indent=4), encoding="utf-8"
     )
     return len(manifest)
+
+# ── 檔名衝突對話框 ────────────────────────────────────────────────────────────
+
+class ConflictDialog(tk.Toplevel):
+    """
+    檔名衝突時彈出，讓使用者選擇處置方式。
+    result: ('skip'|'skip_all'|'overwrite'|'overwrite_all'|'rename', new_filename_or_None)
+    """
+    def __init__(self, parent, spec_id: str, filename: str):
+        super().__init__(parent)
+        self.result = ('skip', None)
+        self.title("檔名衝突")
+        self.resizable(False, False)
+        self.grab_set()
+        self.focus_set()
+
+        ttk.Label(self, text="目標檔案已存在：",
+                  font=("", 10, "bold")).pack(padx=24, pady=(18, 4))
+        ttk.Label(self, text=f"{spec_id}/{filename}",
+                  foreground="#c9a84c").pack(padx=24, pady=(0, 14))
+
+        # ── 改名區 ──────────────────────────────────────────────────────
+        rf = ttk.LabelFrame(self, text=" 改名後上傳 ", padding=10)
+        rf.pack(fill="x", padx=24, pady=(0, 10))
+        ttk.Label(rf, text="新檔名（不含 .png）：").pack(anchor="w")
+        self._new_name = tk.StringVar(value=pathlib.Path(filename).stem)
+        entry = ttk.Entry(rf, textvariable=self._new_name, width=30)
+        entry.pack(fill="x", pady=(4, 6))
+        entry.select_range(0, "end")
+        entry.focus_set()
+        ttk.Button(rf, text="確認改名", command=self._rename).pack(anchor="e")
+
+        # ── 其他選項 ─────────────────────────────────────────────────────
+        bf = ttk.Frame(self)
+        bf.pack(padx=24, pady=(0, 18))
+        ttk.Button(bf, text="覆蓋",      width=10, command=self._overwrite    ).grid(row=0, column=0, padx=4, pady=3)
+        ttk.Button(bf, text="覆蓋全部",  width=10, command=self._overwrite_all).grid(row=0, column=1, padx=4, pady=3)
+        ttk.Button(bf, text="略過",      width=10, command=self._skip         ).grid(row=1, column=0, padx=4, pady=3)
+        ttk.Button(bf, text="略過全部",  width=10, command=self._skip_all     ).grid(row=1, column=1, padx=4, pady=3)
+
+        self.protocol("WM_DELETE_WINDOW", self._skip)
+        self.wait_window()
+
+    def _rename(self):
+        stem = self._new_name.get().strip()
+        if stem:
+            self.result = ('rename', stem + '.png')
+            self.destroy()
+
+    def _overwrite(self):
+        self.result = ('overwrite', None); self.destroy()
+
+    def _overwrite_all(self):
+        self.result = ('overwrite_all', None); self.destroy()
+
+    def _skip(self):
+        self.result = ('skip', None); self.destroy()
+
+    def _skip_all(self):
+        self.result = ('skip_all', None); self.destroy()
+
 
 # ── GUI ───────────────────────────────────────────────────────────────────────
 
@@ -291,14 +332,30 @@ class App(tk.Tk):
         self._set_state(self.compress_btn, "normal")
         self._log(f"▶ 批次選取：{parent}（{len(batches)} 個標本，共 {total} 張）")
 
+    # ── 衝突詢問（在主執行緒顯示對話框）────────────────────────────────────────
+
+    def _ask_conflict(self, spec_id: str, filename: str):
+        """從背景執行緒呼叫，阻塞直到使用者在對話框做出選擇。"""
+        result = [('skip', None)]
+        event  = threading.Event()
+
+        def show():
+            dlg = ConflictDialog(self, spec_id, filename)
+            result[0] = dlg.result
+            event.set()
+
+        self.after(0, show)
+        event.wait()
+        return result[0]
+
     # ── 壓縮核心（單一標本）────────────────────────────────────────────────────
 
     def _do_compress_one(self, spec_id: str, files: list, on_progress=None) -> int:
-        """壓縮並放入 images/<spec_id>/，回傳新增數量"""
+        """壓縮並放入 images/<spec_id>/，回傳新增數量。
+        以檔名判斷重複；衝突時彈出對話框讓使用者決定。"""
         self._log(f"\n  ── {spec_id} ──")
-        hashes     = existing_hashes(spec_id)
         out_folder = IMG_DIR / spec_id
-        ok = dup = skip = err = 0
+        ok = skip = err = 0
 
         for i, raw in enumerate(files):
             if on_progress:
@@ -307,39 +364,59 @@ class App(tk.Tk):
             out_path = out_folder / out_name
             tag      = f"{spec_id}/{out_name}"
 
+            # ── 檔名衝突：詢問使用者 ────────────────────────────────────
             if out_path.exists():
-                self._log(f"  SKIP  {tag}（已存在）")
-                skip += 1
-                continue
+                if self._conflict_all == 'skip_all':
+                    self._log(f"  SKIP  {tag}（略過全部）")
+                    skip += 1
+                    continue
+                elif self._conflict_all == 'overwrite_all':
+                    self._log(f"  OVR   {tag}（覆蓋）")
+                    # fall through to compress
+                else:
+                    action, new_name = self._ask_conflict(spec_id, out_name)
+                    if action == 'skip':
+                        self._log(f"  SKIP  {tag}（略過）")
+                        skip += 1
+                        continue
+                    elif action == 'skip_all':
+                        self._log(f"  SKIP  {tag}（略過）")
+                        skip += 1
+                        self._conflict_all = 'skip_all'
+                        continue
+                    elif action == 'rename':
+                        out_name = new_name
+                        out_path = out_folder / out_name
+                        tag      = f"{spec_id}/{out_name}"
+                    elif action == 'overwrite':
+                        self._log(f"  OVR   {tag}（覆蓋）")
+                    elif action == 'overwrite_all':
+                        self._log(f"  OVR   {tag}（覆蓋）")
+                        self._conflict_all = 'overwrite_all'
+
+            # ── 壓縮並寫入 ──────────────────────────────────────────────
             try:
                 img = Image.open(raw)
-                h   = phash(img)
             except Exception as e:
                 self._log(f"  ERR   {raw.name}: {e}")
                 err += 1
-                continue
-
-            dup_of = next((p for p, dh in hashes.items() if hamming(h, dh) < 5), None)
-            if dup_of:
-                self._log(f"  DUP   {tag}（≈ {dup_of.name}）")
-                dup += 1
                 continue
 
             try:
                 out_folder.mkdir(parents=True, exist_ok=True)
                 data = compress(img)
                 out_path.write_bytes(data)
-                hashes[out_path] = h
                 self._log(f"  OK    {tag}（{len(data)//1024} KB）")
                 ok += 1
             except Exception as e:
                 self._log(f"  ERR   {tag}: {e}")
                 err += 1
 
-        self._log(f"  新增 {ok}  |  重複跳過 {dup}  |  已存在跳過 {skip}  |  錯誤 {err}")
+        self._log(f"  新增 {ok}  |  略過 {skip}  |  錯誤 {err}")
         return ok
 
     def _compress(self):
+        self._conflict_all = None   # 每次壓縮重置「全部略過/覆蓋」狀態
         self._set_state(self.compress_btn, "disabled")
 
         if self._batches:
