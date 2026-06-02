@@ -87,11 +87,18 @@
 
     /* ── Page hero ───────────────────────────────────────────────── */
     .page-hero {
-      text-align: center;
-      padding: 4rem 1.5rem 2.5rem;
       background: linear-gradient(180deg, var(--navy2) 0%, var(--navy) 100%);
       border-bottom: 1px solid var(--border);
+      padding: 3.5rem 2rem 3rem;
     }
+    .page-hero-inner {
+      max-width: 1000px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 3rem;
+    }
+    .page-hero-text { flex: 1; }
     .page-hero h1 {
       font-size: 2.4rem;
       color: var(--gold);
@@ -103,6 +110,29 @@
       color: var(--muted);
       font-size: 0.95rem;
       line-height: 2;
+    }
+    .page-hero-img {
+      flex-shrink: 0;
+      width: 280px;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    }
+    .page-hero-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .page-hero-img figcaption {
+      font-size: 0.72rem;
+      color: var(--muted);
+      text-align: center;
+      padding: 0.4rem 0.75rem;
+      background: var(--navy2);
+      font-style: italic;
+      line-height: 1.5;
     }
 
     /* ── Page content ────────────────────────────────────────────── */
@@ -613,6 +643,9 @@
       .header-inner { gap: 0.75rem; }
       .site-title   { font-size: 0.88rem; }
       .tab-btn      { padding: 0 0.65rem; font-size: 0.85rem; }
+      .page-hero { padding: 2.5rem 1rem 2rem; }
+      .page-hero-inner { flex-direction: column; gap: 1.5rem; }
+      .page-hero-img { width: 100%; max-width: 340px; margin: 0 auto; }
       .page-hero h1 { font-size: 1.7rem; }
       .page-content { padding: 2rem 1rem 4rem; }
       .content-wrap {
@@ -655,12 +688,20 @@
 <div class="page active" id="page-intro">
 
   <div class="page-hero">
-    <h1><em>Culicoides</em> 庫蠓</h1>
-    <p class="subtitle">
-      Image Collection of <em>Culicoides</em> Specimens<br>
-      臺灣大學昆蟲學系寄生蟲實驗室<br>
-      <span style="font-size:0.82rem">Parasitology Laboratory · Department of Entomology · National Taiwan University</span>
-    </p>
+    <div class="page-hero-inner">
+      <div class="page-hero-text">
+        <h1><em>Culicoides</em> 庫蠓</h1>
+        <p class="subtitle">
+          Image Collection of <em>Culicoides</em> Specimens<br>
+          臺灣大學昆蟲學系寄生蟲實驗室<br>
+          <span style="font-size:0.82rem">Parasitology Laboratory · Department of Entomology · National Taiwan University</span>
+        </p>
+      </div>
+      <figure class="page-hero-img">
+        <img src="images/Cer101/荒川.jpg" alt="荒川庫蠓 Culicoides arakawae">
+        <figcaption>荒川庫蠓 <em>Culicoides arakawae</em> (Arakawa, 1910)</figcaption>
+      </figure>
+    </div>
   </div>
 
   <div class="page-content">
