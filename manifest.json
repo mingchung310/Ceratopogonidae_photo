@@ -8,9 +8,10 @@
         "images/Cer10/Cer10 Thorax.png"
     ],
     "Cer101": [
-        "images/Cer101/Cer110.jpg.png",
-        "images/Cer101/荒川.Cer101.jpg.png",
-        "images/Cer101/荒川.Cer108.png"
+        "images/Cer101/荒川.Cer101.jpg.png"
+    ],
+    "Cer108": [
+        "images/Cer108/荒川.Cer108.png"
     ],
     "Cer11": [
         "images/Cer11/0.Cer11 Wings.png",
@@ -19,6 +20,9 @@
         "images/Cer11/Cer11 Antenna 2.png",
         "images/Cer11/Cer11 Head.png",
         "images/Cer11/Cer11 Thorax.png"
+    ],
+    "Cer110": [
+        "images/Cer110/Cer110.jpg.png"
     ],
     "Cer13": [
         "images/Cer13/0.Cer13 Wings.png",
