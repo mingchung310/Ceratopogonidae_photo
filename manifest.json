@@ -70,8 +70,6 @@
         "images/Cer127/head.png"
     ],
     "Cer128": [
-        "images/Cer128/Cer128.png",
-        "images/Cer128/Cer128.tif.png",
         "images/Cer128/Cer128.tif.tif.png"
     ],
     "Cer129": [
@@ -93,7 +91,8 @@
         "images/Cer13/hea_10x_1.png"
     ],
     "Cer132": [
-        "images/Cer132/body.png"
+        "images/Cer132/body.png",
+        "images/Cer132/body.tif.png"
     ],
     "Cer14": [
         "images/Cer14/0.Cer14 Wings.png",
