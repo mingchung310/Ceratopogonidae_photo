@@ -103,6 +103,67 @@ CAT_CHARS = {
     "後足脛節鬃最長":  norm_comb_longest,
 }
 
+# ── 翅斑質性特徵：暫定編碼 ──────────────────────────────────────
+# demo xlsx 各物種填的是描述文字；此處依描述「暫定」歸納成共用狀態，
+# 供互動篩選使用（原始描述仍保留於 raw、顯示於並列比較表）。
+# ⚠️ provisional：分類學判斷，待實驗室確認後再正式定稿。
+WING_CAT = {
+    "第1前緣淡斑": {
+        "actoni": "及第1徑室基部約½", "palpifer": "及第1徑室基部約½",
+        "arakawae": "延伸至基室末端＋第5徑室基部",
+        "homotomus": "延伸至基室末端＋第5徑室基部",
+        "lungchiensis": "延伸至基室末端＋第5徑室基部",
+        "oxystoma": "延伸至基室末端＋第5徑室基部",
+        "jacobsoni": "及第1徑室基部", "tainanus": "及第1徑室基部",
+        "sumatrae": "狹窄，僅第1徑室⅓",
+    },
+    "第2前緣淡斑": {
+        "arakawae": "不覆蓋第2徑室", "homotomus": "不覆蓋第2徑室",
+        "lungchiensis": "覆蓋第2徑室端部約½", "palpifer": "覆蓋第2徑室端部約½",
+        "sumatrae": "覆蓋第2徑室端部約½",
+        "jacobsoni": "覆蓋第2徑室端部，近第1中脈",
+        "tainanus": "覆蓋第2徑室端部，近第1中脈",
+        "actoni": "位於第2徑室外側", "oxystoma": "包圍第2徑室外緣（模糊帶）",
+    },
+    "第3前緣淡斑": {
+        "actoni": "抵翅緣", "arakawae": "抵翅緣", "lungchiensis": "抵翅緣",
+        "oxystoma": "抵翅緣", "tainanus": "抵翅緣",
+        "homotomus": "不抵翅緣", "jacobsoni": "不抵翅緣", "sumatrae": "不抵翅緣",
+        "palpifer": "翅端大弧形（跨R5/M1/M2）",
+    },
+    "M4室": {
+        "actoni": "中部至端部具大淡斑",
+        "arakawae": "僅端部具淡斑", "homotomus": "僅端部具淡斑",
+        "jacobsoni": "僅端部具淡斑", "lungchiensis": "僅端部具淡斑",
+        "palpifer": "僅端部具淡斑", "oxystoma": "僅端部具淡斑",
+        "sumatrae": "僅端部具淡斑", "tainanus": "僅端部具淡斑",
+    },
+    "M1室": {
+        "actoni": "基部及端部各一淡斑",
+        "arakawae": "中部及近端部各一小淡斑", "jacobsoni": "中部及近端部各一小淡斑",
+        "lungchiensis": "中部及近端部各一小淡斑", "oxystoma": "中部及近端部各一小淡斑",
+        "sumatrae": "中部及近端部各一小淡斑",
+        "homotomus": "中＋近端部小淡斑＋中央大淡斑",
+        "tainanus": "中部及近端部各一大淡斑",
+        "palpifer": "模糊淡色帶",
+    },
+    "M2室": {
+        "actoni": "自基部帶狀淡條延伸至（近）翅緣",
+        "jacobsoni": "自基部帶狀淡條延伸至（近）翅緣",
+        "tainanus": "自基部帶狀淡條延伸至（近）翅緣",
+        "arakawae": "中部及近端部各一小淡斑", "homotomus": "中部及近端部各一小淡斑",
+        "palpifer": "中部至端部多個小淡斑", "sumatrae": "中部至端部多個小淡斑",
+        "lungchiensis": "中部單一淡斑", "oxystoma": "基部與中部各一小淡斑",
+    },
+    "翅基淡區": {
+        "actoni": "大（延伸至臀室）", "homotomus": "大（延伸至臀室）",
+        "sumatrae": "大（延伸至臀室）", "tainanus": "大（延伸至臀室）",
+        "lungchiensis": "中（延伸至臀室基部）", "palpifer": "中（延伸至臀室基部）",
+        "arakawae": "小（僅基室／中室基部）", "jacobsoni": "小（僅基室／中室基部）",
+        "oxystoma": "小（僅基室／中室基部）",
+    },
+}
+
 
 def main():
     wb = openpyxl.load_workbook(XLSX, data_only=True)
@@ -170,6 +231,28 @@ def main():
                 "id": "c_" + str(len(interactive)),
                 "region": region, "name": name, "nameEn": nameEn,
                 "type": "cat", "note": ref,
+                "states": states, "values": vals,
+            })
+
+        elif name in WING_CAT:
+            coding = WING_CAT[name]
+            vals, states = {}, []
+            for sid in species_ids:
+                if raw_vals[sid] is None:
+                    vals[sid] = {"state": None, "raw": None}
+                    continue
+                st = coding.get(sid)
+                if st is None:
+                    print(f"  [警告] {name} 缺 {sid} 編碼，暫用原始描述")
+                    st = raw_vals[sid]
+                vals[sid] = {"state": st, "raw": raw_vals[sid]}
+                if st not in states:
+                    states.append(st)
+            states.sort()
+            interactive.append({
+                "id": "c_" + str(len(interactive)),
+                "region": region, "name": name, "nameEn": nameEn,
+                "type": "cat", "note": ref, "provisional": True,
                 "states": states, "values": vals,
             })
 

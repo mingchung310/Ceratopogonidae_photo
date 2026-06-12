@@ -681,6 +681,376 @@ window.KEY_MATRIX = {
   },
   {
    "id": "c_11",
+   "region": "Wing",
+   "name": "第1前緣淡斑",
+   "nameEn": "1st costal pale spot",
+   "type": "cat",
+   "note": "位置（rm crossvein前/後）、大小、是否延伸至翅基",
+   "provisional": true,
+   "states": [
+    "及第1徑室基部",
+    "及第1徑室基部約½",
+    "延伸至基室末端＋第5徑室基部",
+    "狹窄，僅第1徑室⅓"
+   ],
+   "values": {
+    "actoni": {
+     "state": "及第1徑室基部約½",
+     "raw": "覆蓋徑中橫脈及第1徑室基部約1/2"
+    },
+    "arakawae": {
+     "state": "延伸至基室末端＋第5徑室基部",
+     "raw": "覆蓋徑中橫脈、基室末端與第5徑室基部"
+    },
+    "homotomus": {
+     "state": "延伸至基室末端＋第5徑室基部",
+     "raw": "覆蓋徑中橫脈、基室末端與第5徑室基部"
+    },
+    "jacobsoni": {
+     "state": "及第1徑室基部",
+     "raw": "覆蓋徑中橫脈及第1徑室基部"
+    },
+    "lungchiensis": {
+     "state": "延伸至基室末端＋第5徑室基部",
+     "raw": "覆蓋徑中橫脈、基室末端與第5徑室基部"
+    },
+    "palpifer": {
+     "state": "及第1徑室基部約½",
+     "raw": "覆蓋徑中橫脈及第1徑室基部約1/2"
+    },
+    "oxystoma": {
+     "state": "延伸至基室末端＋第5徑室基部",
+     "raw": "覆蓋徑中橫脈、基室末端與第5徑室基部"
+    },
+    "sumatrae": {
+     "state": "狹窄，僅第1徑室⅓",
+     "raw": "狹窄，覆蓋徑中橫脈及第1徑室1/3"
+    },
+    "tainanus": {
+     "state": "及第1徑室基部",
+     "raw": "覆蓋徑中橫脈及第1徑室基部"
+    }
+   }
+  },
+  {
+   "id": "c_12",
+   "region": "Wing",
+   "name": "第2前緣淡斑",
+   "nameEn": "2nd costal pale spot",
+   "type": "cat",
+   "note": "覆蓋第2徑室比例：1/2 / 2/3 / 全部；是否延伸入R5室",
+   "provisional": true,
+   "states": [
+    "不覆蓋第2徑室",
+    "位於第2徑室外側",
+    "包圍第2徑室外緣（模糊帶）",
+    "覆蓋第2徑室端部約½",
+    "覆蓋第2徑室端部，近第1中脈"
+   ],
+   "values": {
+    "actoni": {
+     "state": "位於第2徑室外側",
+     "raw": "位於第2徑室外側，未抵第1中脈"
+    },
+    "arakawae": {
+     "state": "不覆蓋第2徑室",
+     "raw": "覆蓋第5徑室近第2徑室處，不覆蓋第2徑室"
+    },
+    "homotomus": {
+     "state": "不覆蓋第2徑室",
+     "raw": "覆蓋第5徑室近第2徑室處，不覆蓋第2徑室"
+    },
+    "jacobsoni": {
+     "state": "覆蓋第2徑室端部，近第1中脈",
+     "raw": "覆蓋第2徑室端部，未抵第1中脈"
+    },
+    "lungchiensis": {
+     "state": "覆蓋第2徑室端部約½",
+     "raw": "覆蓋第2徑室端部約1/2"
+    },
+    "palpifer": {
+     "state": "覆蓋第2徑室端部約½",
+     "raw": "覆蓋第2徑室端部1/2"
+    },
+    "oxystoma": {
+     "state": "包圍第2徑室外緣（模糊帶）",
+     "raw": "包圍第2徑室外緣（模糊淡色帶）"
+    },
+    "sumatrae": {
+     "state": "覆蓋第2徑室端部約½",
+     "raw": "小，覆蓋第2徑室端部1/2"
+    },
+    "tainanus": {
+     "state": "覆蓋第2徑室端部，近第1中脈",
+     "raw": "覆蓋第2徑室端部，幾乎抵第1中脈"
+    }
+   }
+  },
+  {
+   "id": "c_13",
+   "region": "Wing",
+   "name": "第3前緣淡斑",
+   "nameEn": "3rd costal pale spot",
+   "type": "cat",
+   "note": "有/無；位置（翅端/R5室端）；是否分裂為2小斑",
+   "provisional": true,
+   "states": [
+    "不抵翅緣",
+    "抵翅緣",
+    "翅端大弧形（跨R5/M1/M2）"
+   ],
+   "values": {
+    "actoni": {
+     "state": "抵翅緣",
+     "raw": "位於翅緣，未抵第1中脈"
+    },
+    "arakawae": {
+     "state": "抵翅緣",
+     "raw": "小而圓，位於第5徑室近翅端，抵於翅緣"
+    },
+    "homotomus": {
+     "state": "不抵翅緣",
+     "raw": "不抵翅緣"
+    },
+    "jacobsoni": {
+     "state": "不抵翅緣",
+     "raw": "位於翅緣內側，未抵第1中脈"
+    },
+    "lungchiensis": {
+     "state": "抵翅緣",
+     "raw": "形狀不規則，中段略收縮，抵翅緣"
+    },
+    "palpifer": {
+     "state": "翅端大弧形（跨R5/M1/M2）",
+     "raw": "翅端大弧形淡斑，跨R5/M1/M2"
+    },
+    "oxystoma": {
+     "state": "抵翅緣",
+     "raw": "形狀不規則，中段略收縮，抵翅緣"
+    },
+    "sumatrae": {
+     "state": "不抵翅緣",
+     "raw": "位於翅緣內側，未抵翅緣"
+    },
+    "tainanus": {
+     "state": "抵翅緣",
+     "raw": "大，抵第1中脈且抵翅緣"
+    }
+   }
+  },
+  {
+   "id": "c_14",
+   "region": "Wing",
+   "name": "M4室",
+   "nameEn": "Cell M4 pattern",
+   "type": "cat",
+   "note": "全暗 / 末端淡斑 / 大部分淡 / 全淡",
+   "provisional": true,
+   "states": [
+    "中部至端部具大淡斑",
+    "僅端部具淡斑"
+   ],
+   "values": {
+    "actoni": {
+     "state": "中部至端部具大淡斑",
+     "raw": "中部至端部具大淡斑"
+    },
+    "arakawae": {
+     "state": "僅端部具淡斑",
+     "raw": "端部具淡斑"
+    },
+    "homotomus": {
+     "state": "僅端部具淡斑",
+     "raw": "端部具淡斑"
+    },
+    "jacobsoni": {
+     "state": "僅端部具淡斑",
+     "raw": "端部具淡斑"
+    },
+    "lungchiensis": {
+     "state": "僅端部具淡斑",
+     "raw": "端部具淡斑"
+    },
+    "palpifer": {
+     "state": "僅端部具淡斑",
+     "raw": "端部具淡斑（不明顯）"
+    },
+    "oxystoma": {
+     "state": "僅端部具淡斑",
+     "raw": "端部具淡斑"
+    },
+    "sumatrae": {
+     "state": "僅端部具淡斑",
+     "raw": "端部具小圓形淡斑"
+    },
+    "tainanus": {
+     "state": "僅端部具淡斑",
+     "raw": "端部具淡斑"
+    }
+   }
+  },
+  {
+   "id": "c_15",
+   "region": "Wing",
+   "name": "M1室",
+   "nameEn": "Cell M1 pattern",
+   "type": "cat",
+   "note": "全暗 / 中央淡條 / 中+末端淡斑 / 大部分淡",
+   "provisional": true,
+   "states": [
+    "中部及近端部各一大淡斑",
+    "中部及近端部各一小淡斑",
+    "中＋近端部小淡斑＋中央大淡斑",
+    "基部及端部各一淡斑",
+    "模糊淡色帶"
+   ],
+   "values": {
+    "actoni": {
+     "state": "基部及端部各一淡斑",
+     "raw": "基部及端部各有一淡斑"
+    },
+    "arakawae": {
+     "state": "中部及近端部各一小淡斑",
+     "raw": "中部及近端部各具一小淡斑"
+    },
+    "homotomus": {
+     "state": "中＋近端部小淡斑＋中央大淡斑",
+     "raw": "中部及近端部各具一小淡斑，中央部具大淡斑"
+    },
+    "jacobsoni": {
+     "state": "中部及近端部各一小淡斑",
+     "raw": "中部及近端部各具一小淡斑"
+    },
+    "lungchiensis": {
+     "state": "中部及近端部各一小淡斑",
+     "raw": "中部及近端部各具一小淡斑"
+    },
+    "palpifer": {
+     "state": "模糊淡色帶",
+     "raw": "有模糊淡色帶"
+    },
+    "oxystoma": {
+     "state": "中部及近端部各一小淡斑",
+     "raw": "中部及近端部各具一小淡斑"
+    },
+    "sumatrae": {
+     "state": "中部及近端部各一小淡斑",
+     "raw": "中部與接近端部各有一小淡斑"
+    },
+    "tainanus": {
+     "state": "中部及近端部各一大淡斑",
+     "raw": "中部及近端部各具一大淡斑"
+    }
+   }
+  },
+  {
+   "id": "c_16",
+   "region": "Wing",
+   "name": "M2室",
+   "nameEn": "Cell M2 pattern",
+   "type": "cat",
+   "note": "全暗 / 基到翅端淡條 / 末端淡斑 / 大部分淡",
+   "provisional": true,
+   "states": [
+    "中部及近端部各一小淡斑",
+    "中部單一淡斑",
+    "中部至端部多個小淡斑",
+    "基部與中部各一小淡斑",
+    "自基部帶狀淡條延伸至（近）翅緣"
+   ],
+   "values": {
+    "actoni": {
+     "state": "自基部帶狀淡條延伸至（近）翅緣",
+     "raw": "自基部帶狀淡斑延伸至翅緣"
+    },
+    "arakawae": {
+     "state": "中部及近端部各一小淡斑",
+     "raw": "中部及近端部各具一小淡斑"
+    },
+    "homotomus": {
+     "state": "中部及近端部各一小淡斑",
+     "raw": "中部及近端部各具一小淡斑"
+    },
+    "jacobsoni": {
+     "state": "自基部帶狀淡條延伸至（近）翅緣",
+     "raw": "自基部細長帶狀淡斑延伸至近翅緣"
+    },
+    "lungchiensis": {
+     "state": "中部單一淡斑",
+     "raw": "中部連接中肘叉脈一淡斑"
+    },
+    "palpifer": {
+     "state": "中部至端部多個小淡斑",
+     "raw": "中部至端部3個小淡斑"
+    },
+    "oxystoma": {
+     "state": "基部與中部各一小淡斑",
+     "raw": "第3中室向翅基方向基部與中部各具一小淡斑"
+    },
+    "sumatrae": {
+     "state": "中部至端部多個小淡斑",
+     "raw": "中部至端部3個小淡斑"
+    },
+    "tainanus": {
+     "state": "自基部帶狀淡條延伸至（近）翅緣",
+     "raw": "自基部細長帶狀淡斑延伸至近翅緣"
+    }
+   }
+  },
+  {
+   "id": "c_17",
+   "region": "Wing",
+   "name": "翅基淡區",
+   "nameEn": "Basal pale area",
+   "type": "cat",
+   "note": "有/無；大小；形狀",
+   "provisional": true,
+   "states": [
+    "中（延伸至臀室基部）",
+    "大（延伸至臀室）",
+    "小（僅基室／中室基部）"
+   ],
+   "values": {
+    "actoni": {
+     "state": "大（延伸至臀室）",
+     "raw": "大，延伸至臀室"
+    },
+    "arakawae": {
+     "state": "小（僅基室／中室基部）",
+     "raw": "小而圓，僅基室基部和中室基部"
+    },
+    "homotomus": {
+     "state": "大（延伸至臀室）",
+     "raw": "大，由基室延伸至臀室中間"
+    },
+    "jacobsoni": {
+     "state": "小（僅基室／中室基部）",
+     "raw": "小而不規則，僅基室和中室基部"
+    },
+    "lungchiensis": {
+     "state": "中（延伸至臀室基部）",
+     "raw": "延伸至臀室基部"
+    },
+    "palpifer": {
+     "state": "中（延伸至臀室基部）",
+     "raw": "延伸至臀室基部"
+    },
+    "oxystoma": {
+     "state": "小（僅基室／中室基部）",
+     "raw": "小，僅基室1/2與中室基部"
+    },
+    "sumatrae": {
+     "state": "大（延伸至臀室）",
+     "raw": "大、不規則，由基室延伸至臀室"
+    },
+    "tainanus": {
+     "state": "大（延伸至臀室）",
+     "raw": "大，由基室延伸至臀室"
+    }
+   }
+  },
+  {
+   "id": "c_18",
    "region": "Spermathecae",
    "name": "精囊數目",
    "nameEn": "Number of spermathecae",
@@ -894,102 +1264,6 @@ window.KEY_MATRIX = {
   },
   {
    "region": "Wing",
-   "name": "第1前緣淡斑",
-   "nameEn": "1st costal pale spot",
-   "values": {
-    "actoni": "覆蓋徑中橫脈及第1徑室基部約1/2",
-    "arakawae": "覆蓋徑中橫脈、基室末端與第5徑室基部",
-    "homotomus": "覆蓋徑中橫脈、基室末端與第5徑室基部",
-    "jacobsoni": "覆蓋徑中橫脈及第1徑室基部",
-    "lungchiensis": "覆蓋徑中橫脈、基室末端與第5徑室基部",
-    "palpifer": "覆蓋徑中橫脈及第1徑室基部約1/2",
-    "oxystoma": "覆蓋徑中橫脈、基室末端與第5徑室基部",
-    "sumatrae": "狹窄，覆蓋徑中橫脈及第1徑室1/3",
-    "tainanus": "覆蓋徑中橫脈及第1徑室基部"
-   }
-  },
-  {
-   "region": "Wing",
-   "name": "第2前緣淡斑",
-   "nameEn": "2nd costal pale spot",
-   "values": {
-    "actoni": "位於第2徑室外側，未抵第1中脈",
-    "arakawae": "覆蓋第5徑室近第2徑室處，不覆蓋第2徑室",
-    "homotomus": "覆蓋第5徑室近第2徑室處，不覆蓋第2徑室",
-    "jacobsoni": "覆蓋第2徑室端部，未抵第1中脈",
-    "lungchiensis": "覆蓋第2徑室端部約1/2",
-    "palpifer": "覆蓋第2徑室端部1/2",
-    "oxystoma": "包圍第2徑室外緣（模糊淡色帶）",
-    "sumatrae": "小，覆蓋第2徑室端部1/2",
-    "tainanus": "覆蓋第2徑室端部，幾乎抵第1中脈"
-   }
-  },
-  {
-   "region": "Wing",
-   "name": "第3前緣淡斑",
-   "nameEn": "3rd costal pale spot",
-   "values": {
-    "actoni": "位於翅緣，未抵第1中脈",
-    "arakawae": "小而圓，位於第5徑室近翅端，抵於翅緣",
-    "homotomus": "不抵翅緣",
-    "jacobsoni": "位於翅緣內側，未抵第1中脈",
-    "lungchiensis": "形狀不規則，中段略收縮，抵翅緣",
-    "palpifer": "翅端大弧形淡斑，跨R5/M1/M2",
-    "oxystoma": "形狀不規則，中段略收縮，抵翅緣",
-    "sumatrae": "位於翅緣內側，未抵翅緣",
-    "tainanus": "大，抵第1中脈且抵翅緣"
-   }
-  },
-  {
-   "region": "Wing",
-   "name": "M4室",
-   "nameEn": "Cell M4 pattern",
-   "values": {
-    "actoni": "中部至端部具大淡斑",
-    "arakawae": "端部具淡斑",
-    "homotomus": "端部具淡斑",
-    "jacobsoni": "端部具淡斑",
-    "lungchiensis": "端部具淡斑",
-    "palpifer": "端部具淡斑（不明顯）",
-    "oxystoma": "端部具淡斑",
-    "sumatrae": "端部具小圓形淡斑",
-    "tainanus": "端部具淡斑"
-   }
-  },
-  {
-   "region": "Wing",
-   "name": "M1室",
-   "nameEn": "Cell M1 pattern",
-   "values": {
-    "actoni": "基部及端部各有一淡斑",
-    "arakawae": "中部及近端部各具一小淡斑",
-    "homotomus": "中部及近端部各具一小淡斑，中央部具大淡斑",
-    "jacobsoni": "中部及近端部各具一小淡斑",
-    "lungchiensis": "中部及近端部各具一小淡斑",
-    "palpifer": "有模糊淡色帶",
-    "oxystoma": "中部及近端部各具一小淡斑",
-    "sumatrae": "中部與接近端部各有一小淡斑",
-    "tainanus": "中部及近端部各具一大淡斑"
-   }
-  },
-  {
-   "region": "Wing",
-   "name": "M2室",
-   "nameEn": "Cell M2 pattern",
-   "values": {
-    "actoni": "自基部帶狀淡斑延伸至翅緣",
-    "arakawae": "中部及近端部各具一小淡斑",
-    "homotomus": "中部及近端部各具一小淡斑",
-    "jacobsoni": "自基部細長帶狀淡斑延伸至近翅緣",
-    "lungchiensis": "中部連接中肘叉脈一淡斑",
-    "palpifer": "中部至端部3個小淡斑",
-    "oxystoma": "第3中室向翅基方向基部與中部各具一小淡斑",
-    "sumatrae": "中部至端部3個小淡斑",
-    "tainanus": "自基部細長帶狀淡斑延伸至近翅緣"
-   }
-  },
-  {
-   "region": "Wing",
    "name": "R5室端色",
    "nameEn": "Cell R5 apex",
    "values": {
@@ -1018,22 +1292,6 @@ window.KEY_MATRIX = {
     "oxystoma": null,
     "sumatrae": null,
     "tainanus": null
-   }
-  },
-  {
-   "region": "Wing",
-   "name": "翅基淡區",
-   "nameEn": "Basal pale area",
-   "values": {
-    "actoni": "大，延伸至臀室",
-    "arakawae": "小而圓，僅基室基部和中室基部",
-    "homotomus": "大，由基室延伸至臀室中間",
-    "jacobsoni": "小而不規則，僅基室和中室基部",
-    "lungchiensis": "延伸至臀室基部",
-    "palpifer": "延伸至臀室基部",
-    "oxystoma": "小，僅基室1/2與中室基部",
-    "sumatrae": "大、不規則，由基室延伸至臀室",
-    "tainanus": "大，由基室延伸至臀室"
    }
   },
   {

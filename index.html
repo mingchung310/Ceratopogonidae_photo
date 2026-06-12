@@ -468,6 +468,11 @@
     .mchar-head:hover .mchar-name { color: var(--gold2); }
     .mchar-name { font-size: 0.92rem; line-height: 1.4; }
     .mchar-name .en { color: var(--muted); font-size: 0.74rem; font-style: italic; margin-left: 0.35rem; }
+    .mchar-prov {
+      font-size: 0.6rem; color: var(--gold); border: 1px solid var(--gold);
+      border-radius: 4px; padding: 0.02rem 0.3rem; margin-left: 0.4rem;
+      vertical-align: middle; letter-spacing: 0.05em; opacity: 0.85;
+    }
     .mchar-region {
       font-size: 0.64rem; color: var(--muted); letter-spacing: 0.06em;
       display: block; margin-bottom: 0.1rem; text-transform: uppercase;
@@ -1489,6 +1494,7 @@ function mkRenderChars() {
     if (sel) picked = sel.type === 'cat' ? sel.state : `${sel.value}${ch.unit || ''}`;
 
     let body = '';
+    if (ch.provisional) body += `<div class="mchar-note" style="color:var(--gold);opacity:0.85">⚠️ 暫定編碼：狀態由原始描述歸納而成，待實驗室確認。</div>`;
     if (ch.note) body += `<div class="mchar-note">${ch.note}</div>`;
     if (ch.type === 'cat') {
       body += '<div class="mstate-row">' + ch.states.map(st => {
@@ -1513,7 +1519,7 @@ function mkRenderChars() {
         <button class="mchar-head" type="button" onclick="mkToggle('${ch.id}')">
           <span>
             <span class="mchar-region">${ch.region}</span>
-            <span class="mchar-name">${ch.name}<span class="en">${ch.nameEn || ''}</span></span>
+            <span class="mchar-name">${ch.name}${ch.provisional ? '<span class="mchar-prov">暫定</span>' : ''}<span class="en">${ch.nameEn || ''}</span></span>
           </span>
           ${picked ? `<span class="mchar-pick">${picked}</span>` : ''}
           <span class="mchar-toggle">▸</span>
