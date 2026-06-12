@@ -424,6 +424,180 @@
       border-radius: 8px;
     }
 
+    /* ── 種級互動矩陣檢索 (multi-access key) ─────────────────────── */
+    .mkey {
+      max-width: 980px;
+      margin: 1rem auto 0;
+      display: grid;
+      grid-template-columns: 1.15fr 1fr;
+      gap: 1.25rem;
+      align-items: start;
+    }
+    .mkey-panel {
+      background: var(--navy2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1.25rem 1.4rem;
+    }
+    .mkey-panel-title {
+      font-size: 0.78rem;
+      color: var(--gold);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 0.2rem;
+    }
+    .mkey-panel-sub { font-size: 0.78rem; color: var(--muted); margin-bottom: 1rem; line-height: 1.6; }
+
+    /* 特徵手風琴 */
+    .mchar { border-top: 1px solid var(--border); }
+    .mchar:first-of-type { border-top: none; }
+    .mchar-head {
+      width: 100%;
+      background: none;
+      border: none;
+      color: var(--text);
+      font-family: inherit;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      padding: 0.7rem 0.1rem;
+      text-align: left;
+    }
+    .mchar-head:hover .mchar-name { color: var(--gold2); }
+    .mchar-name { font-size: 0.92rem; line-height: 1.4; }
+    .mchar-name .en { color: var(--muted); font-size: 0.74rem; font-style: italic; margin-left: 0.35rem; }
+    .mchar-region {
+      font-size: 0.64rem; color: var(--muted); letter-spacing: 0.06em;
+      display: block; margin-bottom: 0.1rem; text-transform: uppercase;
+    }
+    .mchar-pick {
+      font-size: 0.74rem; color: var(--gold);
+      background: rgba(201,168,76,0.12);
+      border: 1px solid var(--border);
+      border-radius: 5px; padding: 0.12rem 0.45rem; white-space: nowrap;
+    }
+    .mchar-toggle { color: var(--muted); font-size: 0.8rem; flex-shrink: 0; transition: transform 0.2s; }
+    .mchar.open .mchar-toggle { transform: rotate(90deg); }
+    .mchar-body { display: none; padding: 0 0.1rem 1rem; }
+    .mchar.open .mchar-body { display: block; }
+    .mchar-note { font-size: 0.74rem; color: var(--muted); line-height: 1.6; margin-bottom: 0.7rem; font-style: italic; }
+
+    .mstate-row { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+    .mstate {
+      background: var(--navy3); border: 1px solid var(--border); color: var(--text);
+      font-family: inherit; font-size: 0.8rem; padding: 0.34rem 0.7rem;
+      border-radius: 6px; cursor: pointer; transition: border-color 0.15s, background 0.15s;
+    }
+    .mstate:hover { border-color: var(--gold); }
+    .mstate.sel { background: var(--gold); color: var(--navy); border-color: var(--gold); font-weight: 600; }
+    .mstate small { color: var(--muted); margin-left: 0.3rem; }
+    .mstate.sel small { color: var(--navy); }
+
+    .mnum-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+    .mnum-row input {
+      width: 92px; background: var(--navy); border: 1px solid var(--border);
+      color: var(--text); font-family: inherit; font-size: 0.85rem;
+      padding: 0.36rem 0.5rem; border-radius: 6px;
+    }
+    .mnum-row input:focus { outline: none; border-color: var(--gold); }
+    .mnum-unit { font-size: 0.8rem; color: var(--muted); }
+    .mnum-range { font-size: 0.72rem; color: var(--muted); width: 100%; }
+    .mnum-apply, .mclear-one {
+      background: var(--navy3); border: 1px solid var(--border); color: var(--text);
+      font-family: inherit; font-size: 0.78rem; padding: 0.34rem 0.7rem;
+      border-radius: 6px; cursor: pointer;
+    }
+    .mnum-apply:hover { border-color: var(--gold); color: var(--gold); }
+    .mclear-one { color: var(--muted); }
+    .mclear-one:hover { border-color: var(--gold); color: var(--gold); }
+
+    /* 候選結果面板 */
+    .mkey-summary {
+      display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 0.2rem;
+    }
+    .mkey-count { font-size: 1.9rem; color: var(--gold); font-weight: 700; line-height: 1; }
+    .mkey-count-total { font-size: 0.85rem; color: var(--muted); }
+    .mkey-reset {
+      margin-left: auto; background: none; border: 1px solid var(--border); color: var(--muted);
+      font-family: inherit; font-size: 0.78rem; padding: 0.3rem 0.75rem; border-radius: 6px; cursor: pointer;
+    }
+    .mkey-reset:hover { border-color: var(--gold); color: var(--gold); }
+
+    .mcand { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 1rem; }
+    .mcand-item {
+      display: flex; align-items: center; gap: 0.7rem;
+      background: var(--navy3); border: 1px solid var(--border);
+      border-radius: 9px; padding: 0.5rem 0.6rem; transition: border-color 0.15s;
+    }
+    .mcand-item.win { border-color: var(--gold); background: rgba(201,168,76,0.08); }
+    .mcand-thumb {
+      width: 58px; height: 44px; flex-shrink: 0; border-radius: 6px; overflow: hidden;
+      background: var(--navy); display: flex; align-items: center; justify-content: center;
+    }
+    .mcand-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .mcand-thumb.empty { color: var(--muted); font-size: 1.1rem; opacity: 0.5; }
+    .mcand-txt { flex: 1; min-width: 0; }
+    .mcand-sci { font-size: 0.92rem; color: var(--text); font-style: italic; }
+    .mcand-sci .gen { font-style: italic; }
+    .mcand-zh { font-size: 0.76rem; color: var(--muted); }
+    .mcand-badge { font-size: 0.7rem; color: var(--gold); white-space: nowrap; }
+
+    .mexcl-head {
+      width: 100%; background: none; border: none; color: var(--muted);
+      font-family: inherit; font-size: 0.78rem; cursor: pointer; text-align: left;
+      padding: 0.6rem 0; margin-top: 0.6rem; border-top: 1px dashed var(--border);
+    }
+    .mexcl-head:hover { color: var(--gold); }
+    .mexcl-list { display: none; flex-direction: column; gap: 0.3rem; }
+    .mexcl-list.open { display: flex; }
+    .mexcl-item {
+      font-size: 0.76rem; color: var(--muted); display: flex; align-items: center;
+      gap: 0.5rem; padding: 0.3rem 0.1rem;
+    }
+    .mexcl-item .sci { font-style: italic; color: #a9b6c8; }
+    .mexcl-item .why { font-size: 0.7rem; color: var(--gold); opacity: 0.8; }
+    .mexcl-undo {
+      margin-left: auto; background: none; border: 1px solid var(--border); color: var(--muted);
+      font-size: 0.68rem; padding: 0.1rem 0.4rem; border-radius: 5px; cursor: pointer; font-family: inherit;
+    }
+    .mexcl-undo:hover { border-color: var(--gold); color: var(--gold); }
+
+    /* 並列比較表 */
+    .mcompare-wrap { max-width: 980px; margin: 1.5rem auto 0; }
+    .mcompare-toggle {
+      background: var(--navy3); border: 1px solid var(--border); color: var(--text);
+      font-family: inherit; font-size: 0.85rem; padding: 0.55rem 1.1rem; border-radius: 8px;
+      cursor: pointer; width: 100%;
+    }
+    .mcompare-toggle:hover { border-color: var(--gold); color: var(--gold); }
+    .mcompare-scroll { display: none; margin-top: 1rem; overflow-x: auto; border: 1px solid var(--border); border-radius: 10px; }
+    .mcompare-scroll.open { display: block; }
+    table.mcompare { border-collapse: collapse; font-size: 0.76rem; min-width: 100%; }
+    table.mcompare th, table.mcompare td {
+      border: 1px solid var(--border); padding: 0.45rem 0.6rem; text-align: left; vertical-align: top;
+      line-height: 1.5; white-space: nowrap;
+    }
+    table.mcompare thead th {
+      position: sticky; top: 0; background: var(--navy2); color: var(--gold);
+      font-style: italic; font-weight: 600;
+    }
+    table.mcompare th.mc-region { background: var(--navy3); color: var(--muted); font-style: normal; font-size: 0.66rem; }
+    table.mcompare th.mc-row {
+      position: sticky; left: 0; background: var(--navy2); color: var(--text);
+      font-style: normal; font-weight: 400; z-index: 1; white-space: normal; min-width: 140px;
+    }
+    table.mcompare td { color: var(--muted); white-space: normal; min-width: 120px; }
+    table.mcompare tbody tr:nth-child(even) td,
+    table.mcompare tbody tr:nth-child(even) th.mc-row { background: rgba(255,255,255,0.015); }
+    table.mcompare td.dim { opacity: 0.35; }
+    table.mcompare col.win-col, table.mcompare td.win-cell { background: rgba(201,168,76,0.08); }
+
+    @media (max-width: 820px) {
+      .mkey { grid-template-columns: 1fr; }
+    }
+
     /* ── Specimen page ───────────────────────────────────────────── */
     .content-wrap {
       max-width: 1200px;
@@ -960,6 +1134,22 @@
       <div class="key-wrap" id="key-wrap"><!-- JS 渲染 --></div>
     </div>
 
+    <!-- 種級互動矩陣檢索 -->
+    <div class="section">
+      <h2 class="section-title">種級互動檢索（特徵矩陣）</h2>
+      <p class="section-subtitle">Interactive matrix key to species — 台灣 9 種庫蠓 demo</p>
+      <p style="font-size:0.87rem;color:var(--muted);line-height:1.75;margin-bottom:1rem">
+        不必照固定順序：<strong style="color:var(--text)">挑選你在標本上觀察得到的任一特徵</strong>，
+        左側選定狀態或填入量測值，右側候選物種即時縮減。被排除的物種會列在「已排除」中並可隨時還原。<br>
+        ⚠️ Demo 資料取自 9 種台灣庫蠓特徵矩陣（參考 Lien 1997, 1998; Wirth &amp; Hubert 1989; 虞以新 2006）。
+      </p>
+      <div id="mkey-root"><!-- JS 渲染 --></div>
+      <div class="mcompare-wrap">
+        <button class="mcompare-toggle" id="mcompare-toggle" type="button">▤ 展開候選物種特徵並列比較表</button>
+        <div class="mcompare-scroll" id="mcompare-scroll"><!-- JS 渲染 --></div>
+      </div>
+    </div>
+
   </div>
 </div><!-- /page-taxonomy -->
 
@@ -1044,6 +1234,7 @@
 </footer>
 
 <script src="data.js"></script>
+<script src="keymatrix.js"></script>
 <script>
 'use strict';
 
@@ -1068,7 +1259,8 @@ document.querySelectorAll('.tab-btn').forEach(btn =>
   btn.addEventListener('click', () => switchTab(btn.dataset.tab)));
 
 const _initTab = TABS.includes(location.hash.slice(1)) ? location.hash.slice(1) : 'intro';
-if (_initTab !== 'intro') switchTab(_initTab);
+// 注意：實際的初始分頁切換在整個 script 末端執行，
+// 以確保所有 let 宣告（keyReady / mkReady 等）皆已初始化，避免 TDZ。
 
 
 // ══════════════════════════════════════════════════════════════════════
@@ -1230,10 +1422,272 @@ function keyReset() {
 function initKey() {
   keyReady = true;
   renderKey();
+  initMatrixKey();
 }
 
-// 若直接進入 taxonomy 頁面（從 hash）立即初始化
-if (_initTab === 'taxonomy') initKey();
+
+// ══════════════════════════════════════════════════════════════════════
+//  種級互動矩陣檢索  MULTI-ACCESS MATRIX KEY
+// ══════════════════════════════════════════════════════════════════════
+
+let mkReady = false;
+const mkSel  = {};          // charId -> {type, state} | {type, value}
+const mkOrder = [];         // 選取順序（決定排除原因取第一個觸發的特徵）
+const mkOpen = new Set();   // 展開中的特徵手風琴
+let mkCompareOpen = false;
+
+function _sciHtml(sci) {
+  // "Culicoides actoni" -> "C. actoni"（屬名縮寫）
+  const sp = sci.replace(/^Culicoides\s+/, '');
+  return `<span class="gen">C.</span> ${sp}`;
+}
+
+function mkEvaluate() {
+  const M = window.KEY_MATRIX;
+  const excludedBy = {};   // spId -> {char, reason}
+  M.species.forEach(sp => {
+    for (const cid of mkOrder) {
+      const sel = mkSel[cid];
+      if (!sel) continue;
+      const ch = M.characters.find(c => c.id === cid);
+      const val = ch.values[sp.id];
+      let ok = true, reason = '';
+      if (sel.type === 'cat') {
+        if (val.state == null) { ok = true; }            // 無資料不排除
+        else if (val.state !== sel.state) { ok = false; reason = `${ch.name}：${val.raw}`; }
+      } else { // num
+        if (val.min == null) { ok = true; }              // 無資料不排除
+        else {
+          const lo = val.min - ch.pad, hi = val.max + ch.pad;
+          if (sel.value < lo || sel.value > hi) {
+            ok = false;
+            reason = `${ch.name} = ${val.raw}`;
+          }
+        }
+      }
+      if (!ok) { excludedBy[sp.id] = { char: ch.name, reason }; break; }
+    }
+  });
+  const remaining = M.species.filter(sp => !excludedBy[sp.id]);
+  const excluded  = M.species.filter(sp => excludedBy[sp.id])
+                             .map(sp => ({ sp, ...excludedBy[sp.id] }));
+  return { remaining, excluded, excludedBy };
+}
+
+// 計算某類別狀態符合的物種數（以目前其他條件為基礎做提示）
+function _stateCount(ch, state) {
+  return window.KEY_MATRIX.species.filter(sp => ch.values[sp.id].state === state).length;
+}
+
+function mkRenderChars() {
+  const M = window.KEY_MATRIX;
+  let html = '';
+  M.characters.forEach(ch => {
+    const sel = mkSel[ch.id];
+    const open = mkOpen.has(ch.id);
+    let picked = '';
+    if (sel) picked = sel.type === 'cat' ? sel.state : `${sel.value}${ch.unit || ''}`;
+
+    let body = '';
+    if (ch.note) body += `<div class="mchar-note">${ch.note}</div>`;
+    if (ch.type === 'cat') {
+      body += '<div class="mstate-row">' + ch.states.map(st => {
+        const n = _stateCount(ch, st);
+        const on = sel && sel.state === st ? ' sel' : '';
+        return `<button class="mstate${on}" type="button" onclick="mkPickCat('${ch.id}','${st.replace(/'/g, "\\'")}')">${st}<small>${n}</small></button>`;
+      }).join('') + '</div>';
+    } else {
+      const cur = sel ? sel.value : '';
+      body += `<div class="mnum-row">
+        <input type="number" step="any" id="mnum-${ch.id}" value="${cur}" placeholder="量測值"
+               onkeydown="if(event.key==='Enter'){mkPickNum('${ch.id}')}">
+        <span class="mnum-unit">${ch.unit || ''}</span>
+        <button class="mnum-apply" type="button" onclick="mkPickNum('${ch.id}')">套用</button>
+        <span class="mnum-range">資料範圍：${ch.min}–${ch.max}${ch.unit ? ' ' + ch.unit : ''}（含 ±${ch.pad} 容差）</span>
+      </div>`;
+    }
+    if (sel) body += `<button class="mclear-one" type="button" style="margin-top:0.6rem" onclick="mkClear('${ch.id}')">清除此特徵</button>`;
+
+    html += `
+      <div class="mchar${open ? ' open' : ''}">
+        <button class="mchar-head" type="button" onclick="mkToggle('${ch.id}')">
+          <span>
+            <span class="mchar-region">${ch.region}</span>
+            <span class="mchar-name">${ch.name}<span class="en">${ch.nameEn || ''}</span></span>
+          </span>
+          ${picked ? `<span class="mchar-pick">${picked}</span>` : ''}
+          <span class="mchar-toggle">▸</span>
+        </button>
+        <div class="mchar-body">${body}</div>
+      </div>`;
+  });
+  return html;
+}
+
+function mkRenderCands() {
+  const M = window.KEY_MATRIX;
+  const { remaining, excluded } = mkEvaluate();
+  const win = remaining.length === 1;
+
+  let cands = remaining.map(sp => {
+    const thumb = sp.photo
+      ? `<div class="mcand-thumb"><img src="${sp.photo}" alt="${sp.zh}"></div>`
+      : `<div class="mcand-thumb empty">🔬</div>`;
+    return `<div class="mcand-item${win ? ' win' : ''}">
+      ${thumb}
+      <div class="mcand-txt">
+        <div class="mcand-sci">${_sciHtml(sp.sci)}</div>
+        <div class="mcand-zh">${sp.zh}</div>
+      </div>
+      ${win ? '<span class="mcand-badge">✓ 唯一候選</span>' : ''}
+    </div>`;
+  }).join('');
+  if (!remaining.length) cands = `<div class="mcand-zh" style="padding:0.5rem">沒有符合的物種——條件可能互相衝突，請從「已排除」還原部分特徵。</div>`;
+
+  let excl = '';
+  if (excluded.length) {
+    excl = `
+      <button class="mexcl-head" type="button" onclick="mkToggleExcl(this)">▸ 已排除（${excluded.length}）</button>
+      <div class="mexcl-list">
+        ${excluded.map(e => `
+          <div class="mexcl-item">
+            <span class="sci">${_sciHtml(e.sp.sci)}</span>
+            <span class="why">${e.reason}</span>
+            <button class="mexcl-undo" type="button" onclick="mkUndoChar('${findCharIdByName(e.char)}')">還原</button>
+          </div>`).join('')}
+      </div>`;
+  }
+
+  return `
+    <div class="mkey-summary">
+      <span class="mkey-count">${remaining.length}</span>
+      <span class="mkey-count-total">/ ${M.species.length} 種符合</span>
+      <button class="mkey-reset" type="button" onclick="mkReset()">重設全部</button>
+    </div>
+    <div class="mcand">${cands}</div>
+    ${excl}`;
+}
+
+function findCharIdByName(name) {
+  const c = window.KEY_MATRIX.characters.find(c => c.name === name);
+  return c ? c.id : '';
+}
+
+function mkRenderCompare() {
+  const M = window.KEY_MATRIX;
+  const { excludedBy, remaining } = mkEvaluate();
+  const win = remaining.length === 1 ? remaining[0].id : null;
+
+  // 列：互動特徵（顯示 raw）+ 參考特徵
+  const rows = [];
+  M.characters.forEach(ch => {
+    rows.push({ region: ch.region, name: ch.name, nameEn: ch.nameEn,
+      get: sp => { const v = ch.values[sp.id]; return v.raw != null ? v.raw : (v.state != null ? v.state : '—'); } });
+  });
+  M.reference.forEach(rf => {
+    rows.push({ region: rf.region, name: rf.name, nameEn: rf.nameEn,
+      get: sp => rf.values[sp.id] != null ? rf.values[sp.id] : '—' });
+  });
+
+  const head = M.species.map(sp => {
+    const dim = excludedBy[sp.id] ? ' style="opacity:.4"' : '';
+    const w = sp.id === win ? ' class="win-col"' : '';
+    return `<th${w}${dim}>${_sciHtml(sp.sci)}<br><span style="font-size:.66rem;color:var(--muted);font-style:normal">${sp.zh}</span></th>`;
+  }).join('');
+
+  let lastRegion = '';
+  const bodyRows = rows.map(r => {
+    let regionCell = '';
+    if (r.region !== lastRegion) { lastRegion = r.region; }
+    const cells = M.species.map(sp => {
+      const dim = excludedBy[sp.id] ? ' dim' : '';
+      const w = sp.id === win ? ' win-cell' : '';
+      return `<td class="${dim}${w}">${r.get(sp)}</td>`;
+    }).join('');
+    return `<tr><th class="mc-row">${r.name}${r.nameEn ? `<br><span style="font-size:.66rem;color:var(--muted);font-style:italic">${r.nameEn}</span>` : ''}</th>${cells}</tr>`;
+  }).join('');
+
+  return `<table class="mcompare">
+    <thead><tr><th class="mc-region"></th>${head}</tr></thead>
+    <tbody>${bodyRows}</tbody>
+  </table>`;
+}
+
+function mkRenderAll() {
+  document.getElementById('mkey-root').innerHTML = `
+    <div class="mkey">
+      <div class="mkey-panel">
+        <div class="mkey-panel-title">特徵選擇</div>
+        <div class="mkey-panel-sub">展開任一特徵，選定狀態或填入量測值</div>
+        ${mkRenderChars()}
+      </div>
+      <div class="mkey-panel">
+        <div class="mkey-panel-title">候選物種</div>
+        <div class="mkey-panel-sub">符合目前條件的庫蠓</div>
+        ${mkRenderCands()}
+      </div>
+    </div>`;
+  if (mkCompareOpen) {
+    const box = document.getElementById('mcompare-scroll');
+    box.innerHTML = mkRenderCompare();
+  }
+}
+
+// ── 事件 ──────────────────────────────────────────────
+function mkToggle(cid) {
+  if (mkOpen.has(cid)) mkOpen.delete(cid); else mkOpen.add(cid);
+  mkRenderAll();
+}
+function mkPickCat(cid, state) {
+  const cur = mkSel[cid];
+  if (cur && cur.type === 'cat' && cur.state === state) { mkClear(cid); return; }
+  mkSel[cid] = { type: 'cat', state };
+  if (!mkOrder.includes(cid)) mkOrder.push(cid);
+  mkOpen.add(cid);
+  mkRenderAll();
+}
+function mkPickNum(cid) {
+  const el = document.getElementById('mnum-' + cid);
+  const raw = el ? el.value.trim() : '';
+  if (raw === '') { mkClear(cid); return; }
+  const v = parseFloat(raw);
+  if (isNaN(v)) return;
+  mkSel[cid] = { type: 'num', value: v };
+  if (!mkOrder.includes(cid)) mkOrder.push(cid);
+  mkOpen.add(cid);
+  mkRenderAll();
+}
+function mkClear(cid) {
+  delete mkSel[cid];
+  const i = mkOrder.indexOf(cid);
+  if (i >= 0) mkOrder.splice(i, 1);
+  mkRenderAll();
+}
+function mkUndoChar(cid) { if (cid) mkClear(cid); }
+function mkReset() {
+  Object.keys(mkSel).forEach(k => delete mkSel[k]);
+  mkOrder.length = 0;
+  mkRenderAll();
+}
+function mkToggleExcl(btn) {
+  const list = btn.nextElementSibling;
+  const open = list.classList.toggle('open');
+  btn.textContent = (open ? '▾' : '▸') + btn.textContent.slice(1);
+}
+
+function initMatrixKey() {
+  if (mkReady || !window.KEY_MATRIX) return;
+  mkReady = true;
+  mkRenderAll();
+  const tgl = document.getElementById('mcompare-toggle');
+  const box = document.getElementById('mcompare-scroll');
+  tgl.addEventListener('click', () => {
+    mkCompareOpen = !mkCompareOpen;
+    box.classList.toggle('open', mkCompareOpen);
+    tgl.textContent = (mkCompareOpen ? '▤ 收合' : '▤ 展開') + '候選物種特徵並列比較表';
+    if (mkCompareOpen) box.innerHTML = mkRenderCompare();
+  });
+}
 
 
 // ══════════════════════════════════════════════════════════════════════
@@ -1492,6 +1946,10 @@ dataReady
   .catch(err => {
     grid.innerHTML = `<div class="empty">資料載入失敗：${err.message}</div>`;
   });
+
+
+// ── 初始分頁切換（置於 script 末端，確保所有宣告已初始化）─────────────
+if (_initTab !== 'intro') switchTab(_initTab);
 
 </script>
 </body>

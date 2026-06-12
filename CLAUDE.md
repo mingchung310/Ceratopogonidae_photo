@@ -132,11 +132,22 @@ git push
 ### `add_scalebar.py`（git ignored）
 - 對 `RAW image\` 根目錄的照片：旋轉 180°、加比例尺 → `RAW image\output\`
 
+### `gen_keymatrix.py`
+- 讀取 `Culicoides 特徵矩陣demo_filled.xlsx` → 產生 `keymatrix.js`
+- `keymatrix.js` 供「分類與鑑定」頁的**種級互動矩陣檢索**使用（multi-access key）
+- 特徵分兩類：互動篩選（數值 num／類別 cat）與並列比較參考表（reference）
+- 要新增/修改可篩選特徵，編輯 `gen_keymatrix.py` 內的 `NUM_CHARS` / `CAT_CHARS` 後重跑：
+  ```powershell
+  pip install openpyxl   # 首次
+  python gen_keymatrix.py
+  ```
+- 物種代表翅照對應表在 `SPECIES_META`
+
 ---
 
 ## 注意事項
 
-- `data.js` 和 `manifest.json` 永遠由腳本自動產生，**不要手動修改**
+- `data.js`、`manifest.json`、`keymatrix.js` 永遠由腳本自動產生，**不要手動修改**
 - `RAW image\` 不納入 git（容量大）
 - 比例尺參考圖 `RAW image\IMG_7000.JPG` 不要移動或刪除
 - 封面圖邏輯：同資料夾內名稱最小的檔案自動為封面；加 `0.` 前綴可強制指定
