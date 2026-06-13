@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-gen_keymatrix.py — 由「Culicoides 特徵矩陣demo_filled.xlsx」產生 keymatrix.js
+gen_keymatrix.py — 由「Culicoides 特徵矩陣.xlsx」產生 keymatrix.js
 
 keymatrix.js 供 index.html 的「種級互動檢索（特徵矩陣）」使用。
 - interactive 特徵：可點選/輸入作為篩選條件（數值 num / 類別 cat）
@@ -11,10 +11,13 @@ keymatrix.js 供 index.html 的「種級互動檢索（特徵矩陣）」使用�
 """
 import json
 import re
+import pathlib
 import openpyxl
 
-XLSX = "Culicoides 特徵矩陣demo_filled.xlsx"
-OUT  = "keymatrix.js"
+# 路徑以本檔所在資料夾為準，不受啟動時的工作目錄影響
+BASE = pathlib.Path(__file__).parent
+XLSX = str(BASE / "Culicoides 特徵矩陣.xlsx")
+OUT  = str(BASE / "keymatrix.js")
 
 # ── 物種 → 中文名 + 代表標本翅照 ────────────────────────────────
 SPECIES_META = {

@@ -5,14 +5,17 @@
 
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox, scrolledtext
-import pathlib, io, subprocess, threading, json
+import pathlib, io, subprocess, threading, json, sys
 from PIL import Image
 
-BASE      = pathlib.Path(__file__).parent
-IMG_DIR   = BASE / "images"
-BUILD_PS  = BASE / "build.ps1"
-MAX_BYTES = 200 * 1024
-IMG_EXTS  = {".jpg", ".jpeg", ".png", ".tif", ".tiff"}
+BASE         = pathlib.Path(__file__).parent
+IMG_DIR      = BASE / "images"
+BUILD_PS     = BASE / "build.ps1"
+GEN_KEY      = BASE / "gen_keymatrix.py"
+MATRIX_XLSX  = BASE / "Culicoides 特徵矩陣.xlsx"
+KEYMATRIX_JS = BASE / "keymatrix.js"
+MAX_BYTES    = 200 * 1024
+IMG_EXTS     = {".jpg", ".jpeg", ".png", ".tif", ".tiff"}
 
 # ── 影像工具 ──────────────────────────────────────────────────────────────────
 
@@ -134,6 +137,17 @@ class App(tk.Tk):
                   foreground="gray").pack(anchor="w")
         ttk.Button(f1, text="立即同步", width=14,
                    command=lambda: self._bg(self._sync_sheets)
+                   ).pack(anchor="w", pady=(8, 0))
+
+        # ── 1b. 同步檢索表特徵矩陣 ────────────────────────────────────────
+        fk = ttk.LabelFrame(self, text=" 檢索表：同步特徵矩陣 ", padding=10)
+        fk.pack(fill="x", **P)
+        ttk.Label(fk,
+                  text="改完「Culicoides 特徵矩陣.xlsx」後按此：重建 keymatrix.js\n"
+                       "並推送到 GitHub，線上 key.html 的種級矩陣檢索即會更新。",
+                  foreground="gray", justify="left").pack(anchor="w")
+        ttk.Button(fk, text="重建並推送", width=14,
+                   command=lambda: self._bg(self._sync_keymatrix)
                    ).pack(anchor="w", pady=(8, 0))
 
         # ── 2. 壓縮照片 ──────────────────────────────────────────────────
@@ -268,6 +282,58 @@ class App(tk.Tk):
         ok = self._run_ps()
         self._log("✓ 完成，本機離線版已更新" if ok else "✗ 失敗，請確認網路連線")
         self._idle("✓ 同步完成" if ok else "✗ 同步失敗")
+
+    # ── 1b. 同步檢索表特徵矩陣（xlsx → keymatrix.js → GitHub）─────────────────
+
+    def _sync_keymatrix(self):
+        result = ["待命"]   # finally 用
+        try:
+            self._busy("重建 keymatrix.js 中…")
+            self._log("\n▶ 同步檢索表特徵矩陣 …")
+
+            if not MATRIX_XLSX.exists():
+                self._log(f"  [錯誤] 找不到 {MATRIX_XLSX.name}")
+                result[0] = "✗ 找不到 xlsx"
+                return
+
+            # 1) 由 xlsx 重建 keymatrix.js
+            r = subprocess.run([sys.executable, str(GEN_KEY)],
+                               capture_output=True, text=True,
+                               encoding="utf-8", errors="replace", cwd=str(BASE))
+            for line in (r.stdout or "").strip().splitlines():
+                self._log(f"  {line}")
+            if r.returncode != 0:
+                self._log(f"  [錯誤] {(r.stderr or '').strip()}")
+                self._log("  （xlsx 結構可能有誤，已中止，未推送）")
+                result[0] = "✗ 產生失敗"
+                return
+
+            # 2) 暫存 keymatrix.js 與 xlsx
+            self._busy("提交並推送到 GitHub 中…")
+            self._git("add", str(KEYMATRIX_JS.name), str(MATRIX_XLSX.name))
+
+            has_changes = subprocess.run(
+                ["git", "diff", "--cached", "--quiet"], cwd=str(BASE)
+            ).returncode != 0
+            if not has_changes:
+                self._log("  沒有需要同步的變更（內容與線上相同）")
+                result[0] = "無需同步"
+                return
+
+            # 3) commit + push
+            if not self._git("commit", "-m", "同步檢索表特徵矩陣 → keymatrix.js"):
+                result[0] = "✗ commit 失敗"
+                return
+            ok = self._git("push")
+            self._log("✓ 已推送，線上 key.html 的種級矩陣檢索將更新"
+                      if ok else "✗ push 失敗，請確認網路或權限")
+            result[0] = "✓ 檢索表已同步" if ok else "✗ push 失敗"
+
+        except Exception as e:
+            self._log(f"  [未預期錯誤] {e}")
+            result[0] = "✗ 發生錯誤"
+        finally:
+            self._idle(result[0])
 
     # ── 2. 壓縮照片 ──────────────────────────────────────────────────────────
 

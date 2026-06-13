@@ -35,7 +35,7 @@ Ceratopogonidae_photo_web/
 ├── key.html            互動式檢索表（亞屬二分 + 種級矩陣）獨立檔，index.html 以 iframe 嵌入
 ├── keymatrix.js        種級矩陣資料（自動產生，勿手動改）
 ├── gen_keymatrix.py    由特徵矩陣 xlsx 產生 keymatrix.js
-├── Culicoides 特徵矩陣demo_filled.xlsx   矩陣檢索原始資料
+├── Culicoides 特徵矩陣.xlsx   矩陣檢索原始資料（編輯此檔後用維護工具同步）
 ├── build.ps1           自動產生 manifest.json + data.js
 ├── process_raw.py      壓縮圖片並呼叫 build.ps1
 ├── add_scalebar.py     旋轉 180°、加比例尺（git ignored）
@@ -143,15 +143,21 @@ git push
 - **要改檢索表邏輯／樣式請改 `key.html`**（不在 index.html 內）
 
 ### `gen_keymatrix.py`
-- 讀取 `Culicoides 特徵矩陣demo_filled.xlsx` → 產生 `keymatrix.js`
+- 讀取 `Culicoides 特徵矩陣.xlsx` → 產生 `keymatrix.js`
 - `keymatrix.js` 供 `key.html` 的**種級互動矩陣檢索**使用（multi-access key）
 - 特徵分兩類：互動篩選（數值 num／類別 cat）與並列比較參考表（reference）
-- 要新增/修改可篩選特徵，編輯 `gen_keymatrix.py` 內的 `NUM_CHARS` / `CAT_CHARS` 後重跑：
+- **日常更新檢索表資料**：直接編輯 `Culicoides 特徵矩陣.xlsx`，再用維護工具
+  `maintenance_tool.py` →「檢索表：同步特徵矩陣 → 重建並推送」一鍵完成
+  （= 重跑 `gen_keymatrix.py` 重建 `keymatrix.js`，再 commit + push，線上 key.html 即更新）
+- 要新增/修改**可篩選特徵欄位**（非僅改數值），編輯 `gen_keymatrix.py` 內的
+  `NUM_CHARS` / `CAT_CHARS` / `WING_CAT` 後重跑：
   ```powershell
   pip install openpyxl   # 首次
   python gen_keymatrix.py
   ```
 - 物種代表翅照對應表在 `SPECIES_META`
+- ⚠️ 注意：`key.html` 的**亞屬二分檢索（KEY_NODES）是手寫在 key.html 內**，不來自 xlsx；
+  同步特徵矩陣只會更新**種級矩陣檢索**那一塊
 
 ---
 
