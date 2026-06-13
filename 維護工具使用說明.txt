@@ -201,6 +201,73 @@
     3. 功能四：同步到 GitHub（會自動同步刪除）
 
 ================================================================
+  搬移到其他電腦（讓整套系統可運作）
+================================================================
+
+  「網路端」＝GitHub Pages（網站主機）＋ Google Sheets（資料來源），
+  這兩者在雲端、不需搬移。以下是「本機端」要帶到新電腦的東西。
+
+  ── 先在新電腦安裝（軟體，非檔案）─────────────────────────
+    1. Python 3            https://www.python.org
+    2. pip install pillow openpyxl
+    3. Git                 https://git-scm.com
+    4. 設定 Git 帳號（之後才能推送）：
+         git config --global user.email "your@email.com"
+         git config --global user.name  "Your Name"
+
+  ── 取得檔案：兩種方式 ────────────────────────────────────
+
+  方法一（最推薦）：用 Git 直接複製
+    在新電腦的命令列執行：
+      git clone https://github.com/mingchung310/Ceratopogonidae_photo.git
+    這會一次取得所有「必要檔案」與 GitHub 連線設定（可直接推送）。
+    註：git clone 不會帶到「加比例尺工具 add_scalebar.py」與
+        「RAW image\ 原始照片」（兩者已設為不上傳），需要的話另外用
+        隨身碟複製過去（見下方清單）。
+
+  方法二：用隨身碟複製整個資料夾
+    直接複製整個「Ceratopogonidae_photo_web\」資料夾（含隱藏的 .git）。
+    最完整，但 RAW image\ 容量大，若不需重壓圖片可略過。
+
+  ── 必要檔案清單（依用途）────────────────────────────────
+
+  A. 網站本體（缺了網站無法顯示）
+       index.html              網站主頁
+       key.html                互動檢索表
+       keymatrix.js            種級矩陣檢索資料
+       data.js                 標本資料（離線版）
+       manifest.json           圖片索引
+       images\                 所有標本圖片（整個資料夾）
+       robots.txt
+
+  B. 維護工具鏈（缺了無法更新／推送）
+       maintenance_tool.py     維護工具主程式
+       啟動維護工具.bat         啟動捷徑
+       build.ps1               產生 data.js / manifest.json
+       process_raw.py          壓縮圖片
+       gen_keymatrix.py        由 xlsx 產生 keymatrix.js
+       Culicoides 特徵矩陣.xlsx 檢索表原始資料
+       玻片標本清單 (slide mount).csv   Google Sheets 離線備援
+       launch.bat              本機預覽（localhost:8080）
+
+  C. 說明文件（建議一起帶）
+       維護工具使用說明.txt（本檔）、維護說明.txt、CLAUDE.md、.gitignore
+
+  D. 版本控制（要能從新電腦推送 GitHub 才需要）
+       .git\  整個資料夾（用方法一 git clone 會自動產生，免手動搬）
+
+  ── 不需要搬 ─────────────────────────────────────────────
+       backups\        本機 Excel 備份（會自動重建）
+       RAW image\      原始照片，容量大；僅「重新壓縮圖片」時才需要
+       add_scalebar.py 加比例尺工具；僅要對新原圖加比例尺時才需要
+       __pycache__\、dist\、build\、*.exe   執行產生的暫存，免搬
+
+  ── 搬完後確認能運作 ─────────────────────────────────────
+    1. 雙擊「啟動維護工具.bat」能開啟視窗
+    2. 功能一「立即同步」成功、且 backups\ 出現 Excel 備份
+    3. 功能四或功能二能成功 push（代表 Git 帳號與權限已就緒）
+
+================================================================
   常見問題
 ================================================================
 
