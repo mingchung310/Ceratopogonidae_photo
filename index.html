@@ -284,6 +284,29 @@
       min-height: 640px;
       display: block;
     }
+    .key-fallback {
+      max-width: 700px;
+      margin: 1rem auto 0;
+      background: var(--navy2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2.5rem 2rem;
+      text-align: center;
+    }
+    .key-fallback-title { font-size: 1.05rem; color: var(--gold); margin-bottom: 0.6rem; }
+    .key-fallback-msg   { font-size: 0.88rem; color: var(--muted); line-height: 1.7; margin-bottom: 1.3rem; }
+    .key-fallback-btn {
+      background: var(--navy3);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.88rem;
+      padding: 0.5rem 1.3rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .key-fallback-btn:hover { border-color: var(--gold); color: var(--gold); }
 
     /* ── Specimen page ───────────────────────────────────────────── */
     .content-wrap {
@@ -930,9 +953,12 @@ const _initTab = TABS.includes(location.hash.slice(1)) ? location.hash.slice(1) 
 //  互動檢索 iframe（key.html）自動調整高度
 // ══════════════════════════════════════════════════════════════════════
 
-// 子頁（key.html）回報高度時，調整 iframe 高度使其無捲軸無縫嵌入
+// 子頁（key.html）回報高度時，調整 iframe 高度使其無捲軸無縫嵌入；
+// 同時標記載入成功（收到任何高度訊息即代表 key.html 正常運作）
+let keyFrameOk = false;
 window.addEventListener('message', e => {
   if (e.data && e.data.type === 'ceratoKeyHeight' && e.data.height) {
+    keyFrameOk = true;
     const f = document.getElementById('key-frame');
     if (f) f.style.height = e.data.height + 'px';
   }
@@ -943,6 +969,35 @@ function measureKeyFrame() {
   const f = document.getElementById('key-frame');
   if (f && f.contentWindow) f.contentWindow.postMessage({ type: 'ceratoKeyMeasure' }, '*');
 }
+
+// 優雅降級：若逾時仍未收到 key.html 的高度回報（檔案缺失/部署錯誤），
+// 把 iframe 換成友善提示，避免訪客看到生硬的 404 畫面
+function armKeyFrameFallback() {
+  setTimeout(() => { if (!keyFrameOk) showKeyFrameFallback(); }, 8000);
+}
+function showKeyFrameFallback() {
+  const f = document.getElementById('key-frame');
+  if (!f) return;
+  const div = document.createElement('div');
+  div.className = 'key-fallback';
+  div.innerHTML =
+    '<p class="key-fallback-title">⚠️ 互動式檢索表暫時無法載入</p>' +
+    '<p class="key-fallback-msg">可能是網路或部署問題，本頁其餘內容不受影響。</p>' +
+    '<button type="button" class="key-fallback-btn" onclick="reloadKeyFrame(this)">重新載入檢索表</button>';
+  f.replaceWith(div);
+}
+function reloadKeyFrame(btn) {
+  const div = btn.closest('.key-fallback');
+  const f = document.createElement('iframe');
+  f.id = 'key-frame';
+  f.className = 'key-frame';
+  f.title = '庫蠓互動式檢索表';
+  f.src = 'key.html?retry=' + Date.now();
+  div.replaceWith(f);
+  keyFrameOk = false;
+  armKeyFrameFallback();
+}
+armKeyFrameFallback();
 
 
 
