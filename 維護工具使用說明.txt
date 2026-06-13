@@ -251,7 +251,7 @@
        launch.bat              本機預覽（localhost:8080）
 
   C. 說明文件（建議一起帶）
-       維護工具使用說明.txt（本檔）、維護說明.txt、CLAUDE.md、.gitignore
+       維護工具使用說明.txt（本檔）、CLAUDE.md、.gitignore
 
   D. 版本控制（要能從新電腦推送 GitHub 才需要）
        .git\  整個資料夾（用方法一 git clone 會自動產生，免手動搬）
