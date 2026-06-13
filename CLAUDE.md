@@ -32,6 +32,10 @@ python maintenance_tool.py
 ```
 Ceratopogonidae_photo_web/
 ├── index.html          網站本體（勿手動改 data）
+├── key.html            互動式檢索表（亞屬二分 + 種級矩陣）獨立檔，index.html 以 iframe 嵌入
+├── keymatrix.js        種級矩陣資料（自動產生，勿手動改）
+├── gen_keymatrix.py    由特徵矩陣 xlsx 產生 keymatrix.js
+├── Culicoides 特徵矩陣demo_filled.xlsx   矩陣檢索原始資料
 ├── build.ps1           自動產生 manifest.json + data.js
 ├── process_raw.py      壓縮圖片並呼叫 build.ps1
 ├── add_scalebar.py     旋轉 180°、加比例尺（git ignored）
@@ -132,9 +136,15 @@ git push
 ### `add_scalebar.py`（git ignored）
 - 對 `RAW image\` 根目錄的照片：旋轉 180°、加比例尺 → `RAW image\output\`
 
+### `key.html`（互動式檢索表，獨立檔）
+- 自包含的檢索表頁面：**亞屬二分檢索** + **種級矩陣檢索**，含各自的 CSS／HTML／JS，載入 `keymatrix.js`
+- 可單獨開啟；`index.html` 的「分類與鑑定」頁以 `<iframe src="key.html">` 嵌入
+- 高度自動同步：`key.html` 量測內容高度 → `postMessage({type:'ceratoKeyHeight'})` → `index.html` 調整 iframe 高度（無捲軸無縫嵌入）。切換到該分頁時 `index.html` 會請 `key.html` 重新量測
+- **要改檢索表邏輯／樣式請改 `key.html`**（不在 index.html 內）
+
 ### `gen_keymatrix.py`
 - 讀取 `Culicoides 特徵矩陣demo_filled.xlsx` → 產生 `keymatrix.js`
-- `keymatrix.js` 供「分類與鑑定」頁的**種級互動矩陣檢索**使用（multi-access key）
+- `keymatrix.js` 供 `key.html` 的**種級互動矩陣檢索**使用（multi-access key）
 - 特徵分兩類：互動篩選（數值 num／類別 cat）與並列比較參考表（reference）
 - 要新增/修改可篩選特徵，編輯 `gen_keymatrix.py` 內的 `NUM_CHARS` / `CAT_CHARS` 後重跑：
   ```powershell

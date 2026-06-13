@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>庫蠓互動式檢索表</title>
+  <!--
+    自包含的互動式檢索表（亞屬二分檢索 + 種級矩陣檢索）。
+    可單獨開啟；網站 index.html 以 <iframe> 嵌入並自動調整高度。
+    資料來源：keymatrix.js（由 gen_keymatrix.py 產生）。
+  -->
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:   #0b0f1e;
+      --navy2:  #151b30;
+      --navy3:  #1e2740;
+      --gold:   #c9a84c;
+      --gold2:  #e8c96d;
+      --text:   #e8e4da;
+      --muted:  #8a9bb0;
+      --border: #2a3555;
+      --card-bg:#131929;
+    }
+
+    body {
+      background: var(--navy);
+      color: var(--text);
+      font-family: 'Noto Serif TC', Georgia, serif;
+      padding: 1rem;
+    }
+    .key-page { max-width: 1040px; margin: 0 auto; }
+
+    .section { margin-bottom: 3.5rem; }
+    .section:last-child { margin-bottom: 0.5rem; }
+    .section-title {
+      font-size: 1.3rem;
+      color: var(--gold);
+      letter-spacing: 0.06em;
+      margin-bottom: 0.3rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .section-subtitle {
+      font-size: 0.78rem;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-style: italic;
+      margin-bottom: 1.2rem;
+    }
+
+    /* ── Interactive key ─────────────────────────────────────────── */
+    .key-wrap {
+      background: var(--navy2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+      max-width: 700px;
+      margin: 1rem auto 0;
+    }
+    .key-history {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+      margin-bottom: 1.2rem;
+    }
+    .key-crumb {
+      font-size: 0.72rem;
+      background: var(--navy3);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 0.18rem 0.55rem;
+      border-radius: 4px;
+    }
+    .key-step-label {
+      font-size: 0.75rem;
+      color: var(--gold);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+    .key-question {
+      font-size: 1.08rem;
+      color: var(--text);
+      line-height: 1.5;
+      margin-bottom: 0.4rem;
+    }
+    .key-note {
+      font-size: 0.82rem;
+      color: var(--muted);
+      font-style: italic;
+      line-height: 1.6;
+      margin-bottom: 1.4rem;
+    }
+    .key-choices { display: flex; flex-direction: column; gap: 0.6rem; }
+    .key-choice {
+      background: var(--navy3);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.85rem 1.2rem;
+      border-radius: 8px;
+      cursor: pointer;
+      text-align: left;
+      font-size: 0.93rem;
+      font-family: inherit;
+      line-height: 1.6;
+      transition: border-color 0.2s, background 0.15s;
+    }
+    .key-choice:hover { border-color: var(--gold); background: var(--navy2); }
+    .key-choice strong { color: var(--gold); margin-right: 0.5rem; }
+    .key-nav  { display: flex; gap: 0.5rem; margin-top: 1.4rem; }
+    .key-btn  {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 0.38rem 0.9rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.82rem;
+      font-family: inherit;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .key-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+    /* 圖片選項 */
+    .key-choices-img {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+    .key-choice-img {
+      background: var(--navy3);
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      cursor: pointer;
+      padding: 0;
+      overflow: hidden;
+      width: 100%;
+      font-family: inherit;
+      transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s;
+    }
+    .key-choice-img:hover {
+      border-color: var(--gold);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(201,168,76,0.15);
+    }
+    .key-img-wrap {
+      width: 100%;
+      aspect-ratio: 4/3;
+      overflow: hidden;
+      background: var(--navy2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-bottom: 1px solid var(--border);
+    }
+    .key-img-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .key-img-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      color: var(--muted);
+      padding: 0.75rem;
+      text-align: center;
+    }
+    .key-img-placeholder .icon { font-size: 2rem; opacity: 0.5; }
+    .key-img-placeholder .note { font-size: 0.72rem; line-height: 1.5; }
+    .key-img-label {
+      padding: 0.6rem 0.85rem 0.7rem;
+      font-size: 0.85rem;
+      color: var(--text);
+      line-height: 1.5;
+      text-align: left;
+    }
+    .key-img-label strong { color: var(--gold); margin-right: 0.35rem; }
+
+    .key-result { text-align: center; padding: 0.75rem 0; }
+    .key-result-label {
+      font-size: 0.75rem;
+      color: var(--muted);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+    }
+    .key-result-name { font-size: 1.6rem; color: var(--gold); font-style: italic; margin-bottom: 0.3rem; }
+    .key-result-zh   { font-size: 0.92rem; color: var(--muted); margin-bottom: 1rem; }
+    .key-result-desc {
+      font-size: 0.9rem;
+      line-height: 1.8;
+      color: var(--text);
+      text-align: left;
+      background: var(--navy3);
+      padding: 1rem 1.25rem;
+      border-radius: 8px;
+    }
+
+    /* ── 種級互動矩陣檢索 (multi-access key) ─────────────────────── */
+    .mkey {
+      max-width: 980px;
+      margin: 1rem auto 0;
+      display: grid;
+      grid-template-columns: 1.15fr 1fr;
+      gap: 1.25rem;
+      align-items: start;
+    }
+    .mkey-panel {
+      background: var(--navy2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1.25rem 1.4rem;
+    }
+    .mkey-panel-title {
+      font-size: 0.78rem;
+      color: var(--gold);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 0.2rem;
+    }
+    .mkey-panel-sub { font-size: 0.78rem; color: var(--muted); margin-bottom: 1rem; line-height: 1.6; }
+
+    /* 特徵手風琴 */
+    .mchar { border-top: 1px solid var(--border); }
+    .mchar:first-of-type { border-top: none; }
+    .mchar-head {
+      width: 100%;
+      background: none;
+      border: none;
+      color: var(--text);
+      font-family: inherit;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      padding: 0.7rem 0.1rem;
+      text-align: left;
+    }
+    .mchar-head:hover .mchar-name { color: var(--gold2); }
+    .mchar-name { font-size: 0.92rem; line-height: 1.4; }
+    .mchar-name .en { color: var(--muted); font-size: 0.74rem; font-style: italic; margin-left: 0.35rem; }
+    .mchar-prov {
+      font-size: 0.6rem; color: var(--gold); border: 1px solid var(--gold);
+      border-radius: 4px; padding: 0.02rem 0.3rem; margin-left: 0.4rem;
+      vertical-align: middle; letter-spacing: 0.05em; opacity: 0.85;
+    }
+    .mchar-region {
+      font-size: 0.64rem; color: var(--muted); letter-spacing: 0.06em;
+      display: block; margin-bottom: 0.1rem; text-transform: uppercase;
+    }
+    .mchar-pick {
+      font-size: 0.74rem; color: var(--gold);
+      background: rgba(201,168,76,0.12);
+      border: 1px solid var(--border);
+      border-radius: 5px; padding: 0.12rem 0.45rem; white-space: nowrap;
+    }
+    .mchar-toggle { color: var(--muted); font-size: 0.8rem; flex-shrink: 0; transition: transform 0.2s; }
+    .mchar.open .mchar-toggle { transform: rotate(90deg); }
+    .mchar-body { display: none; padding: 0 0.1rem 1rem; }
+    .mchar.open .mchar-body { display: block; }
+    .mchar-note { font-size: 0.74rem; color: var(--muted); line-height: 1.6; margin-bottom: 0.7rem; font-style: italic; }
+
+    .mstate-row { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+    .mstate {
+      background: var(--navy3); border: 1px solid var(--border); color: var(--text);
+      font-family: inherit; font-size: 0.8rem; padding: 0.34rem 0.7rem;
+      border-radius: 6px; cursor: pointer; transition: border-color 0.15s, background 0.15s;
+    }
+    .mstate:hover { border-color: var(--gold); }
+    .mstate.sel { background: var(--gold); color: var(--navy); border-color: var(--gold); font-weight: 600; }
+    .mstate small { color: var(--muted); margin-left: 0.3rem; }
+    .mstate.sel small { color: var(--navy); }
+
+    .mnum-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+    .mnum-row input {
+      width: 92px; background: var(--navy); border: 1px solid var(--border);
+      color: var(--text); font-family: inherit; font-size: 0.85rem;
+      padding: 0.36rem 0.5rem; border-radius: 6px;
+    }
+    .mnum-row input:focus { outline: none; border-color: var(--gold); }
+    .mnum-unit { font-size: 0.8rem; color: var(--muted); }
+    .mnum-range { font-size: 0.72rem; color: var(--muted); width: 100%; }
+    .mnum-apply, .mclear-one {
+      background: var(--navy3); border: 1px solid var(--border); color: var(--text);
+      font-family: inherit; font-size: 0.78rem; padding: 0.34rem 0.7rem;
+      border-radius: 6px; cursor: pointer;
+    }
+    .mnum-apply:hover { border-color: var(--gold); color: var(--gold); }
+    .mclear-one { color: var(--muted); }
+    .mclear-one:hover { border-color: var(--gold); color: var(--gold); }
+
+    /* 候選結果面板 */
+    .mkey-summary {
+      display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 0.2rem;
+    }
+    .mkey-count { font-size: 1.9rem; color: var(--gold); font-weight: 700; line-height: 1; }
+    .mkey-count-total { font-size: 0.85rem; color: var(--muted); }
+    .mkey-reset {
+      margin-left: auto; background: none; border: 1px solid var(--border); color: var(--muted);
+      font-family: inherit; font-size: 0.78rem; padding: 0.3rem 0.75rem; border-radius: 6px; cursor: pointer;
+    }
+    .mkey-reset:hover { border-color: var(--gold); color: var(--gold); }
+
+    .mcand { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 1rem; }
+    .mcand-item {
+      display: flex; align-items: center; gap: 0.7rem;
+      background: var(--navy3); border: 1px solid var(--border);
+      border-radius: 9px; padding: 0.5rem 0.6rem; transition: border-color 0.15s;
+    }
+    .mcand-item.win { border-color: var(--gold); background: rgba(201,168,76,0.08); }
+    .mcand-thumb {
+      width: 58px; height: 44px; flex-shrink: 0; border-radius: 6px; overflow: hidden;
+      background: var(--navy); display: flex; align-items: center; justify-content: center;
+    }
+    .mcand-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .mcand-thumb.empty { color: var(--muted); font-size: 1.1rem; opacity: 0.5; }
+    .mcand-txt { flex: 1; min-width: 0; }
+    .mcand-sci { font-size: 0.92rem; color: var(--text); font-style: italic; }
+    .mcand-sci .gen { font-style: italic; }
+    .mcand-zh { font-size: 0.76rem; color: var(--muted); }
+    .mcand-badge { font-size: 0.7rem; color: var(--gold); white-space: nowrap; }
+
+    .mexcl-head {
+      width: 100%; background: none; border: none; color: var(--muted);
+      font-family: inherit; font-size: 0.78rem; cursor: pointer; text-align: left;
+      padding: 0.6rem 0; margin-top: 0.6rem; border-top: 1px dashed var(--border);
+    }
+    .mexcl-head:hover { color: var(--gold); }
+    .mexcl-list { display: none; flex-direction: column; gap: 0.3rem; }
+    .mexcl-list.open { display: flex; }
+    .mexcl-item {
+      font-size: 0.76rem; color: var(--muted); display: flex; align-items: center;
+      gap: 0.5rem; padding: 0.3rem 0.1rem;
+    }
+    .mexcl-item .sci { font-style: italic; color: #a9b6c8; }
+    .mexcl-item .why { font-size: 0.7rem; color: var(--gold); opacity: 0.8; }
+    .mexcl-undo {
+      margin-left: auto; background: none; border: 1px solid var(--border); color: var(--muted);
+      font-size: 0.68rem; padding: 0.1rem 0.4rem; border-radius: 5px; cursor: pointer; font-family: inherit;
+    }
+    .mexcl-undo:hover { border-color: var(--gold); color: var(--gold); }
+
+    /* 並列比較表 */
+    .mcompare-wrap { max-width: 980px; margin: 1.5rem auto 0; }
+    .mcompare-toggle {
+      background: var(--navy3); border: 1px solid var(--border); color: var(--text);
+      font-family: inherit; font-size: 0.85rem; padding: 0.55rem 1.1rem; border-radius: 8px;
+      cursor: pointer; width: 100%;
+    }
+    .mcompare-toggle:hover { border-color: var(--gold); color: var(--gold); }
+    .mcompare-scroll { display: none; margin-top: 1rem; overflow-x: auto; border: 1px solid var(--border); border-radius: 10px; }
+    .mcompare-scroll.open { display: block; }
+    table.mcompare { border-collapse: collapse; font-size: 0.76rem; min-width: 100%; }
+    table.mcompare th, table.mcompare td {
+      border: 1px solid var(--border); padding: 0.45rem 0.6rem; text-align: left; vertical-align: top;
+      line-height: 1.5; white-space: nowrap;
+    }
+    table.mcompare thead th {
+      position: sticky; top: 0; background: var(--navy2); color: var(--gold);
+      font-style: italic; font-weight: 600;
+    }
+    table.mcompare th.mc-region { background: var(--navy3); color: var(--muted); font-style: normal; font-size: 0.66rem; }
+    table.mcompare th.mc-row {
+      position: sticky; left: 0; background: var(--navy2); color: var(--text);
+      font-style: normal; font-weight: 400; z-index: 1; white-space: normal; min-width: 140px;
+    }
+    table.mcompare td { color: var(--muted); white-space: normal; min-width: 120px; }
+    table.mcompare tbody tr:nth-child(even) td,
+    table.mcompare tbody tr:nth-child(even) th.mc-row { background: rgba(255,255,255,0.015); }
+    table.mcompare td.dim { opacity: 0.35; }
+    table.mcompare col.win-col, table.mcompare td.win-cell { background: rgba(201,168,76,0.08); }
+
+    @media (max-width: 820px) {
+      .mkey { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div class="key-page">
+
+  <!-- 互動式亞屬檢索表 -->
+  <div class="section">
+    <h2 class="section-title">互動式亞屬檢索表</h2>
+    <p class="section-subtitle">Interactive key to subgenera — 初稿，持續更新中</p>
+    <p style="font-size:0.87rem;color:var(--muted);line-height:1.75;margin-bottom:1rem">
+      依序點選與標本相符的描述，逐步縮小鑑定範圍。<br>
+      ⚠️ 本檢索表目前為框架版本，部分步驟待正式特徵補入後更新。
+    </p>
+    <div class="key-wrap" id="key-wrap"><!-- JS 渲染 --></div>
+  </div>
+
+  <!-- 種級互動矩陣檢索 -->
+  <div class="section">
+    <h2 class="section-title">種級互動檢索（特徵矩陣）</h2>
+    <p class="section-subtitle">Interactive matrix key to species — 台灣 9 種庫蠓 demo</p>
+    <p style="font-size:0.87rem;color:var(--muted);line-height:1.75;margin-bottom:1rem">
+      不必照固定順序：<strong style="color:var(--text)">挑選你在標本上觀察得到的任一特徵</strong>，
+      左側選定狀態或填入量測值，右側候選物種即時縮減。被排除的物種會列在「已排除」中並可隨時還原。<br>
+      ⚠️ Demo 資料取自 9 種台灣庫蠓特徵矩陣（參考 Lien 1997, 1998; Wirth &amp; Hubert 1989; 虞以新 2006）。
+    </p>
+    <div id="mkey-root"><!-- JS 渲染 --></div>
+    <div class="mcompare-wrap">
+      <button class="mcompare-toggle" id="mcompare-toggle" type="button">▤ 展開候選物種特徵並列比較表</button>
+      <div class="mcompare-scroll" id="mcompare-scroll"><!-- JS 渲染 --></div>
+    </div>
+  </div>
+
+</div><!-- /key-page -->
+
+<script src="keymatrix.js"></script>
+<script>
+'use strict';
+
+// ══════════════════════════════════════════════════════════════════════
+//  INTERACTIVE DICHOTOMOUS KEY  互動式亞屬檢索表
+// ══════════════════════════════════════════════════════════════════════
+
+let keyHistory = [];
+let keyCurrent = 1;
+
+// 每個節點：lead = 問題，note = 說明，a/b = 兩個選項
+// go: 跳到另一節點；result: 終點（亞屬 ID）
+const KEY_NODES = {
+  1: {
+    lead: '翅面斑紋（Wing pattern）',
+    note: '對光觀察前翅，注意是否有深淺對比明顯的斑塊分布。',
+    a: { text: '翅面具明顯淡色斑與暗色斑',
+         img: 'images/Cer101/荒川.jpg',
+         imgNote: '具斑紋翅（荒川庫蠓 Cer101）', go: 2 },
+    b: { text: '翅面近乎均勻，無明顯斑紋',
+         img: 'images/Cer36/0.Cer36_win_10x.jpg.png',
+         imgNote: '均勻翅（溪頭三囊亞屬 Cer36）', go: 5 }
+  },
+  2: {
+    lead: '第三觸鬚節感覺窩（Palpal pit on segment III）',
+    note: '以高倍鏡觀察第三節觸鬚，注意感覺窩的相對大小。',
+    a: { text: '感覺窩大，佔第三節明顯比例',
+         img: 'images/Cer14/spe_10x.png',
+         imgNote: '大型感覺窩示例（荒川庫蠓 Cer14）', go: 3 },
+    b: { text: '感覺窩小或不明顯',
+         img: 'images/Cer44/spe_10x.png',
+         imgNote: '小型感覺窩示例（雅氏庫蠓 Cer44）', go: 4 }
+  },
+  3: {
+    lead: '觸鬚比（Palpal ratio, PR）',
+    note: 'PR = 第三節觸鬚長度 ÷（第四節 + 第五節）長度',
+    a: { text: 'PR > 2.5',
+         img: 'images/Cer7/Cer7 Head.png',
+         imgNote: 'PR > 2.5 示例（台南庫蠓 Cer7）', result: 'avaritia' },
+    b: { text: 'PR ≤ 2.5',
+         img: 'images/Cer13/Cer13 Head.png',
+         imgNote: 'PR ≤ 2.5 示例（荒川庫蠓 Cer13）', result: 'culicoides_ss' }
+  },
+  4: {
+    lead: '【初稿】翅斑有、感覺窩小類群——特徵待確認',
+    note: '本步驟尚在整理中，以下為暫定分支。',
+    a: { text: '（特徵 A — 待補充）',
+         img: 'images/Cer48/0.Cer48 Wings.png',
+         imgNote: '示例（嗜牛庫蠓 Cer48）', result: 'oecacta' },
+    b: { text: '（特徵 B — 待補充）',
+         img: 'images/Cer44/0.Cer44 Wings.png',
+         imgNote: '示例（雅氏庫蠓 Cer44）', result: 'beltranmyia' }
+  },
+  5: {
+    lead: '【初稿】翅面無明顯斑紋類群——特徵待確認',
+    note: '本步驟尚在整理中，以下為暫定分支。',
+    a: { text: '（特徵 A — 待補充）',
+         img: 'images/Cer33/0.win_4x.png',
+         imgNote: '示例（蘇島庫蠓 Cer33）', result: 'meijerehelea' },
+    b: { text: '（特徵 B — 待補充）',
+         img: 'images/Cer37/0.Cer37_win_10x_2jpg.jpg.png',
+         imgNote: '示例（牛場三囊亞屬 Cer37）', result: 'other' }
+  }
+};
+
+const KEY_RESULTS = {
+  avaritia:      { name: 'Avaritia',         zh: '',          desc: '全球分布最廣、種數最多的亞屬之一，台灣已有多種記錄。翅面具明顯斑紋，觸鬚感覺窩大型，PR 通常 > 2.5。多種雌蟲具吸血習性，部分種類為藍舌病、赤羽病等動物疾病的媒介昆蟲。' },
+  culicoides_ss: { name: 'Culicoides s.str.', zh: '（指名亞屬）', desc: '指名亞屬。詳細特徵與台灣記錄待補充。' },
+  oecacta:       { name: 'Oecacta',          zh: '',          desc: '特徵與台灣記錄待補充。' },
+  beltranmyia:   { name: 'Beltranmyia',      zh: '',          desc: '特徵與台灣記錄待補充。' },
+  meijerehelea:  { name: 'Meijerehelea',     zh: '',          desc: '特徵與台灣記錄待補充。' },
+  other:         { name: '（其他亞屬）',      zh: '',          desc: '詳細亞屬檢索表建構中，請聯繫實驗室確認鑑定。' }
+};
+
+function _breadcrumb() {
+  if (!keyHistory.length) return '';
+  return `<div class="key-history">${
+    keyHistory.map((h, i) => {
+      const label = KEY_NODES[h.id][h.ch].text.split('（')[0].trim();
+      return `<span class="key-crumb">${i + 1}. ${label}</span>`;
+    }).join(' › ')
+  }</div>`;
+}
+
+function _navBtns() {
+  return keyHistory.length ? `
+    <div class="key-nav">
+      <button class="key-btn" onclick="keyBack()">← 上一步</button>
+      <button class="key-btn" onclick="keyReset()">重新開始</button>
+    </div>` : '';
+}
+
+function _choiceCard(ch, choice) {
+  const imgHtml = choice.img
+    ? `<img src="${choice.img}" alt="${choice.imgNote || ''}">`
+    : `<div class="key-img-placeholder">
+         <span class="icon">🔬</span>
+         <span class="note">${choice.imgNote || '圖片待補充'}</span>
+       </div>`;
+  return `
+    <button class="key-choice-img" onclick="keyChoose('${ch}')">
+      <div class="key-img-wrap">${imgHtml}</div>
+      <div class="key-img-label"><strong>${ch}.</strong> ${choice.text}</div>
+    </button>`;
+}
+
+function renderKey() {
+  const wrap = document.getElementById('key-wrap');
+  const node = KEY_NODES[keyCurrent];
+  wrap.innerHTML = `
+    ${_breadcrumb()}
+    <div class="key-step-label">步驟 ${keyHistory.length + 1}</div>
+    <div class="key-question">${node.lead}</div>
+    ${node.note ? `<div class="key-note">${node.note}</div>` : ''}
+    <div class="key-choices-img">
+      ${_choiceCard('a', node.a)}
+      ${_choiceCard('b', node.b)}
+    </div>
+    ${_navBtns()}`;
+  postHeight();
+}
+
+function renderResult(id) {
+  const r    = KEY_RESULTS[id];
+  const wrap = document.getElementById('key-wrap');
+  wrap.innerHTML = `
+    ${_breadcrumb()}
+    <div class="key-result">
+      <div class="key-result-label">鑑定結果 Result</div>
+      <div class="key-result-name">Culicoides (${r.name})</div>
+      ${r.zh ? `<div class="key-result-zh">${r.zh}</div>` : ''}
+      <div class="key-result-desc">${r.desc}</div>
+    </div>
+    <div class="key-nav">
+      <button class="key-btn" onclick="keyBack()">← 上一步</button>
+      <button class="key-btn" onclick="keyReset()">重新開始</button>
+    </div>`;
+  postHeight();
+}
+
+function keyChoose(ch) {
+  const sel = KEY_NODES[keyCurrent][ch];
+  keyHistory.push({ id: keyCurrent, ch });
+  if (sel.result) { renderResult(sel.result); }
+  else            { keyCurrent = sel.go; renderKey(); }
+}
+
+function keyBack() {
+  if (!keyHistory.length) return;
+  const prev = keyHistory.pop();
+  keyCurrent = prev.id;
+  renderKey();
+}
+
+function keyReset() {
+  keyHistory = [];
+  keyCurrent = 1;
+  renderKey();
+}
+
+
+// ══════════════════════════════════════════════════════════════════════
+//  種級互動矩陣檢索  MULTI-ACCESS MATRIX KEY
+// ══════════════════════════════════════════════════════════════════════
+
+const mkSel  = {};          // charId -> {type, state} | {type, value}
+const mkOrder = [];         // 選取順序（決定排除原因取第一個觸發的特徵）
+const mkOpen = new Set();   // 展開中的特徵手風琴
+let mkCompareOpen = false;
+
+function _sciHtml(sci) {
+  // "Culicoides actoni" -> "C. actoni"（屬名縮寫）
+  const sp = sci.replace(/^Culicoides\s+/, '');
+  return `<span class="gen">C.</span> ${sp}`;
+}
+
+function mkEvaluate() {
+  const M = window.KEY_MATRIX;
+  const excludedBy = {};   // spId -> {char, reason}
+  M.species.forEach(sp => {
+    for (const cid of mkOrder) {
+      const sel = mkSel[cid];
+      if (!sel) continue;
+      const ch = M.characters.find(c => c.id === cid);
+      const val = ch.values[sp.id];
+      let ok = true, reason = '';
+      if (sel.type === 'cat') {
+        if (val.state == null) { ok = true; }            // 無資料不排除
+        else if (val.state !== sel.state) { ok = false; reason = `${ch.name}：${val.raw}`; }
+      } else { // num
+        if (val.min == null) { ok = true; }              // 無資料不排除
+        else {
+          const lo = val.min - ch.pad, hi = val.max + ch.pad;
+          if (sel.value < lo || sel.value > hi) {
+            ok = false;
+            reason = `${ch.name} = ${val.raw}`;
+          }
+        }
+      }
+      if (!ok) { excludedBy[sp.id] = { char: ch.name, reason }; break; }
+    }
+  });
+  const remaining = M.species.filter(sp => !excludedBy[sp.id]);
+  const excluded  = M.species.filter(sp => excludedBy[sp.id])
+                             .map(sp => ({ sp, ...excludedBy[sp.id] }));
+  return { remaining, excluded, excludedBy };
+}
+
+// 計算某類別狀態符合的物種數
+function _stateCount(ch, state) {
+  return window.KEY_MATRIX.species.filter(sp => ch.values[sp.id].state === state).length;
+}
+
+function mkRenderChars() {
+  const M = window.KEY_MATRIX;
+  let html = '';
+  M.characters.forEach(ch => {
+    const sel = mkSel[ch.id];
+    const open = mkOpen.has(ch.id);
+    let picked = '';
+    if (sel) picked = sel.type === 'cat' ? sel.state : `${sel.value}${ch.unit || ''}`;
+
+    let body = '';
+    if (ch.provisional) body += `<div class="mchar-note" style="color:var(--gold);opacity:0.85">⚠️ 暫定編碼：狀態由原始描述歸納而成，待實驗室確認。</div>`;
+    if (ch.note) body += `<div class="mchar-note">${ch.note}</div>`;
+    if (ch.type === 'cat') {
+      body += '<div class="mstate-row">' + ch.states.map(st => {
+        const n = _stateCount(ch, st);
+        const on = sel && sel.state === st ? ' sel' : '';
+        return `<button class="mstate${on}" type="button" onclick="mkPickCat('${ch.id}','${st.replace(/'/g, "\\'")}')">${st}<small>${n}</small></button>`;
+      }).join('') + '</div>';
+    } else {
+      const cur = sel ? sel.value : '';
+      body += `<div class="mnum-row">
+        <input type="number" step="any" id="mnum-${ch.id}" value="${cur}" placeholder="量測值"
+               onkeydown="if(event.key==='Enter'){mkPickNum('${ch.id}')}">
+        <span class="mnum-unit">${ch.unit || ''}</span>
+        <button class="mnum-apply" type="button" onclick="mkPickNum('${ch.id}')">套用</button>
+        <span class="mnum-range">資料範圍：${ch.min}–${ch.max}${ch.unit ? ' ' + ch.unit : ''}（含 ±${ch.pad} 容差）</span>
+      </div>`;
+    }
+    if (sel) body += `<button class="mclear-one" type="button" style="margin-top:0.6rem" onclick="mkClear('${ch.id}')">清除此特徵</button>`;
+
+    html += `
+      <div class="mchar${open ? ' open' : ''}">
+        <button class="mchar-head" type="button" onclick="mkToggle('${ch.id}')">
+          <span>
+            <span class="mchar-region">${ch.region}</span>
+            <span class="mchar-name">${ch.name}${ch.provisional ? '<span class="mchar-prov">暫定</span>' : ''}<span class="en">${ch.nameEn || ''}</span></span>
+          </span>
+          ${picked ? `<span class="mchar-pick">${picked}</span>` : ''}
+          <span class="mchar-toggle">▸</span>
+        </button>
+        <div class="mchar-body">${body}</div>
+      </div>`;
+  });
+  return html;
+}
+
+function mkRenderCands() {
+  const M = window.KEY_MATRIX;
+  const { remaining, excluded } = mkEvaluate();
+  const win = remaining.length === 1;
+
+  let cands = remaining.map(sp => {
+    const thumb = sp.photo
+      ? `<div class="mcand-thumb"><img src="${sp.photo}" alt="${sp.zh}"></div>`
+      : `<div class="mcand-thumb empty">🔬</div>`;
+    return `<div class="mcand-item${win ? ' win' : ''}">
+      ${thumb}
+      <div class="mcand-txt">
+        <div class="mcand-sci">${_sciHtml(sp.sci)}</div>
+        <div class="mcand-zh">${sp.zh}</div>
+      </div>
+      ${win ? '<span class="mcand-badge">✓ 唯一候選</span>' : ''}
+    </div>`;
+  }).join('');
+  if (!remaining.length) cands = `<div class="mcand-zh" style="padding:0.5rem">沒有符合的物種——條件可能互相衝突，請從「已排除」還原部分特徵。</div>`;
+
+  let excl = '';
+  if (excluded.length) {
+    excl = `
+      <button class="mexcl-head" type="button" onclick="mkToggleExcl(this)">▸ 已排除（${excluded.length}）</button>
+      <div class="mexcl-list">
+        ${excluded.map(e => `
+          <div class="mexcl-item">
+            <span class="sci">${_sciHtml(e.sp.sci)}</span>
+            <span class="why">${e.reason}</span>
+            <button class="mexcl-undo" type="button" onclick="mkUndoChar('${findCharIdByName(e.char)}')">還原</button>
+          </div>`).join('')}
+      </div>`;
+  }
+
+  return `
+    <div class="mkey-summary">
+      <span class="mkey-count">${remaining.length}</span>
+      <span class="mkey-count-total">/ ${M.species.length} 種符合</span>
+      <button class="mkey-reset" type="button" onclick="mkReset()">重設全部</button>
+    </div>
+    <div class="mcand">${cands}</div>
+    ${excl}`;
+}
+
+function findCharIdByName(name) {
+  const c = window.KEY_MATRIX.characters.find(c => c.name === name);
+  return c ? c.id : '';
+}
+
+function mkRenderCompare() {
+  const M = window.KEY_MATRIX;
+  const { excludedBy, remaining } = mkEvaluate();
+  const win = remaining.length === 1 ? remaining[0].id : null;
+
+  // 列：互動特徵（顯示 raw）+ 參考特徵
+  const rows = [];
+  M.characters.forEach(ch => {
+    rows.push({ region: ch.region, name: ch.name, nameEn: ch.nameEn,
+      get: sp => { const v = ch.values[sp.id]; return v.raw != null ? v.raw : (v.state != null ? v.state : '—'); } });
+  });
+  M.reference.forEach(rf => {
+    rows.push({ region: rf.region, name: rf.name, nameEn: rf.nameEn,
+      get: sp => rf.values[sp.id] != null ? rf.values[sp.id] : '—' });
+  });
+
+  const head = M.species.map(sp => {
+    const dim = excludedBy[sp.id] ? ' style="opacity:.4"' : '';
+    const w = sp.id === win ? ' class="win-col"' : '';
+    return `<th${w}${dim}>${_sciHtml(sp.sci)}<br><span style="font-size:.66rem;color:var(--muted);font-style:normal">${sp.zh}</span></th>`;
+  }).join('');
+
+  let lastRegion = '';
+  const bodyRows = rows.map(r => {
+    if (r.region !== lastRegion) { lastRegion = r.region; }
+    const cells = M.species.map(sp => {
+      const dim = excludedBy[sp.id] ? ' dim' : '';
+      const w = sp.id === win ? ' win-cell' : '';
+      return `<td class="${dim}${w}">${r.get(sp)}</td>`;
+    }).join('');
+    return `<tr><th class="mc-row">${r.name}${r.nameEn ? `<br><span style="font-size:.66rem;color:var(--muted);font-style:italic">${r.nameEn}</span>` : ''}</th>${cells}</tr>`;
+  }).join('');
+
+  return `<table class="mcompare">
+    <thead><tr><th class="mc-region"></th>${head}</tr></thead>
+    <tbody>${bodyRows}</tbody>
+  </table>`;
+}
+
+function mkRenderAll() {
+  document.getElementById('mkey-root').innerHTML = `
+    <div class="mkey">
+      <div class="mkey-panel">
+        <div class="mkey-panel-title">特徵選擇</div>
+        <div class="mkey-panel-sub">展開任一特徵，選定狀態或填入量測值</div>
+        ${mkRenderChars()}
+      </div>
+      <div class="mkey-panel">
+        <div class="mkey-panel-title">候選物種</div>
+        <div class="mkey-panel-sub">符合目前條件的庫蠓</div>
+        ${mkRenderCands()}
+      </div>
+    </div>`;
+  if (mkCompareOpen) {
+    const box = document.getElementById('mcompare-scroll');
+    box.innerHTML = mkRenderCompare();
+  }
+  postHeight();
+}
+
+// ── 事件 ──────────────────────────────────────────────
+function mkToggle(cid) {
+  if (mkOpen.has(cid)) mkOpen.delete(cid); else mkOpen.add(cid);
+  mkRenderAll();
+}
+function mkPickCat(cid, state) {
+  const cur = mkSel[cid];
+  if (cur && cur.type === 'cat' && cur.state === state) { mkClear(cid); return; }
+  mkSel[cid] = { type: 'cat', state };
+  if (!mkOrder.includes(cid)) mkOrder.push(cid);
+  mkOpen.add(cid);
+  mkRenderAll();
+}
+function mkPickNum(cid) {
+  const el = document.getElementById('mnum-' + cid);
+  const raw = el ? el.value.trim() : '';
+  if (raw === '') { mkClear(cid); return; }
+  const v = parseFloat(raw);
+  if (isNaN(v)) return;
+  mkSel[cid] = { type: 'num', value: v };
+  if (!mkOrder.includes(cid)) mkOrder.push(cid);
+  mkOpen.add(cid);
+  mkRenderAll();
+}
+function mkClear(cid) {
+  delete mkSel[cid];
+  const i = mkOrder.indexOf(cid);
+  if (i >= 0) mkOrder.splice(i, 1);
+  mkRenderAll();
+}
+function mkUndoChar(cid) { if (cid) mkClear(cid); }
+function mkReset() {
+  Object.keys(mkSel).forEach(k => delete mkSel[k]);
+  mkOrder.length = 0;
+  mkRenderAll();
+}
+function mkToggleExcl(btn) {
+  const list = btn.nextElementSibling;
+  const open = list.classList.toggle('open');
+  btn.textContent = (open ? '▾' : '▸') + btn.textContent.slice(1);
+}
+
+function initMatrixKey() {
+  if (!window.KEY_MATRIX) {
+    document.getElementById('mkey-root').innerHTML =
+      '<div class="mcand-zh" style="padding:1rem">⚠️ 無法載入 keymatrix.js，矩陣檢索資料缺失。</div>';
+    return;
+  }
+  mkRenderAll();
+  const tgl = document.getElementById('mcompare-toggle');
+  const box = document.getElementById('mcompare-scroll');
+  tgl.addEventListener('click', () => {
+    mkCompareOpen = !mkCompareOpen;
+    box.classList.toggle('open', mkCompareOpen);
+    tgl.textContent = (mkCompareOpen ? '▤ 收合' : '▤ 展開') + '候選物種特徵並列比較表';
+    if (mkCompareOpen) box.innerHTML = mkRenderCompare();
+    postHeight();
+  });
+}
+
+
+// ══════════════════════════════════════════════════════════════════════
+//  IFRAME 自動調整高度（與父頁 index.html 溝通）
+// ══════════════════════════════════════════════════════════════════════
+
+function postHeight() {
+  // 量測內容容器（.key-page）本身的高度，而非 documentElement.scrollHeight。
+  // 後者會被 iframe 元素自身高度撐住（父頁放大 iframe 後永遠縮不回去）。
+  const page = document.querySelector('.key-page');
+  const h = page.offsetTop + page.offsetHeight + 16; // +body 下緣 padding (1rem)
+  if (window.parent !== window) {
+    window.parent.postMessage({ type: 'ceratoKeyHeight', height: h }, '*');
+  }
+}
+
+// 圖片載入等非互動造成的高度變化自動回報（互動則由各 render 函式主動呼叫）
+if (window.ResizeObserver) {
+  new ResizeObserver(postHeight).observe(document.body);
+}
+window.addEventListener('load', postHeight);
+window.addEventListener('resize', postHeight);
+// 父頁要求重新量測（例如分頁由隱藏切到顯示時）
+window.addEventListener('message', e => {
+  if (e.data && e.data.type === 'ceratoKeyMeasure') postHeight();
+});
+
+// ── 初始化 ──────────────────────────────────────────────
+renderKey();
+initMatrixKey();
+postHeight();
+
+</script>
+</body>
+</html>
