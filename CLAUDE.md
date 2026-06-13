@@ -125,12 +125,8 @@ git push
 
 ### `build.ps1`
 - 掃描 `images/` → 產生 `manifest.json`
-- 從 Google Sheets 下載 CSV（失敗時用本地 CSV）→ 產生 `data.js`
-
-### `maintenance_tool.py` 的 Excel 備份
-- 「同步 Google Sheets」成功後，會自動由 `data.js` 內嵌 CSV 另存一份帶時間戳的
-  Excel 備份到 `backups/標本資料_YYYYMMDD_HHMMSS.xlsx`（`export_xlsx_backup()`）
-- `backups/` 已加入 `.gitignore`（純本機備份，不上 GitHub）；需要 openpyxl
+- 從 Google Sheets 下載 CSV（失敗時用本地 CSV `玻片標本清單 (slide mount).csv`）→ 產生 `data.js`
+- 因此 `玻片標本清單 (slide mount).csv` 是離線備援，搬機必帶；不需另存其他資料備份
 
 ### `process_raw.py`
 - 掃描 `RAW image/<標本ID>/` 下所有圖片

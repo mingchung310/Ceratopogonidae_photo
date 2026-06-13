@@ -1,6 +1,5 @@
 .claude/
 *.txt
-backups/
 images/**/*.tif
 images/**/*.tiff
 RAW image/
