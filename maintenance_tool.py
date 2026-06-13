@@ -5,7 +5,7 @@
 
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox, scrolledtext
-import pathlib, io, subprocess, threading, json, sys
+import pathlib, io, subprocess, threading, json, sys, csv, datetime
 from PIL import Image
 
 BASE         = pathlib.Path(__file__).parent
@@ -14,6 +14,8 @@ BUILD_PS     = BASE / "build.ps1"
 GEN_KEY      = BASE / "gen_keymatrix.py"
 MATRIX_XLSX  = BASE / "Culicoides 特徵矩陣.xlsx"
 KEYMATRIX_JS = BASE / "keymatrix.js"
+DATA_JS      = BASE / "data.js"
+BACKUP_DIR   = BASE / "backups"
 MAX_BYTES    = 200 * 1024
 IMG_EXTS     = {".jpg", ".jpeg", ".png", ".tif", ".tiff"}
 
@@ -54,6 +56,41 @@ def rebuild_manifest():
         json.dumps(manifest, ensure_ascii=False, indent=4), encoding="utf-8"
     )
     return len(manifest)
+
+
+def export_xlsx_backup():
+    """
+    從剛同步好的 data.js 取出內嵌 CSV，另存一份帶時間戳的 Excel 備份到 backups/。
+    回傳 pathlib.Path（備份檔），失敗回傳 None。
+    """
+    import openpyxl   # 延遲匯入：未裝 openpyxl 時不影響其他功能
+    from openpyxl.cell.cell import ILLEGAL_CHARACTERS_RE
+    if not DATA_JS.exists():
+        return None
+    raw = DATA_JS.read_text(encoding="utf-8-sig")
+    marker = "csv: "
+    idx = raw.find(marker)
+    if idx < 0:
+        return None
+    # data.js 內 csv 的值是一段 JSON 字串，用 raw_decode 穩定取出（含中文）
+    csv_text, _ = json.JSONDecoder().raw_decode(raw, idx + len(marker))
+
+    def clean(c):
+        c = ILLEGAL_CHARACTERS_RE.sub("", c)          # 去除 Excel 不接受的控制字元
+        return "'" + c if c[:1] in ("=", "+", "-", "@") else c  # 開頭符號加 ' 防公式
+
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "標本資料"
+    for row in csv.reader(io.StringIO(csv_text)):
+        ws.append([clean(c) for c in row])
+
+    BACKUP_DIR.mkdir(exist_ok=True)
+    ts  = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    out = BACKUP_DIR / f"標本資料_{ts}.xlsx"
+    wb.save(out)
+    return out
+
 
 # ── 檔名衝突對話框 ────────────────────────────────────────────────────────────
 
@@ -280,8 +317,23 @@ class App(tk.Tk):
         self._busy("同步 Google Sheets 中…")
         self._log("\n▶ 同步 Google Sheets …")
         ok = self._run_ps()
-        self._log("✓ 完成，本機離線版已更新" if ok else "✗ 失敗，請確認網路連線")
-        self._idle("✓ 同步完成" if ok else "✗ 同步失敗")
+        if not ok:
+            self._log("✗ 失敗，請確認網路連線")
+            self._idle("✗ 同步失敗")
+            return
+        self._log("✓ 完成，本機離線版已更新")
+        # 順手存一份 Excel 備份到本機 backups/（失敗不影響同步本身）
+        try:
+            path = export_xlsx_backup()
+            if path:
+                self._log(f"  已備份 Excel：backups/{path.name}")
+            else:
+                self._log("  [提醒] 找不到 data.js 內容，未建立 Excel 備份")
+        except ImportError:
+            self._log("  [提醒] 未安裝 openpyxl，略過 Excel 備份（pip install openpyxl）")
+        except Exception as e:
+            self._log(f"  [提醒] Excel 備份失敗：{e}")
+        self._idle("✓ 同步完成")
 
     # ── 1b. 同步檢索表特徵矩陣（xlsx → keymatrix.js → GitHub）─────────────────
 

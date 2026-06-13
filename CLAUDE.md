@@ -127,6 +127,11 @@ git push
 - 掃描 `images/` → 產生 `manifest.json`
 - 從 Google Sheets 下載 CSV（失敗時用本地 CSV）→ 產生 `data.js`
 
+### `maintenance_tool.py` 的 Excel 備份
+- 「同步 Google Sheets」成功後，會自動由 `data.js` 內嵌 CSV 另存一份帶時間戳的
+  Excel 備份到 `backups/標本資料_YYYYMMDD_HHMMSS.xlsx`（`export_xlsx_backup()`）
+- `backups/` 已加入 `.gitignore`（純本機備份，不上 GitHub）；需要 openpyxl
+
 ### `process_raw.py`
 - 掃描 `RAW image/<標本ID>/` 下所有圖片
 - 用感知雜湊偵測重複（跳過相似圖）
