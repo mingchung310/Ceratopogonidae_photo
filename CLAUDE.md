@@ -21,6 +21,7 @@ python maintenance_tool.py
 - **使用本地 CSV** — 離線時從本地 CSV 更新 `data.js`
 - **推送資料更新** — `git add data.js manifest.json` → commit → push
 - **新增圖片** — 選取資料夾 → 重複偵測 → 壓縮 → 放入 `images/` → 上傳 GitHub
+- **匯出可攜版** — robocopy 把離線運作所需檔案複製到指定位置（排除 `RAW image/` 等），供搬到離線電腦
 - **預覽網站** — 直接開啟 `index.html`
 
 > 需要：`pip install pillow`

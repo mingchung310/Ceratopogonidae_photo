@@ -5,7 +5,7 @@
 
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox, scrolledtext
-import pathlib, io, subprocess, threading, json, sys
+import pathlib, io, subprocess, threading, json, sys, datetime
 from PIL import Image
 
 BASE         = pathlib.Path(__file__).parent
@@ -190,6 +190,17 @@ class App(tk.Tk):
                   foreground="gray").pack(anchor="w")
         ttk.Button(f3, text="同步到 GitHub", width=14,
                    command=lambda: self._bg(self._sync_github)
+                   ).pack(anchor="w", pady=(8, 0))
+
+        # ── 匯出可攜版 ───────────────────────────────────────────────────
+        fe = ttk.LabelFrame(self, text=" 匯出可攜版（搬到離線電腦用）", padding=10)
+        fe.pack(fill="x", **P)
+        ttk.Label(fe,
+                  text="把離線運作所需的檔案整包複製到指定位置（例如隨身碟）。\n"
+                       "自動排除 RAW image\\ 等大型/暫存檔，含網站、維護工具與離線備援 CSV。",
+                  foreground="gray", justify="left").pack(anchor="w")
+        ttk.Button(fe, text="匯出可攜版…", width=14,
+                   command=self._export_portable
                    ).pack(anchor="w", pady=(8, 0))
 
         # ── 進度 ─────────────────────────────────────────────────────────
@@ -587,6 +598,70 @@ class App(tk.Tk):
             result[0] = "✗ 發生錯誤"
         finally:
             self._idle(result[0])   # 無論如何都會重置進度條
+
+    # ── 匯出可攜版 ──────────────────────────────────────────────────────────
+
+    # 不必帶到離線電腦的資料夾／檔案（容量大或可重建）
+    EXPORT_EXCLUDE_DIRS  = ["RAW image", "__pycache__", "backups", "dist", "build", ".vs"]
+    EXPORT_EXCLUDE_FILES = ["*.exe", "*.spec", "*.pyc", "*.pyo"]
+
+    def _export_portable(self):
+        """在主執行緒選目的地，再丟到背景執行緒複製。"""
+        dest = filedialog.askdirectory(title="選擇匯出位置（例如隨身碟）")
+        if not dest:
+            return
+        dest = pathlib.Path(dest)
+        try:
+            dest_r, base_r = dest.resolve(), BASE.resolve()
+            if dest_r == base_r or base_r in dest_r.parents:
+                messagebox.showerror(
+                    "位置錯誤", "請選擇專案資料夾「以外」的位置（例如隨身碟），"
+                    "以免複製到自己裡面。")
+                return
+        except Exception:
+            pass
+        self._bg(lambda: self._do_export(dest))
+
+    def _do_export(self, dest: pathlib.Path):
+        result = ["待命"]
+        try:
+            self._busy("匯出可攜版中…")
+            ts     = datetime.datetime.now().strftime("%Y%m%d_%H%M")
+            target = dest / f"Ceratopogonidae_photo_可攜版_{ts}"
+            self._log(f"\n▶ 匯出可攜版 → {target}")
+            self._log("  複製中（含 images/ 與 .git，視容量需數十秒）…")
+
+            # robocopy：/E 複製含子資料夾；保留 .git 讓日後仍可 pull/push
+            cmd = ["robocopy", str(BASE), str(target), "/E",
+                   "/NFL", "/NDL", "/NJH", "/NP", "/R:1", "/W:1",
+                   "/XD", *self.EXPORT_EXCLUDE_DIRS,
+                   "/XF", *self.EXPORT_EXCLUDE_FILES]
+            r = subprocess.run(cmd, capture_output=True, text=True,
+                               encoding="utf-8", errors="replace")
+            for line in (r.stdout or "").splitlines():
+                if line.strip():
+                    self._log("  " + line.rstrip())
+
+            # robocopy 回傳碼 0–7 皆為成功，8 以上才是錯誤
+            if r.returncode < 8:
+                self._log(f"✓ 匯出完成：{target}")
+                self._log("  可把整個資料夾複製到離線電腦，雙擊 啟動維護工具.bat 即可使用；")
+                self._log("  雙擊 index.html 可離線瀏覽網站。")
+                result[0] = "✓ 匯出完成"
+            else:
+                self._log(f"  [錯誤] robocopy 回傳碼 {r.returncode}")
+                if r.stderr:
+                    self._log(f"  {r.stderr.strip()}")
+                result[0] = "✗ 匯出失敗"
+
+        except FileNotFoundError:
+            self._log("  [錯誤] 找不到 robocopy（Windows 內建工具）")
+            result[0] = "✗ 無 robocopy"
+        except Exception as e:
+            self._log(f"  [未預期錯誤] {e}")
+            result[0] = "✗ 發生錯誤"
+        finally:
+            self._idle(result[0])
 
 
 if __name__ == "__main__":
