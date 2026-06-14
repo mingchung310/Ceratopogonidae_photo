@@ -33,7 +33,7 @@ python maintenance_tool.py
 ```
 Ceratopogonidae_photo_web/
 ├── index.html          網站本體（勿手動改 data）
-├── key.html            互動式檢索表（亞屬二分 + 種級矩陣）獨立檔，index.html 以 iframe 嵌入
+├── key.html            種級互動矩陣檢索（multi-access key）獨立檔，index.html 以 iframe 嵌入
 ├── keymatrix.js        種級矩陣資料（自動產生，勿手動改）
 ├── gen_keymatrix.py    由特徵矩陣 xlsx 產生 keymatrix.js
 ├── Culicoides 特徵矩陣.xlsx   矩陣檢索原始資料（編輯此檔後用維護工具同步）
@@ -139,7 +139,7 @@ git push
 - 對 `RAW image\` 根目錄的照片：旋轉 180°、加比例尺 → `RAW image\output\`
 
 ### `key.html`（互動式檢索表，獨立檔）
-- 自包含的檢索表頁面：**亞屬二分檢索** + **種級矩陣檢索**，含各自的 CSS／HTML／JS，載入 `keymatrix.js`
+- 自包含的**種級互動矩陣檢索**（multi-access key），含 CSS／HTML／JS，載入 `keymatrix.js`
 - 可單獨開啟；`index.html` 的「分類與鑑定」頁以 `<iframe src="key.html">` 嵌入
 - 高度自動同步：`key.html` 量測內容高度 → `postMessage({type:'ceratoKeyHeight'})` → `index.html` 調整 iframe 高度（無捲軸無縫嵌入）。切換到該分頁時 `index.html` 會請 `key.html` 重新量測
 - **要改檢索表邏輯／樣式請改 `key.html`**（不在 index.html 內）
@@ -158,8 +158,6 @@ git push
   python gen_keymatrix.py
   ```
 - 物種代表翅照對應表在 `SPECIES_META`
-- ⚠️ 注意：`key.html` 的**亞屬二分檢索（KEY_NODES）是手寫在 key.html 內**，不來自 xlsx；
-  同步特徵矩陣只會更新**種級矩陣檢索**那一塊
 
 ---
 
