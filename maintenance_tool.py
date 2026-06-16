@@ -123,16 +123,56 @@ class App(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("蠓科標本影像維護工具")
-        self.minsize(560, 540)
+        self.minsize(560, 420)
         self._files:   list[pathlib.Path] = []   # 單一資料夾模式
         self._batches: dict[str, list]    = {}   # 批次模式 {spec_id: [files]}
         self._build_ui()
+        # 開窗高度不超過螢幕（避免內容超出畫面、底部看不到）
+        h = min(820, self.winfo_screenheight() - 80)
+        self.geometry(f"600x{h}")
 
     def _build_ui(self):
         P = dict(padx=12, pady=6)
 
+        # ── 底部固定區：進度 + 執行日誌（無論視窗多小都保持可見）─────────
+        bottom = ttk.Frame(self)
+        bottom.pack(side="bottom", fill="x")
+
+        pf = ttk.Frame(bottom)
+        pf.pack(fill="x", padx=12, pady=(4, 2))
+        self.status_lbl = ttk.Label(pf, text="待命", foreground="gray", font=("", 9))
+        self.status_lbl.pack(anchor="w")
+        self.progress = ttk.Progressbar(pf, mode="indeterminate")
+        self.progress.pack(fill="x", pady=(2, 0))
+
+        lf2 = ttk.LabelFrame(bottom, text=" 執行日誌 ", padding=6)
+        lf2.pack(fill="x", padx=12, pady=(4, 2))
+        self.log = scrolledtext.ScrolledText(
+            lf2, height=9, state="disabled", font=("Consolas", 9), wrap="word")
+        self.log.pack(fill="both", expand=True)
+        ttk.Button(bottom, text="清除日誌", command=self._clear
+                   ).pack(anchor="e", padx=12, pady=(0, 6))
+
+        # ── 上方可捲動區：各功能按鈕（視窗太矮時用右側捲軸/滾輪查看）──────
+        sa = ttk.Frame(self)
+        sa.pack(side="top", fill="both", expand=True)
+        canvas = tk.Canvas(sa, highlightthickness=0)
+        vsb = ttk.Scrollbar(sa, orient="vertical", command=canvas.yview)
+        canvas.configure(yscrollcommand=vsb.set)
+        vsb.pack(side="right", fill="y")
+        canvas.pack(side="left", fill="both", expand=True)
+        inner = ttk.Frame(canvas)
+        win = canvas.create_window((0, 0), window=inner, anchor="nw")
+        canvas.bind("<Configure>", lambda e: canvas.itemconfig(win, width=e.width))
+        inner.bind("<Configure>",
+                   lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
+        # 滑鼠指標在捲動區內時，滾輪可捲動（離開時解除，讓日誌區滾輪正常）
+        canvas.bind("<Enter>", lambda e: canvas.bind_all(
+            "<MouseWheel>", lambda ev: canvas.yview_scroll(int(-ev.delta / 120), "units")))
+        canvas.bind("<Leave>", lambda e: canvas.unbind_all("<MouseWheel>"))
+
         # ── 1. Google Sheets 同步 ────────────────────────────────────────
-        f1 = ttk.LabelFrame(self, text=" 1. 同步 Google Sheets ", padding=10)
+        f1 = ttk.LabelFrame(inner, text=" 1. 同步 Google Sheets ", padding=10)
         f1.pack(fill="x", **P)
         ttk.Label(f1, text="下載最新資料，更新本機離線版 index.html 的顯示內容。",
                   foreground="gray").pack(anchor="w")
@@ -141,7 +181,7 @@ class App(tk.Tk):
                    ).pack(anchor="w", pady=(8, 0))
 
         # ── 1b. 同步檢索表特徵矩陣 ────────────────────────────────────────
-        fk = ttk.LabelFrame(self, text=" 檢索表：同步特徵矩陣 ", padding=10)
+        fk = ttk.LabelFrame(inner, text=" 檢索表：同步特徵矩陣 ", padding=10)
         fk.pack(fill="x", **P)
         ttk.Label(fk,
                   text="改完「Culicoides 特徵矩陣.xlsx」後按此：重建 keymatrix.js\n"
@@ -152,8 +192,8 @@ class App(tk.Tk):
                    ).pack(anchor="w", pady=(8, 0))
 
         # ── 2. 壓縮照片 ──────────────────────────────────────────────────
-        f2 = ttk.LabelFrame(self, text=" 2. 壓縮照片並放入 images/ ", padding=10)
-        f2.pack(fill="both", expand=True, **P)
+        f2 = ttk.LabelFrame(inner, text=" 2. 壓縮照片並放入 images/ ", padding=10)
+        f2.pack(fill="x", **P)
 
         top = ttk.Frame(f2)
         top.pack(fill="x")
@@ -184,7 +224,7 @@ class App(tk.Tk):
         self.compress_btn.pack(anchor="w", pady=(8, 0))
 
         # ── 3. 同步到 GitHub ─────────────────────────────────────────────
-        f3 = ttk.LabelFrame(self, text=" 3. 同步 images 到 GitHub ", padding=10)
+        f3 = ttk.LabelFrame(inner, text=" 3. 同步 images 到 GitHub ", padding=10)
         f3.pack(fill="x", **P)
         ttk.Label(f3, text="將 images/ 的新增與刪除同步推送到 GitHub。",
                   foreground="gray").pack(anchor="w")
@@ -193,7 +233,7 @@ class App(tk.Tk):
                    ).pack(anchor="w", pady=(8, 0))
 
         # ── 匯出可攜版 ───────────────────────────────────────────────────
-        fe = ttk.LabelFrame(self, text=" 匯出可攜版（搬到離線電腦用）", padding=10)
+        fe = ttk.LabelFrame(inner, text=" 匯出可攜版（搬到離線電腦用）", padding=10)
         fe.pack(fill="x", **P)
         ttk.Label(fe,
                   text="把離線運作所需的檔案整包複製到指定位置（例如隨身碟）。\n"
@@ -202,23 +242,6 @@ class App(tk.Tk):
         ttk.Button(fe, text="匯出可攜版…", width=14,
                    command=self._export_portable
                    ).pack(anchor="w", pady=(8, 0))
-
-        # ── 進度 ─────────────────────────────────────────────────────────
-        pf = ttk.Frame(self)
-        pf.pack(fill="x", padx=12, pady=(0, 2))
-        self.status_lbl = ttk.Label(pf, text="待命", foreground="gray", font=("", 9))
-        self.status_lbl.pack(anchor="w")
-        self.progress = ttk.Progressbar(pf, mode="indeterminate")
-        self.progress.pack(fill="x", pady=(2, 0))
-
-        # ── 日誌 ─────────────────────────────────────────────────────────
-        lf2 = ttk.LabelFrame(self, text=" 執行日誌 ", padding=6)
-        lf2.pack(fill="both", expand=True, **P)
-        self.log = scrolledtext.ScrolledText(
-            lf2, height=7, state="disabled", font=("Consolas", 9), wrap="word")
-        self.log.pack(fill="both", expand=True)
-        ttk.Button(self, text="清除日誌", command=self._clear
-                   ).pack(anchor="e", padx=12, pady=2)
 
     # ── 工具 ──────────────────────────────────────────────────────────────────
 
