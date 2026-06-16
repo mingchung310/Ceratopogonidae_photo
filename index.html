@@ -1006,22 +1006,36 @@ armKeyFrameFallback();
 // ══════════════════════════════════════════════════════════════════════
 
 function parseCSV(text) {
-  const lines = text.replace(/^﻿/, '').trim().split(/\r?\n/);
-  const headers = lines[0].split(',');
-  return lines.slice(1).filter(l => l.trim()).map(line => {
-    const cols = [];
-    let cur = '', inQ = false;
-    for (let i = 0; i < line.length; i++) {
-      const ch = line[i];
-      if (ch === '"') { inQ = !inQ; }
-      else if (ch === ',' && !inQ) { cols.push(cur); cur = ''; }
+  // 逐字元解析：引號內的逗號、換行（儲存格內的換行）與跳脫引號 "" 都正確處理。
+  // 不可先以換行切行，否則含換行的儲存格（如多行 DNA 序列）會把一筆記錄拆成兩列。
+  text = text.replace(/^﻿/, '');
+  const rows = [];
+  let row = [], cur = '', inQ = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (inQ) {
+      if (ch === '"') {
+        if (text[i + 1] === '"') { cur += '"'; i++; }   // "" → 一個字面引號
+        else inQ = false;
+      } else { cur += ch; }
+    } else {
+      if (ch === '"') { inQ = true; }
+      else if (ch === ',') { row.push(cur); cur = ''; }
+      else if (ch === '\r') { /* 與 \n 一起處理，忽略 */ }
+      else if (ch === '\n') { row.push(cur); cur = ''; rows.push(row); row = []; }
       else { cur += ch; }
     }
-    cols.push(cur);
-    const obj = {};
-    headers.forEach((h, i) => { obj[h.trim()] = (cols[i] || '').trim(); });
-    return obj;
-  });
+  }
+  if (cur !== '' || row.length) { row.push(cur); rows.push(row); }   // 收尾（無末端換行時）
+
+  const headers = rows[0].map(h => h.trim());
+  return rows.slice(1)
+    .filter(r => r.some(c => c.trim() !== ''))   // 跳過全空白列
+    .map(r => {
+      const obj = {};
+      headers.forEach((h, i) => { obj[h] = (r[i] || '').trim(); });
+      return obj;
+    });
 }
 
 function transformRow(r) {
