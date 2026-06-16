@@ -1099,41 +1099,60 @@ function getImages(d) {
   return key.split('|').map(s => s.trim()).filter(Boolean);
 }
 
-function fillSelect(el, values, placeholder) {
+function fillSelect(el, values, placeholder, keep) {
+  const set = [...new Set(values)].filter(Boolean);
+  if (keep && !set.includes(keep)) set.push(keep);   // 保留目前選擇，即使已無交集
+  set.sort();
   el.innerHTML = `<option value="">${placeholder}</option>`;
-  [...new Set(values)].filter(Boolean).sort().forEach(v => {
+  set.forEach(v => {
     const opt = document.createElement('option');
     opt.value = v; opt.textContent = v;
     el.appendChild(opt);
   });
+  el.value = keep || '';
+}
+
+function currentFilters() {
+  return {
+    q:   searchInput.value.trim().toLowerCase(),
+    cat: categoryFilter.value,
+    sub: subgenusFilter.value,
+    sp:  speciesFilter.value,
+    ws:  wholeshotFilter.value,
+    gen: genderFilter.value,
+  };
+}
+
+// 判斷某筆是否符合篩選；ignore 指定要略過的某個條件（用於計算該下拉的可選項）
+function rowMatches(d, f, ignore) {
+  if (ignore !== 'q'   && f.q   && !(d.name.toLowerCase().includes(f.q) || (d.sciName||'').toLowerCase().includes(f.q))) return false;
+  if (ignore !== 'cat' && f.cat && d.category !== f.cat) return false;
+  if (ignore !== 'sub' && f.sub && d.subgenus !== f.sub) return false;
+  if (ignore !== 'sp'  && f.sp  && `${d.category} ${d.species}` !== f.sp) return false;
+  if (ignore !== 'ws'  && f.ws  && d.全身照 !== 'Y') return false;
+  if (ignore !== 'gen' && f.gen && d._sex !== f.gen) return false;
+  return true;
+}
+
+// 連動式篩選：每個下拉只列出「套用其他條件後」仍存在的選項（交集）
+function refreshFilterOptions() {
+  const f = currentFilters();
+  fillSelect(categoryFilter, DATA.filter(d => rowMatches(d, f, 'cat')).map(d => d.category),  '全部屬',   f.cat);
+  fillSelect(subgenusFilter, DATA.filter(d => rowMatches(d, f, 'sub')).map(d => d.subgenus),  '全部亞屬', f.sub);
+  fillSelect(speciesFilter,  DATA.filter(d => rowMatches(d, f, 'sp')).map(d => d.species ? `${d.category} ${d.species}` : ''), '全部種', f.sp);
+  fillSelect(genderFilter,   DATA.filter(d => rowMatches(d, f, 'gen')).map(d => d._sex),      '全部',     f.gen);
 }
 
 function initCategories() {
-  fillSelect(categoryFilter, DATA.map(d => d.category),  '全部屬');
-  fillSelect(subgenusFilter, DATA.map(d => d.subgenus),  '全部亞屬');
-  fillSelect(speciesFilter,  DATA.map(d => d.species ? `${d.category} ${d.species}` : ''), '全部種');
-  fillSelect(genderFilter,   DATA.map(d => d._sex),      '全部');
+  refreshFilterOptions();
 }
 
 function renderGrid() {
-  const q   = searchInput.value.trim().toLowerCase();
-  const cat = categoryFilter.value;
-  const sub = subgenusFilter.value;
-  const sp  = speciesFilter.value;
-  const ws  = wholeshotFilter.value;
-  const gen = genderFilter.value;
+  refreshFilterOptions();           // 先依目前選擇重算各下拉的可選項（交集）
+  const f = currentFilters();
+  const filtered = DATA.filter(d => rowMatches(d, f, null));
 
-  const filtered = DATA.filter(d => {
-    const matchQ   = !q   || d.name.toLowerCase().includes(q) || (d.sciName||'').toLowerCase().includes(q);
-    const matchCat = !cat || d.category === cat;
-    const matchSub = !sub || d.subgenus === sub;
-    const matchSp  = !sp  || `${d.category} ${d.species}` === sp;
-    const matchWS  = !ws  || d.全身照 === 'Y';
-    const matchGen = !gen || d._sex === gen;
-    return matchQ && matchCat && matchSub && matchSp && matchWS && matchGen;
-  });
-
-  clearBtn.classList.toggle('visible', !!(q || cat || sub || sp || ws || gen));
+  clearBtn.classList.toggle('visible', !!(f.q || f.cat || f.sub || f.sp || f.ws || f.gen));
   resultsInfo.textContent = `共 ${filtered.length} 筆`;
   grid.innerHTML = '';
 
