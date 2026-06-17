@@ -15,7 +15,7 @@ GEN_KEY      = BASE / "gen_keymatrix.py"
 MATRIX_XLSX  = BASE / "Culicoides 特徵矩陣.xlsx"
 KEYMATRIX_JS = BASE / "keymatrix.js"
 MAX_BYTES    = 200 * 1024
-IMG_EXTS     = {".jpg", ".jpeg", ".png", ".tif", ".tiff"}
+IMG_EXTS     = {".jpg", ".jpeg", ".png", ".tif", ".tiff", ".bmp"}
 
 # ── 影像工具 ──────────────────────────────────────────────────────────────────
 
@@ -380,7 +380,7 @@ class App(tk.Tk):
         folder = pathlib.Path(folder)
         files  = sorted(f for f in folder.iterdir() if f.suffix.lower() in IMG_EXTS)
         if not files:
-            messagebox.showwarning("無圖片", "資料夾中找不到 JPG / PNG / TIF 圖片")
+            messagebox.showwarning("無圖片", "資料夾中找不到 JPG / PNG / TIF / BMP 圖片")
             return
         self._files   = files
         self._batches = {}
