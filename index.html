@@ -1096,7 +1096,12 @@ function getImages(d) {
   if (!d.image) return [];
   const key = d.image.trim();
   if (MANIFEST[key]) return MANIFEST[key];
-  return key.split('|').map(s => s.trim()).filter(Boolean);
+  // 後備：僅當值本身就像圖片路徑（含 / 或圖片副檔名）或以 | 分隔多張時才採用；
+  // 否則（純標本編號但無對應圖片資料夾）視為無圖，顯示 emoji 佔位而非破圖。
+  if (/[|/]/.test(key) || /\.(png|jpe?g|gif|webp|bmp|tiff?)$/i.test(key)) {
+    return key.split('|').map(s => s.trim()).filter(Boolean);
+  }
+  return [];
 }
 
 function fillSelect(el, values, placeholder, keep) {
