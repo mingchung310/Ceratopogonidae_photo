@@ -898,5 +898,39 @@
         "images/Cer99/win_4x.png",
         "images/Cer99/win_4x_1.png",
         "images/Cer99/win_4x_2.png"
+    ],
+    "HM2-1": [
+        "images/HM2-1/01.png",
+        "images/HM2-1/02.png",
+        "images/HM2-1/03.png",
+        "images/HM2-1/04.png",
+        "images/HM2-1/05.png",
+        "images/HM2-1/07.png",
+        "images/HM2-1/08.png",
+        "images/HM2-1/09.png",
+        "images/HM2-1/10.png",
+        "images/HM2-1/11.png",
+        "images/HM2-1/12.png",
+        "images/HM2-1/leg1.png",
+        "images/HM2-1/leg2.png",
+        "images/HM2-1/leg3.png"
+    ],
+    "HM3-1": [
+        "images/HM3-1/01.png",
+        "images/HM3-1/02.png",
+        "images/HM3-1/03.png",
+        "images/HM3-1/04.png",
+        "images/HM3-1/05.png",
+        "images/HM3-1/06.png",
+        "images/HM3-1/07.png",
+        "images/HM3-1/08.png",
+        "images/HM3-1/09.png",
+        "images/HM3-1/10.png",
+        "images/HM3-1/11.png",
+        "images/HM3-1/12.png",
+        "images/HM3-1/13.png",
+        "images/HM3-1/leg1.png",
+        "images/HM3-1/leg2.png",
+        "images/HM3-1/leg3.png"
     ]
 }
