@@ -308,6 +308,74 @@
     }
     .key-fallback-btn:hover { border-color: var(--gold); color: var(--gold); }
 
+    /* ── 種級代表照 ─────────────────────────────────────────────── */
+    .plate-row {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--navy2);
+      padding: 1rem 1.1rem 1.2rem;
+      margin-bottom: 1rem;
+    }
+    .plate-name { font-size: 1rem; color: var(--gold); margin-bottom: 0.8rem; }
+    .plate-name em { font-style: italic; }
+    .plate-name span { color: var(--muted); font-size: 0.85rem; margin-left: 0.5rem; }
+    .plate-parts {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 0.6rem;
+    }
+    .plate-cell { margin: 0; min-width: 0; }
+    .plate-thumb {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      border-radius: 8px;
+      overflow: hidden;
+      background: var(--navy3);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .plate-thumb img {
+      width: 100%; height: 100%; object-fit: cover; display: block; cursor: zoom-in;
+      transition: transform 0.15s;
+    }
+    .plate-thumb img:hover { transform: scale(1.04); }
+    .plate-thumb.empty::after {
+      content: '🔬';
+      font-size: 1.3rem;
+      opacity: 0.35;
+    }
+    .plate-cell figcaption {
+      font-size: 0.72rem;
+      color: var(--muted);
+      text-align: center;
+      margin-top: 0.35rem;
+      line-height: 1.4;
+    }
+    .plate-lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.88);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      cursor: zoom-out;
+    }
+    .plate-lightbox.open { display: flex; }
+    .plate-lightbox img {
+      max-width: 100%; max-height: 100%; object-fit: contain;
+      border-radius: 8px; box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+    }
+    @media (max-width: 760px) {
+      .plate-parts { grid-template-columns: repeat(4, 1fr); }
+    }
+    @media (max-width: 460px) {
+      .plate-parts { grid-template-columns: repeat(3, 1fr); }
+    }
+
     /* ── Specimen page ───────────────────────────────────────────── */
     .content-wrap {
       max-width: 1200px;
@@ -841,6 +909,16 @@
     <iframe id="key-frame" class="key-frame" src="key.html"
             title="庫蠓種級互動檢索表"></iframe>
 
+    <!-- 種級代表照 -->
+    <div class="section">
+      <h2 class="section-title">種級代表照</h2>
+      <p class="section-subtitle">Representative photos by species</p>
+      <p style="font-size:0.87rem;color:var(--muted);line-height:1.75;margin-bottom:1rem">
+        各物種的代表照（全身、翅膀、頭部、儲精囊、小顎鬚、觸角、後足）。點圖可放大；尚未提供的部位顯示佔位。
+      </p>
+      <div id="plate-root"><!-- JS 渲染 --></div>
+    </div>
+
   </div>
 </div><!-- /page-taxonomy -->
 
@@ -943,7 +1021,85 @@ function switchTab(tab) {
     btn.classList.toggle('active', btn.dataset.tab === tab));
   history.replaceState(null, '', `#${tab}`);
   // 由隱藏切到顯示後，iframe 內部版面需要時間重排，故多次量測去除短暫跳動
-  if (tab === 'taxonomy') { [60, 250, 600].forEach(d => setTimeout(measureKeyFrame, d)); }
+  if (tab === 'taxonomy') {
+    [60, 250, 600].forEach(d => setTimeout(measureKeyFrame, d));
+    renderPlate();
+  }
+}
+
+
+// ══════════════════════════════════════════════════════════════════════
+//  種級代表照  SPECIES REFERENCE PLATE
+// ══════════════════════════════════════════════════════════════════════
+
+// 新增物種：在此加一行，並在 species_photos/ 建同名 id 資料夾
+const PLATE_SPECIES = [
+  { id: 'actoni',       sci: 'Culicoides actoni',       zh: '阿氏庫蠓' },
+  { id: 'arakawae',     sci: 'Culicoides arakawae',     zh: '荒川庫蠓' },
+  { id: 'homotomus',    sci: 'Culicoides homotomus',    zh: '原野庫蠓' },
+  { id: 'jacobsoni',    sci: 'Culicoides jacobsoni',    zh: '雅氏庫蠓' },
+  { id: 'lungchiensis', sci: 'Culicoides lungchiensis', zh: '龍溪庫蠓' },
+  { id: 'palpifer',     sci: 'Culicoides palpifer',     zh: '帶鬚庫蠓' },
+  { id: 'oxystoma',     sci: 'Culicoides oxystoma',     zh: '嗜牛庫蠓' },
+  { id: 'sumatrae',     sci: 'Culicoides sumatrae',     zh: '蘇島庫蠓' },
+  { id: 'tainanus',     sci: 'Culicoides tainanus',     zh: '台南庫蠓' },
+];
+// 部位 → 檔名（species_photos/<id>/<key>.jpg 或 .png）
+const PLATE_PARTS = [
+  { key: 'body',        label: '全身照' },
+  { key: 'wing',        label: '翅膀'   },
+  { key: 'head',        label: '頭部'   },
+  { key: 'spermatheca', label: '儲精囊' },
+  { key: 'palp',        label: '小顎鬚' },
+  { key: 'antenna',     label: '觸角'   },
+  { key: 'hindleg',     label: '後足'   },
+];
+
+let plateReady = false;
+function renderPlate() {
+  if (plateReady) return;
+  plateReady = true;
+  const root = document.getElementById('plate-root');
+  if (!root) return;
+  root.innerHTML = PLATE_SPECIES.map(sp => `
+    <div class="plate-row">
+      <div class="plate-name"><em>${sp.sci.replace(/^Culicoides\s+/, 'C. ')}</em><span>${sp.zh}</span></div>
+      <div class="plate-parts">
+        ${PLATE_PARTS.map(p => `
+          <figure class="plate-cell">
+            <div class="plate-thumb">
+              <img src="species_photos/${sp.id}/${p.key}.jpg" alt="${sp.zh} ${p.label}"
+                   loading="lazy" onclick="plateZoom(this)" onerror="plateImgErr(this)">
+            </div>
+            <figcaption>${p.label}</figcaption>
+          </figure>`).join('')}
+      </div>
+    </div>`).join('');
+}
+
+// 找不到 .jpg 時改試 .png；再找不到就顯示佔位
+function plateImgErr(img) {
+  if (/\.jpg(\?|$)/i.test(img.src)) {
+    img.src = img.src.replace(/\.jpg(\?|$)/i, '.png$1');
+  } else {
+    const wrap = img.closest('.plate-thumb');
+    if (wrap) wrap.classList.add('empty');
+    img.remove();
+  }
+}
+
+function plateZoom(img) {
+  let lb = document.getElementById('plate-lightbox');
+  if (!lb) {
+    lb = document.createElement('div');
+    lb.id = 'plate-lightbox';
+    lb.className = 'plate-lightbox';
+    lb.innerHTML = '<img alt="">';
+    lb.addEventListener('click', () => lb.classList.remove('open'));
+    document.body.appendChild(lb);
+  }
+  lb.querySelector('img').src = img.src;
+  lb.classList.add('open');
 }
 
 document.querySelectorAll('.tab-btn').forEach(btn =>
