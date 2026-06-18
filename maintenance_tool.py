@@ -12,6 +12,7 @@ BASE         = pathlib.Path(__file__).parent
 IMG_DIR      = BASE / "images"
 BUILD_PS     = BASE / "build.ps1"
 GEN_KEY      = BASE / "gen_keymatrix.py"
+GEN_PLATE    = BASE / "gen_species_plate.py"
 MATRIX_XLSX  = BASE / "Culicoides 特徵矩陣.xlsx"
 KEYMATRIX_JS = BASE / "keymatrix.js"
 MAX_BYTES    = 200 * 1024
@@ -315,8 +316,26 @@ class App(tk.Tk):
         self._busy("同步 Google Sheets 中…")
         self._log("\n▶ 同步 Google Sheets …")
         ok = self._run_ps()
-        self._log("✓ 完成，本機離線版已更新" if ok else "✗ 失敗，請確認網路連線")
+        if ok:
+            self._log("✓ 完成，本機離線版已更新")
+            # 依最新資料庫種名同步「種級代表照」清單與資料夾
+            self._sync_species_plate()
+        else:
+            self._log("✗ 失敗，請確認網路連線")
         self._idle("✓ 同步完成" if ok else "✗ 同步失敗")
+
+    def _sync_species_plate(self):
+        """重建 species_plate.js 並補齊 species_photos/ 資料夾（依 data.js 種名）。"""
+        try:
+            r = subprocess.run([sys.executable, str(GEN_PLATE)],
+                               capture_output=True, text=True,
+                               encoding="utf-8", errors="replace", cwd=str(BASE))
+            for line in (r.stdout or "").strip().splitlines():
+                self._log("  " + line)
+            if r.returncode != 0:
+                self._log(f"  [提醒] 種級代表照同步失敗：{(r.stderr or '').strip()}")
+        except Exception as e:
+            self._log(f"  [提醒] 種級代表照同步失敗：{e}")
 
     # ── 1b. 同步檢索表特徵矩陣（xlsx → keymatrix.js → GitHub）─────────────────
 

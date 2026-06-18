@@ -19,24 +19,17 @@
 
 例：荒川庫蠓的翅膀照 → `species_photos/arakawae/wing.jpg`
 
-## 物種資料夾對照
+## 物種清單從資料庫自動同步
 
-| 資料夾         | 學名                      | 中文名   |
-|----------------|---------------------------|----------|
-| `actoni`       | *Culicoides actoni*       | 阿氏庫蠓 |
-| `arakawae`     | *Culicoides arakawae*     | 荒川庫蠓 |
-| `homotomus`    | *Culicoides homotomus*    | 原野庫蠓 |
-| `jacobsoni`    | *Culicoides jacobsoni*    | 雅氏庫蠓 |
-| `lungchiensis` | *Culicoides lungchiensis* | 龍溪庫蠓 |
-| `palpifer`     | *Culicoides palpifer*     | 帶鬚庫蠓 |
-| `oxystoma`     | *Culicoides oxystoma*     | 嗜牛庫蠓 |
-| `sumatrae`     | *Culicoides sumatrae*     | 蘇島庫蠓 |
-| `tainanus`     | *Culicoides tainanus*     | 台南庫蠓 |
+物種清單（`species_plate.js`）與本資料夾的物種子資料夾，由
+`gen_species_plate.py` **依資料庫（data.js）的所有種名自動產生**：
 
-## 要新增一個物種？
+- 用維護工具按「同步 Google Sheets」時會**一併重新同步**（更新清單、補齊缺少的資料夾）。
+- 也可單獨執行：`python gen_species_plate.py`
+- 對照表（id / 學名 / 中文名）直接看 `species_plate.js`。
+- 資料夾 id 由種小名產生（例 `Culicoides arakawae` → `arakawae`）。
 
-1. 在這裡新增一個物種子資料夾（資料夾名用英文 id，例如 `orientalis`）。
-2. 在 `index.html` 的 `PLATE_SPECIES` 陣列加一行：`{ id:'orientalis', sci:'Culicoides orientalis', zh:'東方庫蠓' }`。
-3. 把照片依上表檔名放進新資料夾。
+> 要新增物種：在 Google Sheets 填入該標本（含 Genus / Species / 中文名），
+> 再同步即可，不需手動建資料夾。
 
 > 照片建議先縮到適合網頁的大小（寬約 800–1200 px、數百 KB）。

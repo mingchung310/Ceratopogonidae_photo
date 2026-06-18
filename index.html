@@ -1003,6 +1003,7 @@
 </footer>
 
 <script src="data.js"></script>
+<script src="species_plate.js"></script>
 <script>
 'use strict';
 
@@ -1032,7 +1033,8 @@ function switchTab(tab) {
 //  種級代表照  SPECIES REFERENCE PLATE
 // ══════════════════════════════════════════════════════════════════════
 
-// 新增物種：在此加一行，並在 species_photos/ 建同名 id 資料夾
+// 物種清單由 species_plate.js（gen_species_plate.py 依資料庫種名自動產生）提供；
+// 下方為後備清單，僅在 species_plate.js 缺失時使用。
 const PLATE_SPECIES = [
   { id: 'actoni',       sci: 'Culicoides actoni',       zh: '阿氏庫蠓' },
   { id: 'arakawae',     sci: 'Culicoides arakawae',     zh: '荒川庫蠓' },
@@ -1061,7 +1063,8 @@ function renderPlate() {
   plateReady = true;
   const root = document.getElementById('plate-root');
   if (!root) return;
-  root.innerHTML = PLATE_SPECIES.map(sp => `
+  const list = window.SPECIES_PLATE || PLATE_SPECIES;
+  root.innerHTML = list.map(sp => `
     <div class="plate-row">
       <div class="plate-name"><em>${sp.sci.replace(/^Culicoides\s+/, 'C. ')}</em><span>${sp.zh}</span></div>
       <div class="plate-parts">
