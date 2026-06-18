@@ -1,5 +1,6 @@
 .claude/
 *.txt
+Thumbs.db
 images/**/*.tif
 images/**/*.tiff
 RAW image/

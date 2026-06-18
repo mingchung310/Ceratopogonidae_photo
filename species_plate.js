@@ -31,6 +31,11 @@ window.SPECIES_PLATE = [
   "zh": "龍溪庫蠓"
  },
  {
+  "id": "malayae__kinabaluensis__cameronensis",
+  "sci": "Culicoides malayae / kinabaluensis / cameronensis",
+  "zh": "近似馬來庫蠓"
+ },
+ {
   "id": "mcdonaldi",
   "sci": "Culicoides mcdonaldi",
   "zh": "棲山庫蠓/麥氏庫蠓"

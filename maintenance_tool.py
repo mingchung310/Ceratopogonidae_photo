@@ -594,8 +594,9 @@ class App(tk.Tk):
 
             # ── 2. 暫存所有變更（50%）──────────────────────────────────
             self._set_progress(2, TOTAL, "2/4 暫存變更…")
-            self._log("  暫存 images/ manifest.json data.js …")
-            self._git("add", "-A", "images/", "manifest.json", "data.js")
+            self._log("  暫存 images/ species_photos/ manifest.json data.js species_plate.js …")
+            self._git("add", "-A", "images/", "species_photos/",
+                      "manifest.json", "data.js", "species_plate.js")
 
             # 顯示已暫存清單（方便診斷）
             r = subprocess.run(
