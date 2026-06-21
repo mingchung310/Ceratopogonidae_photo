@@ -321,38 +321,42 @@
     .plate-name span { color: var(--muted); font-size: 0.85rem; margin-left: 0.5rem; }
     .plate-parts {
       display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 0.6rem;
+      grid-template-columns: repeat(4, 1fr);
+      grid-auto-rows: 8rem;
+      gap: 0.5rem;
+      grid-template-areas:
+        "body body wing wing"
+        "body body head head"
+        "spermatheca palp antenna hindleg";
     }
-    .plate-cell { margin: 0; min-width: 0; }
-    .plate-thumb {
-      width: 100%;
-      aspect-ratio: 1 / 1;
+    .plate-cell {
+      position: relative;
+      margin: 0;
+      min-width: 0;
       border-radius: 8px;
       overflow: hidden;
       background: var(--navy3);
       border: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: center;
     }
-    .plate-thumb img {
+    .plate-cell img {
       width: 100%; height: 100%; object-fit: cover; display: block; cursor: zoom-in;
       transition: transform 0.15s;
     }
-    .plate-thumb img:hover { transform: scale(1.04); }
-    .plate-thumb.empty::after {
+    .plate-cell img:hover { transform: scale(1.04); }
+    .plate-cell.empty::before {
       content: '🔬';
-      font-size: 1.3rem;
-      opacity: 0.35;
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem; opacity: 0.3;
     }
-    .plate-cell figcaption {
-      font-size: 0.72rem;
-      color: var(--muted);
-      text-align: center;
-      margin-top: 0.35rem;
-      line-height: 1.4;
+    .plate-label {
+      position: absolute; left: 0; right: 0; bottom: 0;
+      font-size: 0.72rem; color: var(--text);
+      background: linear-gradient(transparent, rgba(11,15,30,0.85));
+      padding: 0.5rem 0.5rem 0.3rem; text-align: center;
+      pointer-events: none; line-height: 1.2;
     }
+    .plate-cell.empty .plate-label { background: none; color: var(--muted); }
     .plate-lightbox {
       display: none;
       position: fixed;
@@ -369,11 +373,16 @@
       max-width: 100%; max-height: 100%; object-fit: contain;
       border-radius: 8px; box-shadow: 0 8px 40px rgba(0,0,0,0.6);
     }
-    @media (max-width: 760px) {
-      .plate-parts { grid-template-columns: repeat(4, 1fr); }
-    }
-    @media (max-width: 460px) {
-      .plate-parts { grid-template-columns: repeat(3, 1fr); }
+    @media (max-width: 620px) {
+      .plate-parts {
+        grid-template-columns: repeat(2, 1fr);
+        grid-auto-rows: 6.5rem;
+        grid-template-areas:
+          "body body"
+          "wing head"
+          "spermatheca palp"
+          "antenna hindleg";
+      }
     }
 
     /* ── Specimen page ───────────────────────────────────────────── */
@@ -1069,12 +1078,10 @@ function renderPlate() {
       <div class="plate-name"><em>${sp.sci.replace(/^Culicoides\s+/, 'C. ')}</em><span>${sp.zh}</span></div>
       <div class="plate-parts">
         ${PLATE_PARTS.map(p => `
-          <figure class="plate-cell">
-            <div class="plate-thumb">
-              <img src="species_photos/${sp.id}/${p.key}.jpg" alt="${sp.zh} ${p.label}"
-                   loading="lazy" onclick="plateZoom(this)" onerror="plateImgErr(this)">
-            </div>
-            <figcaption>${p.label}</figcaption>
+          <figure class="plate-cell" style="grid-area:${p.key}">
+            <img src="species_photos/${sp.id}/${p.key}.jpg" alt="${sp.zh} ${p.label}"
+                 loading="lazy" onclick="plateZoom(this)" onerror="plateImgErr(this)">
+            <span class="plate-label">${p.label}</span>
           </figure>`).join('')}
       </div>
     </div>`).join('');
@@ -1085,8 +1092,8 @@ function plateImgErr(img) {
   if (/\.jpg(\?|$)/i.test(img.src)) {
     img.src = img.src.replace(/\.jpg(\?|$)/i, '.png$1');
   } else {
-    const wrap = img.closest('.plate-thumb');
-    if (wrap) wrap.classList.add('empty');
+    const cell = img.closest('.plate-cell');
+    if (cell) cell.classList.add('empty');
     img.remove();
   }
 }
