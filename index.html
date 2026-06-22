@@ -653,6 +653,27 @@
     }
     .modal-section p { font-size: 0.93rem; line-height: 1.8; color: var(--text); }
 
+    /* ── 文中浮動圖（文字繞圖）─────────────────────────────────── */
+    .fig-float-right, .fig-float-left {
+      max-width: 300px;
+      margin: 0.3rem 0 1rem;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    }
+    .fig-float-right { float: right; margin-left: 1.5rem; }
+    .fig-float-left  { float: left;  margin-right: 1.5rem; }
+    .fig-float-right img, .fig-float-left img { width: 100%; display: block; }
+    .fig-float-right figcaption, .fig-float-left figcaption {
+      font-size: 0.72rem; color: var(--muted); text-align: center;
+      padding: 0.45rem 0.75rem; background: var(--navy2);
+      font-style: italic; line-height: 1.5;
+    }
+    @media (max-width: 640px) {
+      .fig-float-right, .fig-float-left { float: none; max-width: 100%; margin: 1rem auto; }
+    }
+
     /* ── Footer ──────────────────────────────────────────────────── */
     footer {
       text-align: center;
@@ -742,13 +763,13 @@
 
       <p>由於庫蠓分布涵蓋臺灣的中高海拔地區，並能依附野生動物維持族群，近年許多中高海拔山區的「小黑蚊叮咬事件」，很可能都是庫蠓造成（e.g. 林與楊，2015）。然而與鋏蠓屬僅少數種類吸食人血的狀況不同，多種庫蠓都有攻擊人類的現象。其體型小、多樣性高，目前大部分地區庫蠓的種類與出沒高峰季節都沒有資料可供參考，這也造成種類誤判以及連帶影響防控的效率。</p>
 
-      <div style="margin-top:2rem">
+      <div style="margin-top:2rem;display:flow-root">
         <h3 style="font-size:1rem;color:var(--gold2);margin-bottom:0.5rem;padding-bottom:0.3rem;border-bottom:1px solid var(--border)">幼蟲棲息地</h3>
-        <p>蠓科幼蟲棲息地多樣，總體上偏好潮濕且富含有機質的環境，但三個主要吸血的類群分別偏好不同的環境，其中庫蠓屬廣泛佔據半水生棲息地，包括牲畜糞便浸潤或富含基質的泥濘土壤 (e.g. <em>C. bolitinos, C. brevitarsis, C. chiopterus, C. dewulfi, C. imicola, C. insignis, C. obsoletus, C. pulicaris, C. pusillus, C. scoticus, C. sonorensis, C. stellifer, C. variipennis</em>)、積水或廢棄稻田 (<em>C. arakawae, C. debilipalpis, C. insignis, C. iriartei, C. kibunensis, C. leoni, C. nipponensis, C. oxystoma, C. pachymerus, C. peregrinus, C. pictimargo, C. punctatus, C. verbosus</em>)、泥炭苔蘚或腐爛的植物堆 (<em>C. impunctatus</em>)、或是樹洞 (<em>C. debilipalpis, C. paraensis, C. guttipenni</em>) 中 (Carrasquilla et al. 2010, Yanase et al. 2013, Purse et al. 2014, McDermott and Lysyk 2020, Songumpai et al. 2022)，亦有部分種類被發現棲息在沼澤或高鹽環境中 (e.g. <em>C. furens, C. hollensis, C. melleus, C. mohave</em>) (Mullen and Murphree 2019)。鋏蠓屬幼蟲多分布在淺水中的苔蘚或藻類，或是腐爛的木頭 (Mullen and Murphree 2019)，台灣近年好發的小黑蚊 (台灣鋏蠓 (<em>F. taiwana</em>)) 則多出現在長滿藍綠菌或是藻類的潮濕土壤上 (Liu et al. 2008)，過多的水量，如強降雨，可能破壞幼蟲棲息地，影響幼蟲發育及成長 (Chuang et al. 2000)。細蠓屬幼蟲則偏好乾旱地區的沙質或黏土質鹼性土壤，以及潮汐邊緣或沿海沼澤和海灘 (Mullen and Murphree 2019)，因此勒蠓的發生與危害多集中在這類環境中。有研究顯示透過沙漠泉水的引流可控制 <em>L. kerteszi</em> (Zhang et al. 2023)，亦說明乾旱地區中的潮濕環境對其幼蟲發育的重要性。</p>
-        <figure style="max-width:380px;margin:1.2rem auto 0;border:1px solid var(--border);border-radius:10px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,0.4)">
-          <img src="image_for_web/larvaebreed.jpg" alt="山區溪流潮濕環境——蠓科幼蟲常見棲地" style="width:100%;display:block" loading="lazy">
-          <figcaption style="font-size:0.72rem;color:var(--muted);text-align:center;padding:0.45rem 0.75rem;background:var(--navy2);font-style:italic;line-height:1.5">山區溪流環境——潮濕、植被茂密、富含有機質，是蠓科幼蟲常見的半水生棲地</figcaption>
+        <figure class="fig-float-right">
+          <img src="image_for_web/larvaebreed.jpg" alt="山區溪流潮濕環境——蠓科幼蟲常見棲地" loading="lazy">
+          <figcaption>山區溪流環境——潮濕、植被茂密、富含有機質，是蠓科幼蟲常見的半水生棲地</figcaption>
         </figure>
+        <p>蠓科幼蟲棲息地多樣，總體上偏好潮濕且富含有機質的環境，但三個主要吸血的類群分別偏好不同的環境，其中庫蠓屬廣泛佔據半水生棲息地，包括牲畜糞便浸潤或富含基質的泥濘土壤 (e.g. <em>C. bolitinos, C. brevitarsis, C. chiopterus, C. dewulfi, C. imicola, C. insignis, C. obsoletus, C. pulicaris, C. pusillus, C. scoticus, C. sonorensis, C. stellifer, C. variipennis</em>)、積水或廢棄稻田 (<em>C. arakawae, C. debilipalpis, C. insignis, C. iriartei, C. kibunensis, C. leoni, C. nipponensis, C. oxystoma, C. pachymerus, C. peregrinus, C. pictimargo, C. punctatus, C. verbosus</em>)、泥炭苔蘚或腐爛的植物堆 (<em>C. impunctatus</em>)、或是樹洞 (<em>C. debilipalpis, C. paraensis, C. guttipenni</em>) 中 (Carrasquilla et al. 2010, Yanase et al. 2013, Purse et al. 2014, McDermott and Lysyk 2020, Songumpai et al. 2022)，亦有部分種類被發現棲息在沼澤或高鹽環境中 (e.g. <em>C. furens, C. hollensis, C. melleus, C. mohave</em>) (Mullen and Murphree 2019)。鋏蠓屬幼蟲多分布在淺水中的苔蘚或藻類，或是腐爛的木頭 (Mullen and Murphree 2019)，台灣近年好發的小黑蚊 (台灣鋏蠓 (<em>F. taiwana</em>)) 則多出現在長滿藍綠菌或是藻類的潮濕土壤上 (Liu et al. 2008)，過多的水量，如強降雨，可能破壞幼蟲棲息地，影響幼蟲發育及成長 (Chuang et al. 2000)。細蠓屬幼蟲則偏好乾旱地區的沙質或黏土質鹼性土壤，以及潮汐邊緣或沿海沼澤和海灘 (Mullen and Murphree 2019)，因此勒蠓的發生與危害多集中在這類環境中。有研究顯示透過沙漠泉水的引流可控制 <em>L. kerteszi</em> (Zhang et al. 2023)，亦說明乾旱地區中的潮濕環境對其幼蟲發育的重要性。</p>
       </div>
 
       <div style="margin-top:1.2rem">
