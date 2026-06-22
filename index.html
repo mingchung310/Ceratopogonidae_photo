@@ -661,6 +661,8 @@
       font-size: 0.8rem;
       border-top: 1px solid var(--border);
     }
+    .foot-meta { margin-top: 0.4rem; font-size: 0.74rem; color: var(--muted); opacity: 0.85; }
+    .foot-meta b { color: var(--text); font-weight: 600; }
 
     /* ── Responsive ──────────────────────────────────────────────── */
     @media (max-width: 700px) {
@@ -1017,6 +1019,10 @@
 <!-- ── Footer ──────────────────────────────────────────────────────── -->
 <footer>
   庫蠓標本影像 © 臺灣大學昆蟲學系寄生蟲實驗室 · 持續收錄中
+  <div class="foot-meta">
+    <span id="foot-updated-wrap" hidden>最後更新：<b id="foot-updated"></b></span>
+    <span id="foot-visits-wrap" hidden> ｜ 瀏覽人數：<b id="foot-visits"></b></span>
+  </div>
 </footer>
 
 <script src="data.js"></script>
@@ -1477,6 +1483,32 @@ dataReady
 
 // ── 初始分頁切換（置於 script 末端，確保所有宣告已初始化）─────────────
 if (_initTab !== 'intro') switchTab(_initTab);
+
+
+// ══════════════════════════════════════════════════════════════════════
+//  頁尾：最後更新日期（GitHub 最後 commit）＋ 瀏覽人數（counterapi.dev）
+//  皆需網路；失敗則該項不顯示。離線（file://）略過。
+// ══════════════════════════════════════════════════════════════════════
+if (!isOffline) {
+  fetch('https://api.github.com/repos/mingchung310/Ceratopogonidae_photo/commits?per_page=1')
+    .then(r => r.ok ? r.json() : null)
+    .then(d => {
+      const iso = d && d[0] && d[0].commit && d[0].commit.committer && d[0].commit.committer.date;
+      if (!iso) return;
+      const dt = new Date(iso);
+      document.getElementById('foot-updated').textContent =
+        `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
+      document.getElementById('foot-updated-wrap').hidden = false;
+    }).catch(() => {});
+
+  fetch('https://api.counterapi.dev/v1/ceratopogonidae-photo/visits/up')
+    .then(r => r.ok ? r.json() : null)
+    .then(d => {
+      if (!d || typeof d.count !== 'number') return;
+      document.getElementById('foot-visits').textContent = d.count.toLocaleString();
+      document.getElementById('foot-visits-wrap').hidden = false;
+    }).catch(() => {});
+}
 
 </script>
 </body>
