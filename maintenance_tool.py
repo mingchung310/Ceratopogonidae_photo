@@ -310,6 +310,12 @@ class App(tk.Tk):
             self._log(f"  {line}")
         return r.returncode == 0
 
+    def _stamp_lastupdated(self):
+        """把今天日期寫入 lastupdated.js（頁尾「最後更新」用，純本機、不對外）。"""
+        d = datetime.date.today().isoformat()
+        (BASE / "lastupdated.js").write_text(
+            f'window.LAST_UPDATED = "{d}";\n', encoding="utf-8")
+
     # ── 1. Google Sheets 同步 ────────────────────────────────────────────────
 
     def _sync_sheets(self):
@@ -364,7 +370,8 @@ class App(tk.Tk):
 
             # 2) 暫存 keymatrix.js 與 xlsx
             self._busy("提交並推送到 GitHub 中…")
-            self._git("add", str(KEYMATRIX_JS.name), str(MATRIX_XLSX.name))
+            self._stamp_lastupdated()
+            self._git("add", str(KEYMATRIX_JS.name), str(MATRIX_XLSX.name), "lastupdated.js")
 
             has_changes = subprocess.run(
                 ["git", "diff", "--cached", "--quiet"], cwd=str(BASE)
@@ -594,9 +601,10 @@ class App(tk.Tk):
 
             # ── 2. 暫存所有變更（50%）──────────────────────────────────
             self._set_progress(2, TOTAL, "2/4 暫存變更…")
-            self._log("  暫存 images/ species_photos/ manifest.json data.js species_plate.js …")
+            self._stamp_lastupdated()
+            self._log("  暫存 images/ species_photos/ manifest.json data.js species_plate.js lastupdated.js …")
             self._git("add", "-A", "images/", "species_photos/",
-                      "manifest.json", "data.js", "species_plate.js")
+                      "manifest.json", "data.js", "species_plate.js", "lastupdated.js")
 
             # 顯示已暫存清單（方便診斷）
             r = subprocess.run(
