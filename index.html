@@ -683,6 +683,18 @@
     .cmp-scroll { overflow-y: auto; }
     .cmp-window .modal-img { margin-top: 0; }
     .cmp-hint { font-size: 0.75rem; color: var(--muted); margin: 0.2rem 0 0; }
+    #cmp-toolbar {
+      position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
+      display: none; gap: 0.5rem; z-index: 300;
+      background: var(--navy2); border: 1px solid var(--border); border-radius: 999px;
+      padding: 0.4rem 0.5rem; box-shadow: 0 6px 24px rgba(0,0,0,0.5);
+    }
+    #cmp-toolbar button {
+      background: var(--navy3); border: 1px solid var(--border); color: var(--text);
+      font-family: inherit; font-size: 0.82rem; padding: 0.35rem 0.9rem;
+      border-radius: 999px; cursor: pointer;
+    }
+    #cmp-toolbar button:hover { border-color: var(--gold); color: var(--gold); }
 
     /* ── 文中浮動圖（文字繞圖）─────────────────────────────────── */
     .fig-float-right, .fig-float-left {
@@ -1422,23 +1434,51 @@ const cmpWindows = new Map();   // specimen id -> 視窗元素
 let cmpTopZ = 200;
 
 function _windowBody(d) {
-  const FIXED = new Set(['id','name','sciName','category','subgenus','species',
-                         'date','emoji','image','number','全身照','_sex']);
+  // 只顯示圖片（與縮圖切換），不附下方欄位資訊
   const images = getImages(d);
-  let imgHtml, thumbsHtml = '';
-  if (!images.length) {
-    imgHtml = `<div class="modal-img">${d.emoji || '📦'}</div>`;
-  } else {
-    imgHtml = `<div class="modal-img"><img src="${images[0]}" alt="${d.name}"></div>`;
-    if (images.length > 1) {
-      thumbsHtml = `<div class="modal-thumbs">${images.map((s, i) =>
-        `<img src="${s}" class="thumb${i === 0 ? ' active' : ''}" data-src="${s}">`).join('')}</div>`;
-    }
+  if (!images.length) return `<div class="modal-img">${d.emoji || '📦'}</div>`;
+  let html = `<div class="modal-img"><img src="${images[0]}" alt="${d.name}"></div>`;
+  if (images.length > 1) {
+    html += `<div class="modal-thumbs">${images.map((s, i) =>
+      `<img src="${s}" class="thumb${i === 0 ? ' active' : ''}" data-src="${s}">`).join('')}</div>`;
   }
-  let sections = '';
-  Object.keys(d).forEach(k => { if (!FIXED.has(k) && d[k]) sections += `<div class="modal-section"><h4>${k}</h4><p>${d[k]}</p></div>`; });
-  const tags = `<span class="tag">${d.category}</span>${d._sex ? `<span class="tag">${d._sex}</span>` : ''}<span class="tag">${d.date || ''}</span>`;
-  return `${imgHtml}${thumbsHtml}<div class="modal-body"><p class="modal-sci">${d.sciName || ''}</p><div class="modal-tags">${tags}</div><div>${sections}</div></div>`;
+  return html;
+}
+
+// 一鍵並排平鋪：所有開啟的視窗等寬橫向排成一列
+function tileWindows() {
+  const wins = [...cmpWindows.values()];
+  const n = wins.length;
+  if (!n) return;
+  const gap = 8, top = 68;
+  const w = Math.max(150, Math.floor((window.innerWidth - (n + 1) * gap) / n));
+  const maxH = window.innerHeight - top - gap;
+  wins.forEach((win, i) => {
+    win.style.left = (gap + i * (w + gap)) + 'px';
+    win.style.top = top + 'px';
+    win.style.width = w + 'px';
+    win.style.maxHeight = maxH + 'px';
+    win.style.zIndex = ++cmpTopZ;
+  });
+}
+
+let _cmpToolbar = null;
+function _updateCmpToolbar() {
+  if (!_cmpToolbar) {
+    _cmpToolbar = document.createElement('div');
+    _cmpToolbar.id = 'cmp-toolbar';
+    _cmpToolbar.innerHTML =
+      '<button type="button" id="cmp-tile">⊞ 並排平鋪</button>' +
+      '<button type="button" id="cmp-closeall">✕ 全部關閉</button>';
+    document.body.appendChild(_cmpToolbar);
+    _cmpToolbar.querySelector('#cmp-tile').addEventListener('click', tileWindows);
+    _cmpToolbar.querySelector('#cmp-closeall').addEventListener('click', () => {
+      cmpWindows.forEach(w => w.remove());
+      cmpWindows.clear();
+      _updateCmpToolbar();
+    });
+  }
+  _cmpToolbar.style.display = cmpWindows.size ? 'flex' : 'none';
 }
 
 function _focusWindow(win) { win.style.zIndex = ++cmpTopZ; }
@@ -1471,9 +1511,10 @@ function openWindow(d) {
     });
   });
 
-  win.querySelector('.cmp-close').addEventListener('click', () => { win.remove(); cmpWindows.delete(d.id); });
+  win.querySelector('.cmp-close').addEventListener('click', () => { win.remove(); cmpWindows.delete(d.id); _updateCmpToolbar(); });
   win.addEventListener('pointerdown', () => _focusWindow(win));
   _makeDraggable(win, win.querySelector('.cmp-head'));
+  _updateCmpToolbar();
 }
 
 function _makeDraggable(win, handle) {
@@ -1503,7 +1544,7 @@ document.addEventListener('keydown', e => {
   if (e.key !== 'Escape' || !cmpWindows.size) return;
   let top = null, tz = -1, topId = null;
   cmpWindows.forEach((w, id) => { const z = +w.style.zIndex || 0; if (z >= tz) { tz = z; top = w; topId = id; } });
-  if (top) { top.remove(); cmpWindows.delete(topId); }
+  if (top) { top.remove(); cmpWindows.delete(topId); _updateCmpToolbar(); }
 });
 
 searchInput.addEventListener('input', renderGrid);
