@@ -682,6 +682,9 @@
     .cmp-close:hover { color: var(--text); }
     .cmp-scroll { overflow-y: auto; }
     .cmp-window .modal-img { margin-top: 0; }
+    /* 平鋪模式：圖片填滿格子高度 */
+    .cmp-window.tiled .cmp-scroll { flex: 1 1 auto; display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
+    .cmp-window.tiled .modal-img { flex: 1 1 auto; aspect-ratio: auto; height: auto; min-height: 0; }
     .cmp-hint { font-size: 0.75rem; color: var(--muted); margin: 0.2rem 0 0; }
     #cmp-toolbar {
       position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
@@ -1063,7 +1066,7 @@
         </div>
       </div>
       <p class="results-info" id="resultsInfo"></p>
-      <p class="cmp-hint">點標本可開啟視窗，最多同時開 5 個、可拖曳並排比對。</p>
+      <p class="cmp-hint">點標本可開啟視窗，最多同時開 9 個、可拖曳並排比對（支援一鍵九宮格平鋪）。</p>
       <div class="grid" id="grid"></div>
     </section>
 
@@ -1429,7 +1432,7 @@ function renderGrid() {
 }
 
 // ── 比對浮動視窗：可同時開多個（上限 5）、可拖曳並排比對 ──────────────
-const CMP_MAX   = 5;
+const CMP_MAX   = 9;
 const cmpWindows = new Map();   // specimen id -> 視窗元素
 let cmpTopZ = 200;
 
@@ -1445,19 +1448,24 @@ function _windowBody(d) {
   return html;
 }
 
-// 一鍵並排平鋪：所有開啟的視窗等寬橫向排成一列
+// 一鍵九宮格平鋪：所有開啟的視窗排成最多 3 欄的方格（9 個＝3×3）
 function tileWindows() {
   const wins = [...cmpWindows.values()];
   const n = wins.length;
   if (!n) return;
-  const gap = 8, top = 68;
-  const w = Math.max(150, Math.floor((window.innerWidth - (n + 1) * gap) / n));
-  const maxH = window.innerHeight - top - gap;
+  const gap = 8, top0 = 60;
+  const cols = Math.min(3, n);
+  const rows = Math.ceil(n / cols);
+  const cellW = Math.max(150, Math.floor((window.innerWidth  - (cols + 1) * gap) / cols));
+  const cellH = Math.max(140, Math.floor((window.innerHeight - top0 - (rows + 1) * gap) / rows));
   wins.forEach((win, i) => {
-    win.style.left = (gap + i * (w + gap)) + 'px';
-    win.style.top = top + 'px';
-    win.style.width = w + 'px';
-    win.style.maxHeight = maxH + 'px';
+    const c = i % cols, r = Math.floor(i / cols);
+    win.classList.add('tiled');
+    win.style.left   = (gap + c * (cellW + gap)) + 'px';
+    win.style.top    = (top0 + gap + r * (cellH + gap)) + 'px';
+    win.style.width  = cellW + 'px';
+    win.style.height = cellH + 'px';
+    win.style.maxHeight = 'none';
     win.style.zIndex = ++cmpTopZ;
   });
 }
