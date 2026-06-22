@@ -653,6 +653,37 @@
     }
     .modal-section p { font-size: 0.93rem; line-height: 1.8; color: var(--text); }
 
+    /* ── 比對浮動視窗（可同時開多個、可拖曳）──────────────────── */
+    .cmp-window {
+      position: fixed;
+      width: min(360px, 92vw);
+      max-height: 82vh;
+      display: flex;
+      flex-direction: column;
+      background: var(--navy2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: 0 12px 48px rgba(0,0,0,0.55);
+      overflow: hidden;
+      z-index: 200;
+    }
+    .cmp-head {
+      display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;
+      padding: 0.55rem 0.5rem 0.55rem 0.9rem;
+      background: var(--navy3);
+      border-bottom: 1px solid var(--border);
+      cursor: move; user-select: none; touch-action: none;
+    }
+    .cmp-title { font-size: 0.95rem; color: var(--gold); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .cmp-close {
+      background: none; border: none; color: var(--muted); font-size: 1.3rem;
+      cursor: pointer; line-height: 1; padding: 0 0.4rem; flex-shrink: 0;
+    }
+    .cmp-close:hover { color: var(--text); }
+    .cmp-scroll { overflow-y: auto; }
+    .cmp-window .modal-img { margin-top: 0; }
+    .cmp-hint { font-size: 0.75rem; color: var(--muted); margin: 0.2rem 0 0; }
+
     /* ── 文中浮動圖（文字繞圖）─────────────────────────────────── */
     .fig-float-right, .fig-float-left {
       max-width: 300px;
@@ -1020,6 +1051,7 @@
         </div>
       </div>
       <p class="results-info" id="resultsInfo"></p>
+      <p class="cmp-hint">點標本可開啟視窗，最多同時開 5 個、可拖曳並排比對。</p>
       <div class="grid" id="grid"></div>
     </section>
 
@@ -1027,22 +1059,7 @@
 </div><!-- /page-specimens -->
 
 
-<!-- ── Modal ───────────────────────────────────────────────────────── -->
-<div class="modal-overlay" id="modalOverlay">
-  <div class="modal">
-    <div class="modal-header">
-      <h2 id="mName"></h2>
-      <button class="modal-close" id="modalClose">×</button>
-    </div>
-    <div class="modal-img"    id="mImgWrap"></div>
-    <div class="modal-thumbs" id="mThumbs" style="display:none"></div>
-    <div class="modal-body">
-      <p class="modal-sci" id="mSci"></p>
-      <div class="modal-tags" id="mTags"></div>
-      <div id="mSections"></div>
-    </div>
-  </div>
-</div>
+<!-- 比對視窗由 JS 動態建立並 append 到 body -->
 
 <!-- ── Footer ──────────────────────────────────────────────────────── -->
 <footer>
@@ -1300,7 +1317,6 @@ const genderFilter    = document.getElementById('genderFilter');
 const wholeshotFilter = document.getElementById('wholeshotFilter');
 const clearBtn        = document.getElementById('clearBtn');
 const resultsInfo     = document.getElementById('resultsInfo');
-const overlay         = document.getElementById('modalOverlay');
 
 let DATA = [], MANIFEST = {};
 
@@ -1395,68 +1411,100 @@ function renderGrid() {
           <span class="card-date">${d.date || ''}</span>
         </div>
       </div>`;
-    card.addEventListener('click', () => openModal(d));
+    card.addEventListener('click', () => openWindow(d));
     grid.appendChild(card);
   });
 }
 
-function openModal(d) {
+// ── 比對浮動視窗：可同時開多個（上限 5）、可拖曳並排比對 ──────────────
+const CMP_MAX   = 5;
+const cmpWindows = new Map();   // specimen id -> 視窗元素
+let cmpTopZ = 200;
+
+function _windowBody(d) {
   const FIXED = new Set(['id','name','sciName','category','subgenus','species',
                          'date','emoji','image','number','全身照','_sex']);
-  document.getElementById('mName').textContent = d.name;
-  document.getElementById('mSci').textContent  = d.sciName || '';
-
-  const sections = document.getElementById('mSections');
-  sections.innerHTML = '';
-  Object.keys(d).forEach(key => {
-    if (FIXED.has(key) || !d[key]) return;
-    const sec = document.createElement('div');
-    sec.className = 'modal-section';
-    sec.innerHTML = `<h4>${key}</h4><p>${d[key]}</p>`;
-    sections.appendChild(sec);
-  });
-
-  const images     = getImages(d);
-  const imgWrap    = document.getElementById('mImgWrap');
-  const thumbsWrap = document.getElementById('mThumbs');
-
+  const images = getImages(d);
+  let imgHtml, thumbsHtml = '';
   if (!images.length) {
-    imgWrap.innerHTML        = d.emoji || '📦';
-    thumbsWrap.style.display = 'none';
+    imgHtml = `<div class="modal-img">${d.emoji || '📦'}</div>`;
   } else {
-    imgWrap.innerHTML = `<img src="${images[0]}" alt="${d.name}">`;
+    imgHtml = `<div class="modal-img"><img src="${images[0]}" alt="${d.name}"></div>`;
     if (images.length > 1) {
-      thumbsWrap.style.display = 'flex';
-      thumbsWrap.innerHTML = images.map((src, i) =>
-        `<img src="${src}" class="thumb${i === 0 ? ' active' : ''}" data-src="${src}">`
-      ).join('');
-      thumbsWrap.querySelectorAll('.thumb').forEach(t => {
-        t.addEventListener('click', () => {
-          imgWrap.innerHTML = `<img src="${t.dataset.src}" alt="${d.name}">`;
-          thumbsWrap.querySelectorAll('.thumb').forEach(x => x.classList.remove('active'));
-          t.classList.add('active');
-        });
-      });
-    } else {
-      thumbsWrap.style.display = 'none';
+      thumbsHtml = `<div class="modal-thumbs">${images.map((s, i) =>
+        `<img src="${s}" class="thumb${i === 0 ? ' active' : ''}" data-src="${s}">`).join('')}</div>`;
     }
   }
-
-  document.getElementById('mTags').innerHTML =
-    `<span class="tag">${d.category}</span><span class="tag">${d.date || ''}</span>`;
-
-  overlay.classList.add('open');
-  document.body.style.overflow = 'hidden';
+  let sections = '';
+  Object.keys(d).forEach(k => { if (!FIXED.has(k) && d[k]) sections += `<div class="modal-section"><h4>${k}</h4><p>${d[k]}</p></div>`; });
+  const tags = `<span class="tag">${d.category}</span>${d._sex ? `<span class="tag">${d._sex}</span>` : ''}<span class="tag">${d.date || ''}</span>`;
+  return `${imgHtml}${thumbsHtml}<div class="modal-body"><p class="modal-sci">${d.sciName || ''}</p><div class="modal-tags">${tags}</div><div>${sections}</div></div>`;
 }
 
-function closeModal() {
-  overlay.classList.remove('open');
-  document.body.style.overflow = '';
+function _focusWindow(win) { win.style.zIndex = ++cmpTopZ; }
+
+function openWindow(d) {
+  if (cmpWindows.has(d.id)) { _focusWindow(cmpWindows.get(d.id)); return; }
+  if (cmpWindows.size >= CMP_MAX) {
+    alert(`最多同時開啟 ${CMP_MAX} 個比對視窗，請先關閉一個。`);
+    return;
+  }
+  const win = document.createElement('div');
+  win.className = 'cmp-window';
+  const n = cmpWindows.size;
+  win.style.left = Math.max(8, Math.min(60 + n * 34, window.innerWidth - 380)) + 'px';
+  win.style.top  = (84 + n * 30) + 'px';
+  win.style.zIndex = ++cmpTopZ;
+  win.innerHTML =
+    `<div class="cmp-head"><span class="cmp-title">${d.name}</span><button class="cmp-close" title="關閉">×</button></div>` +
+    `<div class="cmp-scroll">${_windowBody(d)}</div>`;
+  document.body.appendChild(win);
+  cmpWindows.set(d.id, win);
+
+  // 縮圖切換主圖
+  const imgWrap = win.querySelector('.modal-img');
+  win.querySelectorAll('.modal-thumbs .thumb').forEach(t => {
+    t.addEventListener('click', () => {
+      imgWrap.innerHTML = `<img src="${t.dataset.src}" alt="${d.name}">`;
+      win.querySelectorAll('.modal-thumbs .thumb').forEach(x => x.classList.remove('active'));
+      t.classList.add('active');
+    });
+  });
+
+  win.querySelector('.cmp-close').addEventListener('click', () => { win.remove(); cmpWindows.delete(d.id); });
+  win.addEventListener('pointerdown', () => _focusWindow(win));
+  _makeDraggable(win, win.querySelector('.cmp-head'));
 }
 
-document.getElementById('modalClose').addEventListener('click', closeModal);
-overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+function _makeDraggable(win, handle) {
+  let sx, sy, ox, oy, dragging = false;
+  handle.addEventListener('pointerdown', e => {
+    if (e.target.closest('.cmp-close')) return;
+    dragging = true;
+    try { handle.setPointerCapture(e.pointerId); } catch (_) {}
+    const r = win.getBoundingClientRect();
+    ox = r.left; oy = r.top; sx = e.clientX; sy = e.clientY;
+    e.preventDefault();
+  });
+  handle.addEventListener('pointermove', e => {
+    if (!dragging) return;
+    let nx = ox + (e.clientX - sx), ny = oy + (e.clientY - sy);
+    nx = Math.max(0, Math.min(nx, window.innerWidth  - win.offsetWidth));
+    ny = Math.max(0, Math.min(ny, window.innerHeight - 40));
+    win.style.left = nx + 'px'; win.style.top = ny + 'px';
+  });
+  const stop = e => { dragging = false; try { handle.releasePointerCapture(e.pointerId); } catch (_) {} };
+  handle.addEventListener('pointerup', stop);
+  handle.addEventListener('pointercancel', stop);
+}
+
+// Esc：關閉最上層（最近聚焦）的視窗
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Escape' || !cmpWindows.size) return;
+  let top = null, tz = -1, topId = null;
+  cmpWindows.forEach((w, id) => { const z = +w.style.zIndex || 0; if (z >= tz) { tz = z; top = w; topId = id; } });
+  if (top) { top.remove(); cmpWindows.delete(topId); }
+});
 
 searchInput.addEventListener('input', renderGrid);
 [categoryFilter, subgenusFilter, speciesFilter, wholeshotFilter, genderFilter]
