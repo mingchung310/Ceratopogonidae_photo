@@ -1454,7 +1454,7 @@ function tileWindows() {
   const n = wins.length;
   if (!n) return;
   const gap = 8, top0 = 60;
-  const cols = n === 9 ? 3 : Math.min(2, n);   // 滿 9 個＝3×3；少於 9 個用 2 欄
+  const cols = Math.min(3, n);   // 最多 3 欄；9 個＝3×3
   const rows = Math.ceil(n / cols);
   const cellW = Math.max(150, Math.floor((window.innerWidth  - (cols + 1) * gap) / cols));
   const cellH = Math.max(140, Math.floor((window.innerHeight - top0 - (rows + 1) * gap) / rows));
