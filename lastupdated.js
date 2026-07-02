@@ -1,1 +1,1 @@
-window.LAST_UPDATED = "2026-07-01";
+window.LAST_UPDATED = "2026-07-02";

@@ -346,6 +346,44 @@
         "images/Cer14/win_4x.png",
         "images/Cer14/win_4x_1.png"
     ],
+    "Cer140": [
+        "images/Cer140/wing.png"
+    ],
+    "Cer141": [
+        "images/Cer141/wing.png",
+        "images/Cer141/wing2.png"
+    ],
+    "Cer142": [
+        "images/Cer142/body.png",
+        "images/Cer142/head.png"
+    ],
+    "Cer143": [
+        "images/Cer143/hea_20x.png",
+        "images/Cer143/wing.png"
+    ],
+    "Cer144": [
+        "images/Cer144/body.png"
+    ],
+    "Cer145": [
+        "images/Cer145/body.png",
+        "images/Cer145/head.png"
+    ],
+    "Cer146": [
+        "images/Cer146/body.tif.png",
+        "images/Cer146/head.png"
+    ],
+    "Cer147": [
+        "images/Cer147/body.png",
+        "images/Cer147/head.png"
+    ],
+    "Cer148": [
+        "images/Cer148/body.png",
+        "images/Cer148/head.png"
+    ],
+    "Cer149": [
+        "images/Cer149/body.png",
+        "images/Cer149/head.png"
+    ],
     "Cer15": [
         "images/Cer15/0.Cer15 Wings.png",
         "images/Cer15/Cer15 Abdomen.png",
