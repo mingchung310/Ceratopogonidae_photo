@@ -674,7 +674,13 @@
       border-bottom: 1px solid var(--border);
       cursor: move; user-select: none; touch-action: none;
     }
-    .cmp-title { font-size: 0.95rem; color: var(--gold); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .cmp-title { flex: 1; font-size: 0.95rem; color: var(--gold); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .cmp-info-btn {
+      background: none; border: none; color: var(--muted); font-size: 1rem;
+      cursor: pointer; line-height: 1; padding: 0 0.35rem; flex-shrink: 0;
+    }
+    .cmp-info-btn:hover { color: var(--gold); }
+    .cmp-window.info-open .cmp-info-btn { color: var(--gold); }
     .cmp-close {
       background: none; border: none; color: var(--muted); font-size: 1.3rem;
       cursor: pointer; line-height: 1; padding: 0 0.4rem; flex-shrink: 0;
@@ -682,9 +688,14 @@
     .cmp-close:hover { color: var(--text); }
     .cmp-scroll { overflow-y: auto; }
     .cmp-window .modal-img { margin-top: 0; }
+    /* 詳細資訊（預設隱藏，按 ⓘ 展開）*/
+    .cmp-info { display: none; border-top: 1px solid var(--border); }
+    .cmp-window.info-open .cmp-info { display: block; }
     /* 平鋪模式：圖片填滿格子高度 */
     .cmp-window.tiled .cmp-scroll { flex: 1 1 auto; display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
     .cmp-window.tiled .modal-img { flex: 1 1 auto; aspect-ratio: auto; height: auto; min-height: 0; }
+    .cmp-window.tiled.info-open .cmp-scroll { overflow-y: auto; }
+    .cmp-window.tiled.info-open .modal-img { flex: 0 0 auto; aspect-ratio: 16 / 9; }
     .cmp-hint { font-size: 0.75rem; color: var(--muted); margin: 0.2rem 0 0; }
     #cmp-toolbar {
       position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
@@ -1066,7 +1077,7 @@
         </div>
       </div>
       <p class="results-info" id="resultsInfo"></p>
-      <p class="cmp-hint">點標本可開啟視窗，最多同時開 9 個、可拖曳並排比對（支援一鍵九宮格平鋪）。</p>
+      <p class="cmp-hint">點標本可開啟視窗，最多同時開 9 個、可拖曳並排比對（支援一鍵九宮格平鋪）；視窗右上 ⓘ 可展開詳細資訊。</p>
       <div class="grid" id="grid"></div>
     </section>
 
@@ -1437,14 +1448,24 @@ const cmpWindows = new Map();   // specimen id -> 視窗元素
 let cmpTopZ = 200;
 
 function _windowBody(d) {
-  // 只顯示圖片（與縮圖切換），不附下方欄位資訊
+  // 預設只顯示圖片；詳細資訊放在 .cmp-info（預設隱藏，按 ⓘ 展開）
   const images = getImages(d);
-  if (!images.length) return `<div class="modal-img">${d.emoji || '📦'}</div>`;
-  let html = `<div class="modal-img"><img src="${images[0]}" alt="${d.name}"></div>`;
-  if (images.length > 1) {
-    html += `<div class="modal-thumbs">${images.map((s, i) =>
-      `<img src="${s}" class="thumb${i === 0 ? ' active' : ''}" data-src="${s}">`).join('')}</div>`;
+  let html;
+  if (!images.length) {
+    html = `<div class="modal-img">${d.emoji || '📦'}</div>`;
+  } else {
+    html = `<div class="modal-img"><img src="${images[0]}" alt="${d.name}"></div>`;
+    if (images.length > 1) {
+      html += `<div class="modal-thumbs">${images.map((s, i) =>
+        `<img src="${s}" class="thumb${i === 0 ? ' active' : ''}" data-src="${s}">`).join('')}</div>`;
+    }
   }
+  const FIXED = new Set(['id','name','sciName','category','subgenus','species',
+                         'date','emoji','image','number','全身照','_sex']);
+  let sections = '';
+  Object.keys(d).forEach(k => { if (!FIXED.has(k) && d[k]) sections += `<div class="modal-section"><h4>${k}</h4><p>${d[k]}</p></div>`; });
+  const tags = `<span class="tag">${d.category}</span>${d._sex ? `<span class="tag">${d._sex}</span>` : ''}<span class="tag">${d.date || ''}</span>`;
+  html += `<div class="cmp-info"><div class="modal-body"><p class="modal-sci">${d.sciName || ''}</p><div class="modal-tags">${tags}</div>${sections}</div></div>`;
   return html;
 }
 
@@ -1504,7 +1525,9 @@ function openWindow(d) {
   win.style.top  = (84 + n * 30) + 'px';
   win.style.zIndex = ++cmpTopZ;
   win.innerHTML =
-    `<div class="cmp-head"><span class="cmp-title">${d.name}</span><button class="cmp-close" title="關閉">×</button></div>` +
+    `<div class="cmp-head"><span class="cmp-title">${d.name}</span>` +
+    `<button class="cmp-info-btn" title="詳細資訊">ⓘ</button>` +
+    `<button class="cmp-close" title="關閉">×</button></div>` +
     `<div class="cmp-scroll">${_windowBody(d)}</div>`;
   document.body.appendChild(win);
   cmpWindows.set(d.id, win);
@@ -1519,6 +1542,7 @@ function openWindow(d) {
     });
   });
 
+  win.querySelector('.cmp-info-btn').addEventListener('click', e => { e.stopPropagation(); win.classList.toggle('info-open'); });
   win.querySelector('.cmp-close').addEventListener('click', () => { win.remove(); cmpWindows.delete(d.id); _updateCmpToolbar(); });
   win.addEventListener('pointerdown', () => _focusWindow(win));
   _makeDraggable(win, win.querySelector('.cmp-head'));
@@ -1528,7 +1552,7 @@ function openWindow(d) {
 function _makeDraggable(win, handle) {
   let sx, sy, ox, oy, dragging = false;
   handle.addEventListener('pointerdown', e => {
-    if (e.target.closest('.cmp-close')) return;
+    if (e.target.closest('.cmp-close, .cmp-info-btn')) return;
     dragging = true;
     try { handle.setPointerCapture(e.pointerId); } catch (_) {}
     const r = win.getBoundingClientRect();
