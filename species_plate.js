@@ -11,14 +11,29 @@ window.SPECIES_PLATE = [
   "zh": "荒川庫蠓"
  },
  {
+  "id": "clavipalpis",
+  "sci": "Culicoides clavipalpis",
+  "zh": "棒鬚庫蠓"
+ },
+ {
   "id": "dentiformis",
   "sci": "Culicoides dentiformis",
   "zh": "齒紋庫蠓"
  },
  {
+  "id": "dubius",
+  "sci": "Culicoides dubius",
+  "zh": "疑念庫蠓"
+ },
+ {
   "id": "homotomus",
   "sci": "Culicoides homotomus",
   "zh": "原野庫蠓"
+ },
+ {
+  "id": "innoxius",
+  "sci": "Culicoides innoxius",
+  "zh": "無害庫蠓"
  },
  {
   "id": "jacobsoni",
@@ -64,6 +79,11 @@ window.SPECIES_PLATE = [
   "id": "tamada",
   "sci": "Culicoides tamada",
   "zh": "平淡庫蠓"
+ },
+ {
+  "id": "verbosus",
+  "sci": "Culicoides verbosus",
+  "zh": "婆娑庫蠓"
  },
  {
   "id": "應該是帶鬚",
