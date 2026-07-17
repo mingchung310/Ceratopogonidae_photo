@@ -1605,7 +1605,7 @@ document.addEventListener('keydown', e => {
 });
 
 searchInput.addEventListener('input', renderGrid);
-[categoryFilter, subgenusFilter, speciesFilter, wholeshotFilter, genderFilter]
+[categoryFilter, subgenusFilter, groupFilter, speciesFilter, wholeshotFilter, genderFilter]
   .forEach(el => el.addEventListener('change', renderGrid));
 
 clearBtn.addEventListener('click', () => {
