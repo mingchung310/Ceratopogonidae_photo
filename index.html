@@ -1046,6 +1046,11 @@
         <select id="subgenusFilter" class="filter-select"><option value="">全部</option></select>
       </div>
 
+      <span class="filter-label">種團</span>
+      <div class="filter-wrap">
+        <select id="groupFilter" class="filter-select"><option value="">全部</option></select>
+      </div>
+
       <span class="filter-label">種</span>
       <div class="filter-wrap">
         <select id="speciesFilter" class="filter-select"><option value="">全部</option></select>
@@ -1312,11 +1317,13 @@ function transformRow(r) {
     sciName,
     category: genus,
     subgenus, species,
+    speciesGroup: (r['Complex/group'] || r['Species group'] || '').trim().toLowerCase(),
     date:     (r['Col. Date'] || '').trim(),
     emoji:    '🦟',
     image:    num,
     全身照:   (r['全身照'] || '').trim(),
     _sex:     (r['sex']    || '').trim(),
+    _zh:      (r['中文名']  || '').trim(),
   };
 
   const fields = {
@@ -1337,6 +1344,7 @@ const grid            = document.getElementById('grid');
 const searchInput     = document.getElementById('searchInput');
 const categoryFilter  = document.getElementById('categoryFilter');
 const subgenusFilter  = document.getElementById('subgenusFilter');
+const groupFilter     = document.getElementById('groupFilter');
 const speciesFilter   = document.getElementById('speciesFilter');
 const genderFilter    = document.getElementById('genderFilter');
 const wholeshotFilter = document.getElementById('wholeshotFilter');
@@ -1357,14 +1365,21 @@ function getImages(d) {
   return [];
 }
 
+// values 可為字串，或 {value, label}（顯示文字與實際值不同時用）
 function fillSelect(el, values, placeholder, keep) {
-  const set = [...new Set(values)].filter(Boolean);
-  if (keep && !set.includes(keep)) set.push(keep);   // 保留目前選擇，即使已無交集
-  set.sort();
+  const map = new Map();   // value -> 顯示文字
+  values.forEach(v => {
+    if (!v) return;
+    const val   = typeof v === 'object' ? v.value : v;
+    const label = typeof v === 'object' ? v.label : v;
+    if (val && !map.has(val)) map.set(val, label);
+  });
+  if (keep && !map.has(keep)) map.set(keep, keep);   // 保留目前選擇，即使已無交集
+  const entries = [...map.entries()].sort((a, b) => a[1].localeCompare(b[1], 'zh-Hant'));
   el.innerHTML = `<option value="">${placeholder}</option>`;
-  set.forEach(v => {
+  entries.forEach(([val, label]) => {
     const opt = document.createElement('option');
-    opt.value = v; opt.textContent = v;
+    opt.value = val; opt.textContent = label;
     el.appendChild(opt);
   });
   el.value = keep || '';
@@ -1375,6 +1390,7 @@ function currentFilters() {
     q:   searchInput.value.trim().toLowerCase(),
     cat: categoryFilter.value,
     sub: subgenusFilter.value,
+    grp: groupFilter.value,
     sp:  speciesFilter.value,
     ws:  wholeshotFilter.value,
     gen: genderFilter.value,
@@ -1386,6 +1402,7 @@ function rowMatches(d, f, ignore) {
   if (ignore !== 'q'   && f.q   && !(d.name.toLowerCase().includes(f.q) || (d.sciName||'').toLowerCase().includes(f.q))) return false;
   if (ignore !== 'cat' && f.cat && d.category !== f.cat) return false;
   if (ignore !== 'sub' && f.sub && d.subgenus !== f.sub) return false;
+  if (ignore !== 'grp' && f.grp && d.speciesGroup !== f.grp) return false;
   if (ignore !== 'sp'  && f.sp  && `${d.category} ${d.species}` !== f.sp) return false;
   if (ignore !== 'ws'  && f.ws  && d.全身照 !== 'Y') return false;
   if (ignore !== 'gen' && f.gen && d._sex !== f.gen) return false;
@@ -1395,10 +1412,14 @@ function rowMatches(d, f, ignore) {
 // 連動式篩選：每個下拉只列出「套用其他條件後」仍存在的選項（交集）
 function refreshFilterOptions() {
   const f = currentFilters();
-  fillSelect(categoryFilter, DATA.filter(d => rowMatches(d, f, 'cat')).map(d => d.category),  '全部屬',   f.cat);
-  fillSelect(subgenusFilter, DATA.filter(d => rowMatches(d, f, 'sub')).map(d => d.subgenus),  '全部亞屬', f.sub);
-  fillSelect(speciesFilter,  DATA.filter(d => rowMatches(d, f, 'sp')).map(d => d.species ? `${d.category} ${d.species}` : ''), '全部種', f.sp);
-  fillSelect(genderFilter,   DATA.filter(d => rowMatches(d, f, 'gen')).map(d => d._sex),      '全部',     f.gen);
+  fillSelect(categoryFilter, DATA.filter(d => rowMatches(d, f, 'cat')).map(d => d.category),      '全部屬',   f.cat);
+  fillSelect(subgenusFilter, DATA.filter(d => rowMatches(d, f, 'sub')).map(d => d.subgenus),      '全部亞屬', f.sub);
+  fillSelect(groupFilter,    DATA.filter(d => rowMatches(d, f, 'grp')).map(d => d.speciesGroup),  '全部種團', f.grp);
+  fillSelect(speciesFilter,  DATA.filter(d => rowMatches(d, f, 'sp')).map(d => d.species
+    ? { value: `${d.category} ${d.species}`,
+        label: d._zh ? `${d._zh}（${d.category} ${d.species}）` : `${d.category} ${d.species}` }
+    : ''), '全部種', f.sp);
+  fillSelect(genderFilter,   DATA.filter(d => rowMatches(d, f, 'gen')).map(d => d._sex),          '全部',     f.gen);
 }
 
 function initCategories() {
@@ -1410,7 +1431,7 @@ function renderGrid() {
   const f = currentFilters();
   const filtered = DATA.filter(d => rowMatches(d, f, null));
 
-  clearBtn.classList.toggle('visible', !!(f.q || f.cat || f.sub || f.sp || f.ws || f.gen));
+  clearBtn.classList.toggle('visible', !!(f.q || f.cat || f.sub || f.grp || f.sp || f.ws || f.gen));
   resultsInfo.textContent = `共 ${filtered.length} 筆`;
   grid.innerHTML = '';
 
@@ -1584,7 +1605,7 @@ searchInput.addEventListener('input', renderGrid);
 
 clearBtn.addEventListener('click', () => {
   searchInput.value = '';
-  [categoryFilter, subgenusFilter, speciesFilter, wholeshotFilter, genderFilter]
+  [categoryFilter, subgenusFilter, groupFilter, speciesFilter, wholeshotFilter, genderFilter]
     .forEach(el => { el.value = ''; });
   renderGrid();
 });
