@@ -1311,13 +1311,18 @@ function transformRow(r) {
   const lat = (r['LATDD'] || '').trim();
   const lon = (r['LONDD'] || '').trim();
 
+  // Complex/Group 欄位名稱大小寫/命名常變動，改用彈性比對；NA/空白視為無
+  const grpKey = Object.keys(r).find(k => /complex|group/i.test(k));
+  let grp = grpKey ? (r[grpKey] || '').trim() : '';
+  if (/^na$/i.test(grp)) grp = '';
+
   const obj = {
     id: num, number: num,
     name:     `${(r['中文名'] || '').trim()} ${num}`.trim(),
     sciName,
     category: genus,
     subgenus, species,
-    speciesGroup: (r['Complex/group'] || r['Species group'] || '').trim().toLowerCase(),
+    speciesGroup: grp.toLowerCase(),
     date:     (r['Col. Date'] || '').trim(),
     emoji:    '🦟',
     image:    num,
