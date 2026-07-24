@@ -1082,7 +1082,7 @@
         </div>
       </div>
       <p class="results-info" id="resultsInfo"></p>
-      <p class="cmp-hint">點標本可開啟視窗，最多同時開 9 個、可拖曳並排比對（支援一鍵九宮格平鋪）；視窗右上 ⓘ 可展開詳細資訊。</p>
+      <p class="cmp-hint">點標本可開啟視窗，最多同時開 4 個、可拖曳並排比對（支援一鍵 2×2 平鋪）；視窗右上 ⓘ 可展開詳細資訊。</p>
       <div class="grid" id="grid"></div>
     </section>
 
@@ -1494,14 +1494,13 @@ function _windowBody(d) {
   return html;
 }
 
-// 一鍵方格平鋪：所有開啟的視窗排成接近正方形的格子（最多 4 個＝2×2）
+// 一鍵方格平鋪：所有開啟的視窗固定排成 2×2 格局（不論開幾個視窗）
 function tileWindows() {
   const wins = [...cmpWindows.values()];
   const n = wins.length;
   if (!n) return;
   const gap = 8, top0 = 60, bottomReserve = 70;   // 底部留給 #cmp-toolbar，避免蓋住視窗內縮圖
-  const cols = Math.ceil(Math.sqrt(n));   // 4 個＝2×2
-  const rows = Math.ceil(n / cols);
+  const cols = 2, rows = 2;   // 固定 2×2
   const cellW = Math.max(150, Math.floor((window.innerWidth  - (cols + 1) * gap) / cols));
   const cellH = Math.max(140, Math.floor((window.innerHeight - top0 - bottomReserve - (rows + 1) * gap) / rows));
   wins.forEach((win, i) => {
