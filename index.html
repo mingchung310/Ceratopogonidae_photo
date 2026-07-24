@@ -1494,13 +1494,13 @@ function _windowBody(d) {
   return html;
 }
 
-// 一鍵方格平鋪：所有開啟的視窗固定排成 2×2 格局（不論開幾個視窗）
+// 一鍵方格平鋪：多個視窗固定排成 2×2 格局；只開 1 個時該視窗放大滿版
 function tileWindows() {
   const wins = [...cmpWindows.values()];
   const n = wins.length;
   if (!n) return;
   const gap = 8, top0 = 60, bottomReserve = 70;   // 底部留給 #cmp-toolbar，避免蓋住視窗內縮圖
-  const cols = 2, rows = 2;   // 固定 2×2
+  const cols = n === 1 ? 1 : 2, rows = n === 1 ? 1 : 2;   // 只開 1 個視窗時滿版，否則固定 2×2
   const cellW = Math.max(150, Math.floor((window.innerWidth  - (cols + 1) * gap) / cols));
   const cellH = Math.max(140, Math.floor((window.innerHeight - top0 - bottomReserve - (rows + 1) * gap) / rows));
   wins.forEach((win, i) => {
