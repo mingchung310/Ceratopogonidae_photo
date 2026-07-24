@@ -1467,8 +1467,8 @@ function renderGrid() {
   });
 }
 
-// ── 比對浮動視窗：可同時開多個（上限 5）、可拖曳並排比對 ──────────────
-const CMP_MAX   = 9;
+// ── 比對浮動視窗：可同時開多個（上限 4）、可拖曳並排比對 ──────────────
+const CMP_MAX   = 4;
 const cmpWindows = new Map();   // specimen id -> 視窗元素
 let cmpTopZ = 200;
 
@@ -1494,16 +1494,16 @@ function _windowBody(d) {
   return html;
 }
 
-// 一鍵九宮格平鋪：所有開啟的視窗排成最多 3 欄的方格（9 個＝3×3）
+// 一鍵方格平鋪：所有開啟的視窗排成接近正方形的格子（最多 4 個＝2×2）
 function tileWindows() {
   const wins = [...cmpWindows.values()];
   const n = wins.length;
   if (!n) return;
-  const gap = 8, top0 = 60;
-  const cols = Math.min(3, n);   // 最多 3 欄；9 個＝3×3
+  const gap = 8, top0 = 60, bottomReserve = 70;   // 底部留給 #cmp-toolbar，避免蓋住視窗內縮圖
+  const cols = Math.ceil(Math.sqrt(n));   // 4 個＝2×2
   const rows = Math.ceil(n / cols);
   const cellW = Math.max(150, Math.floor((window.innerWidth  - (cols + 1) * gap) / cols));
-  const cellH = Math.max(140, Math.floor((window.innerHeight - top0 - (rows + 1) * gap) / rows));
+  const cellH = Math.max(140, Math.floor((window.innerHeight - top0 - bottomReserve - (rows + 1) * gap) / rows));
   wins.forEach((win, i) => {
     const c = i % cols, r = Math.floor(i / cols);
     win.classList.add('tiled');
