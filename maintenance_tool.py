@@ -593,11 +593,15 @@ class App(tk.Tk):
         result = ["待命"]   # finally 用
 
         try:
-            # ── 1. 更新 manifest（25%）──────────────────────────────────
+            # ── 1. 重建索引：manifest.json + data.js（25%）───────────────
+            #     須同時重建 data.js 內嵌索引，否則離線版（file://）看不到新圖
             self._set_progress(1, TOTAL, "1/4 更新索引…")
             self._log("\n▶ 同步 images/ 到 GitHub …")
-            n = rebuild_manifest()
-            self._log(f"  manifest.json 已更新（{n} 個資料夾）")
+            self._log("  重建 manifest.json 與 data.js（含最新圖片索引）…")
+            if not self._run_ps():
+                self._log("  [提醒] build.ps1 失敗，改僅重建 manifest.json（data.js 未更新）")
+                n = rebuild_manifest()
+                self._log(f"  manifest.json 已更新（{n} 個資料夾）")
 
             # ── 2. 暫存所有變更（50%）──────────────────────────────────
             self._set_progress(2, TOTAL, "2/4 暫存變更…")
