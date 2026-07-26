@@ -6,6 +6,11 @@ window.SPECIES_PLATE = [
   "zh": "阿氏庫蠓"
  },
  {
+  "id": "albifascia",
+  "sci": "Culicoides albifascia",
+  "zh": "白斑庫蠓"
+ },
+ {
   "id": "arakawae",
   "sci": "Culicoides arakawae",
   "zh": "荒川庫蠓"
