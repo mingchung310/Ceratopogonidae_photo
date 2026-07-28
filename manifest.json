@@ -103,6 +103,7 @@
                    "images/cer173/cer173_win_4x_DF.png"
                ],
     "Cer64":  [
+                  "images/Cer64/0.cer64_win_4x.png",
                   "images/Cer64/cer64_win_4x.png",
                   "images/Cer64/cer64_win_4x_1.png",
                   "images/Cer64/cer64_win_4x_DF.png"
@@ -130,6 +131,7 @@
                   "images/Cer90/win_4x_DF.png"
               ],
     "Cer63":  [
+                  "images/Cer63/0.cer63_win_4x.png",
                   "images/Cer63/cer63_win_4x.png",
                   "images/Cer63/cer63_win_4x_1.png",
                   "images/Cer63/cer63_win_4x_DF.png"
@@ -204,11 +206,13 @@
                    "images/Cer152/win_10x_DF.png"
                ],
     "Cer53":  [
+                  "images/Cer53/0.cer53_win_4x.png",
                   "images/Cer53/cer53_win_4x.png",
                   "images/Cer53/cer53_win_4x_1.png",
                   "images/Cer53/cer53_win_4x_DF.png"
               ],
     "Cer65":  [
+                  "images/Cer65/0.cer65_win_4x_1.png",
                   "images/Cer65/cer65_win_4x.png",
                   "images/Cer65/cer65_win_4x_1.png",
                   "images/Cer65/cer65_win_4x_DF.png"
@@ -223,6 +227,7 @@
                    "images/Cer100/win2_10x_2.png"
                ],
     "Cer54":  [
+                  "images/Cer54/0.cer54_win_4x.png",
                   "images/Cer54/cer54_win_4x.png",
                   "images/Cer54/cer54_win_4x_1.png",
                   "images/Cer54/cer54_win_4x_DF.png"
@@ -315,6 +320,7 @@
                   "images/Cer98/win_4x_DF.png"
               ],
     "Cer62":  [
+                  "images/Cer62/0.cer62_win_4x.png",
                   "images/Cer62/cer62_win_4x.png",
                   "images/Cer62/cer62_win_4x_1.png",
                   "images/Cer62/cer62_win_4x_DF.png"
@@ -365,6 +371,7 @@
                    "images/Cer133/win_4x_DF.png"
                ],
     "Cer70":  [
+                  "images/Cer70/0.win_10x_1.png",
                   "images/Cer70/gen_20x.png",
                   "images/Cer70/gen_20x_1.png",
                   "images/Cer70/gen_20x_2.png",
@@ -764,6 +771,7 @@
                   "images/Cer42/win_4x_DF.png"
               ],
     "Cer71":  [
+                  "images/Cer71/0.win_4x.png",
                   "images/Cer71/ant_20x.png",
                   "images/Cer71/ant_20x_1.png",
                   "images/Cer71/ant_20x_10.png",
@@ -964,16 +972,19 @@
                    "images/Cer137/win_10x_DF.png"
                ],
     "Cer56":  [
+                  "images/Cer56/0.cer56_win_4x.png",
                   "images/Cer56/cer56_win_4x.png",
                   "images/Cer56/cer56_win_4x_1.png",
                   "images/Cer56/cer56_win_4x_DF.png"
               ],
     "Cer57":  [
+                  "images/Cer57/0.cer57_win_4x_1.png",
                   "images/Cer57/cer57_win_4x.png",
                   "images/Cer57/cer57_win_4x_1.png",
                   "images/Cer57/cer57_win_4x_DF.png"
               ],
     "Cer69":  [
+                  "images/Cer69/0.cer69_win_4x_1.png",
                   "images/Cer69/cer69_win_4x.png",
                   "images/Cer69/cer69_win_4x_1.png",
                   "images/Cer69/cer69_win_4x_DF.png"
@@ -1071,6 +1082,7 @@
                  "images/Cer8/cer8_win_4x_DF.png"
              ],
     "Cer66":  [
+                  "images/Cer66/0.cer66_win_4x_1.png",
                   "images/Cer66/cer66_win_4x.png",
                   "images/Cer66/cer66_win_4x_1.png",
                   "images/Cer66/cer66_win_4x_DF.png"
@@ -1449,6 +1461,7 @@
                  "images/Cer9/IMG_7011.png"
              ],
     "Cer73":  [
+                  "images/Cer73/0.win_10x_1.png",
                   "images/Cer73/abd_10x.png",
                   "images/Cer73/abd_10x_1.png",
                   "images/Cer73/abd_10x_2.png",
@@ -1591,6 +1604,7 @@
                   "images/Cer50/Cer50 Wings.png"
               ],
     "Cer58":  [
+                  "images/Cer58/0.cer58_win_4x_1.png",
                   "images/Cer58/cer58_win_4x.png",
                   "images/Cer58/cer58_win_4x_1.png",
                   "images/Cer58/cer58_win_4x_DF.png"
