@@ -1,10 +1,12 @@
 ﻿{
     "Cer52":  [
+                  "images/Cer52/0.cer52_win_4x_1.png",
                   "images/Cer52/cer52_win_4x.png",
                   "images/Cer52/cer52_win_4x_1.png",
                   "images/Cer52/cer52_win_4x_DF.png"
               ],
     "HM3-1":  [
+                  "images/HM3-1/005.png",
                   "images/HM3-1/01.png",
                   "images/HM3-1/02.png",
                   "images/HM3-1/03.png",
@@ -226,6 +228,7 @@
                   "images/Cer54/cer54_win_4x_DF.png"
               ],
     "Cer13":  [
+                  "images/Cer13/0.0.Cer13 Wings.png",
                   "images/Cer13/0.Cer13 Wings.png",
                   "images/Cer13/Cer13 Abdomen.png",
                   "images/Cer13/Cer13 Head.png",
@@ -240,6 +243,7 @@
                   "images/Cer13/hea_10x_1.png"
               ],
     "Cer20":  [
+                  "images/Cer20/0.cer20_win_4x_1.png",
                   "images/Cer20/cer20_win_4x.png",
                   "images/Cer20/cer20_win_4x_1.png",
                   "images/Cer20/cer20_win_4x_DF.png"
@@ -272,6 +276,7 @@
                   "images/Cer25/IMG_7013.png"
               ],
     "Cer39":  [
+                  "images/Cer39/0.cer39_win_4x.png",
                   "images/Cer39/cer39_win_4x.png",
                   "images/Cer39/cer39_win_4x_1.png",
                   "images/Cer39/cer39_win_4x_DF.png"
@@ -428,6 +433,7 @@
                   "images/Cer80/win_4x_DF.png"
               ],
     "Cer30":  [
+                  "images/Cer30/0.cer30_win_4x.png",
                   "images/Cer30/cer30_win_4x.png",
                   "images/Cer30/cer30_win_4x_1.png",
                   "images/Cer30/cer30_win_4x_DF.png"
@@ -456,6 +462,7 @@
                   "images/Cer38/IMG_7016.png"
               ],
     "Cer16":  [
+                  "images/Cer16/0.cer16_win_4x.png",
                   "images/Cer16/cer16_win_4x.png",
                   "images/Cer16/cer16_win_4x_1.png",
                   "images/Cer16/cer16_win_4x_DF.png"
@@ -512,6 +519,7 @@
                   "images/Cer10/Cer10 Thorax.png"
               ],
     "Cer7":  [
+                 "images/Cer7/0.0.Cer7 Wings.png",
                  "images/Cer7/0.Cer7 Wings.png",
                  "images/Cer7/C_tainanus_mf_cer7_male_20x.png",
                  "images/Cer7/C_tainanus_mf_cer7_male_20x_1.png",
@@ -526,6 +534,7 @@
              ],
     "Cer36":  [
                   "images/Cer36/0.Cer36_win_10x.jpg.png",
+                  "images/Cer36/0.Cer36_win_10x_1.png",
                   "images/Cer36/Cer36_foreleg_10x.png",
                   "images/Cer36/Cer36_hindleg_10x.jpg.png",
                   "images/Cer36/Cer36_hindleg_10x_1.png",
@@ -575,6 +584,7 @@
                ],
     "Cer21":  [
                   "images/Cer21/0.Cer21 Wings.png",
+                  "images/Cer21/0.cer21_win_4x.png",
                   "images/Cer21/Cer21 Abdomen.png",
                   "images/Cer21/Cer21 Antenna 1.png",
                   "images/Cer21/Cer21 Antenna 2.png",
@@ -605,6 +615,7 @@
                    "images/Cer151/win_10x_1.png"
                ],
     "HM4-1":  [
+                  "images/HM4-1/0.wing-10x.png",
                   "images/HM4-1/0I6A9141.png",
                   "images/HM4-1/0I6A9543.png",
                   "images/HM4-1/abd.png",
@@ -674,6 +685,7 @@
                   "images/Cer81/win_4x_DF.png"
               ],
     "Cer46":  [
+                  "images/Cer46/0.0.Cer46 Wings.png",
                   "images/Cer46/0.Cer46 Wings.png",
                   "images/Cer46/Cer46 Abdomen.png",
                   "images/Cer46/Cer46 Head and Antenna.png",
@@ -889,6 +901,7 @@
                ],
     "Cer28":  [
                   "images/Cer28/0.Cer28 Wings.png",
+                  "images/Cer28/0.win_4x.png",
                   "images/Cer28/Cer28 Abdomen.png",
                   "images/Cer28/Cer28 Antenna 1.png",
                   "images/Cer28/Cer28 Antenna 2.png",
@@ -1032,6 +1045,7 @@
               ],
     "Cer44":  [
                   "images/Cer44/0.Cer44 Wings.png",
+                  "images/Cer44/0.win_4x_2.png",
                   "images/Cer44/Cer44 Abdomen.png",
                   "images/Cer44/Cer44 Antenna 1.png",
                   "images/Cer44/Cer44 Antenna 2.png",
@@ -1115,6 +1129,7 @@
               ],
     "Cer37":  [
                   "images/Cer37/0.Cer37_win_10x_2jpg.jpg.png",
+                  "images/Cer37/0.Cer37_win_10x_3.png",
                   "images/Cer37/Cer37_ann10_40x.png",
                   "images/Cer37/Cer37_ann12_11_40x.png",
                   "images/Cer37/Cer37_ann13_40x.png",
@@ -1286,6 +1301,7 @@
                    "images/Cer134/lac_20x.png"
                ],
     "Cer41":  [
+                  "images/Cer41/0.win_4x.png",
                   "images/Cer41/ant_10x.png",
                   "images/Cer41/ant_10x_1.png",
                   "images/Cer41/ant_10x_2.png",
@@ -1383,6 +1399,7 @@
                    "images/Cer136/win_4x_DF.png"
                ],
     "HM4-2":  [
+                  "images/HM4-2/0.wing3.png",
                   "images/HM4-2/abd.png",
                   "images/HM4-2/hea_20x.png",
                   "images/HM4-2/hea_20x-2.png",
@@ -1397,6 +1414,7 @@
                   "images/HM4-2/wing4.png"
               ],
     "Cer34":  [
+                  "images/Cer34/0.cer34_win_4x.png",
                   "images/Cer34/cer34_win_4x.png",
                   "images/Cer34/cer34_win_4x_1.png",
                   "images/Cer34/cer34_win_4x_DF.png"
@@ -1585,6 +1603,7 @@
                    "images/Cer114/Cer114.jpg.jpg.jpg.jpg.png"
                ],
     "Cer24":  [
+                  "images/Cer24/0.cer24_win_4x.png",
                   "images/Cer24/cer24_win_4x.png",
                   "images/Cer24/cer24_win_4x_1.png",
                   "images/Cer24/cer24_win_4x_DF.png"
