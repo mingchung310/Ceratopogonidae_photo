@@ -493,6 +493,10 @@
               ],
     "Cer153":  [
                    "images/Cer153/0.win_4x_1.png",
+                   "images/Cer153/cer153_spe_10x.png",
+                   "images/Cer153/cer153_spe_10x_1.png",
+                   "images/Cer153/cer153_spe_20x.png",
+                   "images/Cer153/cer153_spe_20x_1.png",
                    "images/Cer153/win_4x.png",
                    "images/Cer153/win_4x_1.png",
                    "images/Cer153/win_4x_DF.png"
@@ -734,6 +738,15 @@
               ],
     "Cer141":  [
                    "images/Cer141/0.wing2.png",
+                   "images/Cer141/cer141_hea_4x.png",
+                   "images/Cer141/cer141_lac_10x.png",
+                   "images/Cer141/cer141_lac_40x.png",
+                   "images/Cer141/cer141_lac_40x_1.png",
+                   "images/Cer141/cer141_man_20x.png",
+                   "images/Cer141/cer141_man_20x_1.png",
+                   "images/Cer141/cer141_win_4x.png",
+                   "images/Cer141/cer141_win_4x_1.png",
+                   "images/Cer141/cer141_win_4x_DF.png",
                    "images/Cer141/wing.png",
                    "images/Cer141/wing2.png"
                ],
@@ -1495,6 +1508,8 @@
                    "images/cer178/cer178_man_40x_2.png",
                    "images/cer178/cer178_man_40x_3.png",
                    "images/cer178/cer178_pal_40x.png",
+                   "images/cer178/cer178_spe_10x.png",
+                   "images/cer178/cer178_spe_10x_1.png",
                    "images/cer178/cer178_win_4x.png",
                    "images/cer178/cer178_win_4x_1.png",
                    "images/cer178/cer178_win_4x_2.png",
@@ -1608,6 +1623,13 @@
               ],
     "Cer142":  [
                    "images/Cer142/body.png",
+                   "images/Cer142/cer_body_2_5x.png",
+                   "images/Cer142/cer142_body_2_5x.png",
+                   "images/Cer142/cer142_hid_10x.png",
+                   "images/Cer142/cer142_win_4x.png",
+                   "images/Cer142/cer142_win_4x_1.png",
+                   "images/Cer142/cer142_win_4x_DF.png",
+                   "images/Cer142/cer142_win_4x_DF_1.png",
                    "images/Cer142/head.png"
                ],
     "Cer114":  [
