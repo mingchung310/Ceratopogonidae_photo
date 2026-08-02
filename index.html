@@ -1046,7 +1046,7 @@
         <select id="subgenusFilter" class="filter-select"><option value="">全部</option></select>
       </div>
 
-      <span class="filter-label">種群</span>
+      <span class="filter-label">翅斑型態</span>
       <div class="filter-wrap">
         <select id="groupFilter" class="filter-select"><option value="">全部</option></select>
       </div>
@@ -1311,8 +1311,8 @@ function transformRow(r) {
   const lat = (r['LATDD'] || '').trim();
   const lon = (r['LONDD'] || '').trim();
 
-  // Complex/Group 欄位名稱大小寫/命名常變動，改用彈性比對；NA/空白視為無
-  const grpKey = Object.keys(r).find(k => /complex|group/i.test(k));
+  // 翅斑型態欄位（Wing_type，舊資料可能仍用 Complex/Group 命名）大小寫/命名常變動，改用彈性比對；NA/空白視為無
+  const grpKey = Object.keys(r).find(k => /wing.?type|complex|group/i.test(k));
   let grp = grpKey ? (r[grpKey] || '').trim() : '';
   if (/^na$/i.test(grp)) grp = '';
 
@@ -1419,7 +1419,7 @@ function refreshFilterOptions() {
   const f = currentFilters();
   fillSelect(categoryFilter, DATA.filter(d => rowMatches(d, f, 'cat')).map(d => d.category),      '全部屬',   f.cat);
   fillSelect(subgenusFilter, DATA.filter(d => rowMatches(d, f, 'sub')).map(d => d.subgenus),      '全部亞屬', f.sub);
-  fillSelect(groupFilter,    DATA.filter(d => rowMatches(d, f, 'grp')).map(d => d.speciesGroup),  '全部種群', f.grp);
+  fillSelect(groupFilter,    DATA.filter(d => rowMatches(d, f, 'grp')).map(d => d.speciesGroup),  '全部翅斑型態', f.grp);
   fillSelect(speciesFilter,  DATA.filter(d => rowMatches(d, f, 'sp')).map(d => d.species
     ? { value: `${d.category} ${d.species}`,
         label: d._zh ? `${d._zh}（${d.category} ${d.species}）` : `${d.category} ${d.species}` }
