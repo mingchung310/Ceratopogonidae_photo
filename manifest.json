@@ -85,22 +85,22 @@
     "Cer26":  [
                   "images/Cer26/Cer26.jpg.png"
               ],
-    "cer173":  [
-                   "images/cer173/cer173_ant_20x.png",
-                   "images/cer173/cer173_ant_20x_1.png",
-                   "images/cer173/cer173_hea_10x.png",
-                   "images/cer173/cer173_hea_10x_1.png",
-                   "images/cer173/cer173_man_40x.png",
-                   "images/cer173/cer173_man_40x_1.png",
-                   "images/cer173/cer173_man_40x_2.png",
-                   "images/cer173/cer173_man_40x_3.png",
-                   "images/cer173/cer173_man_40x_4.png",
-                   "images/cer173/cer173_win_10x.png",
-                   "images/cer173/cer173_win_10x_1.png",
-                   "images/cer173/cer173_win_10x_2.png",
-                   "images/cer173/cer173_win_10x_DF.png",
-                   "images/cer173/cer173_win_10x_DF_1.png",
-                   "images/cer173/cer173_win_4x_DF.png"
+    "Cer173":  [
+                   "images/Cer173/cer173_ant_20x.png",
+                   "images/Cer173/cer173_ant_20x_1.png",
+                   "images/Cer173/cer173_hea_10x.png",
+                   "images/Cer173/cer173_hea_10x_1.png",
+                   "images/Cer173/cer173_man_40x.png",
+                   "images/Cer173/cer173_man_40x_1.png",
+                   "images/Cer173/cer173_man_40x_2.png",
+                   "images/Cer173/cer173_man_40x_3.png",
+                   "images/Cer173/cer173_man_40x_4.png",
+                   "images/Cer173/cer173_win_10x.png",
+                   "images/Cer173/cer173_win_10x_1.png",
+                   "images/Cer173/cer173_win_10x_2.png",
+                   "images/Cer173/cer173_win_10x_DF.png",
+                   "images/Cer173/cer173_win_10x_DF_1.png",
+                   "images/Cer173/cer173_win_4x_DF.png"
                ],
     "Cer64":  [
                   "images/Cer64/0.cer64_win_4x.png",
@@ -651,15 +651,15 @@
                   "images/Cer79/ful_4x_1.png",
                   "images/Cer79/ful_4x_2.png"
               ],
-    "cer158":  [
-                   "images/cer158/cer158_lac_20x.png",
-                   "images/cer158/cer158_man_20x.png",
-                   "images/cer158/cer158_man_20x_1.png",
-                   "images/cer158/cer158_man_20x_2.png",
-                   "images/cer158/cer158_win_4x.png",
-                   "images/cer158/cer158_win_4x_1.png",
-                   "images/cer158/cer158_win_4x_2.png",
-                   "images/cer158/cer158_win_4x_DF.png"
+    "Cer158":  [
+                   "images/Cer158/cer158_lac_20x.png",
+                   "images/Cer158/cer158_man_20x.png",
+                   "images/Cer158/cer158_man_20x_1.png",
+                   "images/Cer158/cer158_man_20x_2.png",
+                   "images/Cer158/cer158_win_4x.png",
+                   "images/Cer158/cer158_win_4x_1.png",
+                   "images/Cer158/cer158_win_4x_2.png",
+                   "images/Cer158/cer158_win_4x_DF.png"
                ],
     "Cer35":  [
                   "images/Cer35/Cer35.jpg.png",
@@ -1498,22 +1498,22 @@
                   "images/Cer73/win_10x_2.png",
                   "images/Cer73/win_10x_DF.png"
               ],
-    "cer178":  [
-                   "images/cer178/cer178_hea_10x.png",
-                   "images/cer178/cer178_hea_10x_1.png",
-                   "images/cer178/cer178_lac_40x.png",
-                   "images/cer178/cer178_lac_40x_1.png",
-                   "images/cer178/cer178_man_40x.png",
-                   "images/cer178/cer178_man_40x_1.png",
-                   "images/cer178/cer178_man_40x_2.png",
-                   "images/cer178/cer178_man_40x_3.png",
-                   "images/cer178/cer178_pal_40x.png",
-                   "images/cer178/cer178_spe_10x.png",
-                   "images/cer178/cer178_spe_10x_1.png",
-                   "images/cer178/cer178_win_4x.png",
-                   "images/cer178/cer178_win_4x_1.png",
-                   "images/cer178/cer178_win_4x_2.png",
-                   "images/cer178/cer178_win_4x_DF.png"
+    "Cer178":  [
+                   "images/Cer178/cer178_hea_10x.png",
+                   "images/Cer178/cer178_hea_10x_1.png",
+                   "images/Cer178/cer178_lac_40x.png",
+                   "images/Cer178/cer178_lac_40x_1.png",
+                   "images/Cer178/cer178_man_40x.png",
+                   "images/Cer178/cer178_man_40x_1.png",
+                   "images/Cer178/cer178_man_40x_2.png",
+                   "images/Cer178/cer178_man_40x_3.png",
+                   "images/Cer178/cer178_pal_40x.png",
+                   "images/Cer178/cer178_spe_10x.png",
+                   "images/Cer178/cer178_spe_10x_1.png",
+                   "images/Cer178/cer178_win_4x.png",
+                   "images/Cer178/cer178_win_4x_1.png",
+                   "images/Cer178/cer178_win_4x_2.png",
+                   "images/Cer178/cer178_win_4x_DF.png"
                ],
     "Cer3":  [
                  "images/Cer3/C_tainanus_mf_cer3_hea_10x.png",
