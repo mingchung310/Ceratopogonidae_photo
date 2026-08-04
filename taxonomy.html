@@ -152,6 +152,8 @@
 <script>
 'use strict';
 
+// 物種清單由 species_plate.js（gen_species_plate.py 依資料庫種名自動產生）提供；
+// 下方為後備清單，僅在 species_plate.js 缺失時使用。
 const PLATE_SPECIES = [
   { id: 'actoni',       sci: 'Culicoides actoni',       zh: '阿氏庫蠓' },
   { id: 'arakawae',     sci: 'Culicoides arakawae',     zh: '荒川庫蠓' },
@@ -235,7 +237,7 @@ window.addEventListener('message', e => {
   }
 });
 
-// 切換到「分類與鑑定」分頁時，請子頁重新量測（先前隱藏時高度可能為 0）
+// 頁面載入時請子頁（key.html）回報一次高度
 function measureKeyFrame() {
   const f = document.getElementById('key-frame');
   if (f && f.contentWindow) f.contentWindow.postMessage({ type: 'ceratoKeyMeasure' }, '*');
@@ -271,6 +273,7 @@ function reloadKeyFrame(btn) {
 
 renderPlate();
 armKeyFrameFallback();
+measureKeyFrame();
 
 // ── 頁尾最後更新日期：由 lastupdated.js（推送時自動產生）提供 ──────────
 //    純本機同源檔，不對外發送任何請求，離線亦可顯示。

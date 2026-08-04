@@ -36,7 +36,7 @@ Ceratopogonidae_photo_web/
 ├── taxonomy.html       「分類與鑑定」頁（含 key.html 互動檢索 iframe）
 ├── specimens.html      「標本影像」頁（篩選器、標本卡片、比對浮動視窗）
 ├── style.css            index.html／taxonomy.html／specimens.html 共用樣式
-├── key.html            種級互動矩陣檢索（multi-access key）獨立檔，index.html 以 iframe 嵌入
+├── key.html            種級互動矩陣檢索（multi-access key）獨立檔，taxonomy.html 以 iframe 嵌入
 ├── keymatrix.js        種級矩陣資料（自動產生，勿手動改）
 ├── gen_keymatrix.py    由特徵矩陣 xlsx 產生 keymatrix.js
 ├── Culicoides 特徵矩陣.xlsx   矩陣檢索原始資料（編輯此檔後用維護工具同步）
@@ -143,9 +143,9 @@ git push
 
 ### `key.html`（互動式檢索表，獨立檔）
 - 自包含的**種級互動矩陣檢索**（multi-access key），含 CSS／HTML／JS，載入 `keymatrix.js`
-- 可單獨開啟；`index.html` 的「分類與鑑定」頁以 `<iframe src="key.html">` 嵌入
-- 高度自動同步：`key.html` 量測內容高度 → `postMessage({type:'ceratoKeyHeight'})` → `index.html` 調整 iframe 高度（無捲軸無縫嵌入）。切換到該分頁時 `index.html` 會請 `key.html` 重新量測
-- **要改檢索表邏輯／樣式請改 `key.html`**（不在 index.html 內）
+- 可單獨開啟；`taxonomy.html` 的「分類與鑑定」頁以 `<iframe src="key.html">` 嵌入
+- 高度自動同步：`key.html` 量測內容高度 → `postMessage({type:'ceratoKeyHeight'})` → `taxonomy.html` 調整 iframe 高度（無捲軸無縫嵌入）
+- **要改檢索表邏輯／樣式請改 `key.html`**（不在 taxonomy.html 內）
 
 ### `gen_keymatrix.py`
 - 讀取 `Culicoides 特徵矩陣.xlsx` → 產生 `keymatrix.js`
