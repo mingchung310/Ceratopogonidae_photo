@@ -268,13 +268,21 @@
   ── 必要檔案清單（依用途）────────────────────────────────
 
   A. 網站本體（缺了網站無法顯示）
-       index.html              網站主頁
+       index.html              網站首頁「認識庫蠓」
+       taxonomy.html           「分類與鑑定」頁
+       specimens.html          「標本影像」頁
+       style.css               三頁共用樣式
        key.html                互動檢索表
        keymatrix.js            種級矩陣檢索資料
        data.js                 標本資料（離線版）
        manifest.json           圖片索引
        images\                 所有標本圖片（整個資料夾）
        robots.txt
+       （以下為原本就漏列的項目，本次一併補上）
+       species_plate.js        種級代表照對應表（自動產生）
+       lastupdated.js          頁尾「最後更新」日期（自動產生）
+       species_photos\         種級代表照圖片（整個資料夾）
+       image_for_web\          網站用圖片（整個資料夾）
 
   B. 維護工具鏈（缺了無法更新／推送）
        maintenance_tool.py     維護工具主程式
