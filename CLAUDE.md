@@ -32,7 +32,10 @@ python maintenance_tool.py
 
 ```
 Ceratopogonidae_photo_web/
-├── index.html          網站本體（勿手動改 data）
+├── index.html          網站首頁「認識庫蠓」
+├── taxonomy.html       「分類與鑑定」頁（含 key.html 互動檢索 iframe）
+├── specimens.html      「標本影像」頁（篩選器、標本卡片、比對浮動視窗）
+├── style.css            index.html／taxonomy.html／specimens.html 共用樣式
 ├── key.html            種級互動矩陣檢索（multi-access key）獨立檔，index.html 以 iframe 嵌入
 ├── keymatrix.js        種級矩陣資料（自動產生，勿手動改）
 ├── gen_keymatrix.py    由特徵矩陣 xlsx 產生 keymatrix.js
@@ -115,10 +118,10 @@ git push
 
 ```powershell
 .\build.ps1
-# 然後直接雙擊 index.html
+# 然後直接雙擊 index.html（認識庫蠓）／taxonomy.html（分類與鑑定）／specimens.html（標本影像）
 ```
 
-或雙擊 `launch.bat`（啟動 localhost:8080）
+或雙擊 `launch.bat`（啟動 localhost:8080），三個頁面用導覽列互相切換
 
 ---
 
@@ -168,3 +171,4 @@ git push
 - 比例尺參考圖 `RAW image\IMG_7000.JPG` 不要移動或刪除
 - 封面圖邏輯：同資料夾內名稱最小的檔案自動為封面；加 `0.` 前綴可強制指定
 - 標本編號大小寫需和 Google Sheets 完全一致
+- 網站分成 `index.html`／`taxonomy.html`／`specimens.html` 三個獨立頁面，共用 `style.css`；改樣式只需要改 `style.css`，改某一頁內容只需要改對應的那個檔案
