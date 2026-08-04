@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>標本影像｜庫蠓標本影像：臺灣大學昆蟲學系寄生蟲實驗室</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ── Header ─────────────────────────────────────────────────────── -->
+<header>
+  <div class="header-inner">
+    <a class="site-title" href="index.html">庫蠓標本影像</a>
+    <nav class="tab-nav">
+      <a class="tab-btn" href="index.html">認識庫蠓</a>
+      <a class="tab-btn" href="taxonomy.html">分類與鑑定</a>
+      <a class="tab-btn active" href="specimens.html">標本影像</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ════════════════════════════════════════════════════════════════
+     PAGE 3  標本影像
+     ════════════════════════════════════════════════════════════════ -->
+<div class="page active" id="page-specimens">
+  <div class="content-wrap">
+
+    <aside class="filter-panel">
+      <p class="filter-title">篩選</p>
+
+      <span class="filter-label">屬</span>
+      <div class="filter-wrap">
+        <select id="categoryFilter" class="filter-select"><option value="">全部</option></select>
+      </div>
+
+      <span class="filter-label">亞屬</span>
+      <div class="filter-wrap">
+        <select id="subgenusFilter" class="filter-select"><option value="">全部</option></select>
+      </div>
+
+      <span class="filter-label">翅斑型態</span>
+      <div class="filter-wrap">
+        <select id="groupFilter" class="filter-select"><option value="">全部</option></select>
+      </div>
+
+      <span class="filter-label">種</span>
+      <div class="filter-wrap">
+        <select id="speciesFilter" class="filter-select"><option value="">全部</option></select>
+      </div>
+
+      <span class="filter-label">性別</span>
+      <div class="filter-wrap">
+        <select id="genderFilter" class="filter-select"><option value="">全部</option></select>
+      </div>
+
+      <span class="filter-label">全身照</span>
+      <div class="filter-wrap">
+        <select id="wholeshotFilter" class="filter-select">
+          <option value="">全部</option>
+          <option value="Y">有全身照</option>
+        </select>
+      </div>
+
+      <button id="clearBtn" title="清除篩選">✕ 清除篩選</button>
+    </aside>
+
+    <section class="grid-section">
+      <div class="specimen-toolbar">
+        <div class="search-wrap">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input id="searchInput" type="text" placeholder="搜尋名稱…" />
+        </div>
+      </div>
+      <p class="results-info" id="resultsInfo"></p>
+      <p class="cmp-hint">點標本可開啟視窗，最多同時開 4 個、可拖曳並排比對（支援一鍵 2×2 平鋪）；視窗右上 ⓘ 可展開詳細資訊。</p>
+      <div class="grid" id="grid"></div>
+    </section>
+
+  </div>
+</div><!-- /page-specimens -->
+
+
+<!-- 比對視窗由 JS 動態建立並 append 到 body -->
+
+<!-- ── Footer ──────────────────────────────────────────────────────── -->
+<footer>
+  庫蠓標本影像 © 臺灣大學昆蟲學系寄生蟲實驗室 · 持續收錄中
+  <div class="foot-meta">
+    <span id="foot-updated-wrap" hidden>最後更新：<b id="foot-updated"></b></span>
+  </div>
+</footer>
+
+<script src="data.js"></script>
+<script src="lastupdated.js"></script>
+<script>
+'use strict';
+
+function parseCSV(text) {
+  // 逐字元解析：引號內的逗號、換行（儲存格內的換行）與跳脫引號 "" 都正確處理。
+  // 不可先以換行切行，否則含換行的儲存格（如多行 DNA 序列）會把一筆記錄拆成兩列。
+  text = text.replace(/^﻿/, '');
+  const rows = [];
+  let row = [], cur = '', inQ = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (inQ) {
+      if (ch === '"') {
+        if (text[i + 1] === '"') { cur += '"'; i++; }   // "" → 一個字面引號
+        else inQ = false;
+      } else { cur += ch; }
+    } else {
+      if (ch === '"') { inQ = true; }
+      else if (ch === ',') { row.push(cur); cur = ''; }
+      else if (ch === '\r') { /* 與 \n 一起處理，忽略 */ }
+      else if (ch === '\n') { row.push(cur); cur = ''; rows.push(row); row = []; }
+      else { cur += ch; }
+    }
+  }
+  if (cur !== '' || row.length) { row.push(cur); rows.push(row); }   // 收尾（無末端換行時）
+
+  const headers = rows[0].map(h => h.trim());
+  return rows.slice(1)
+    .filter(r => r.some(c => c.trim() !== ''))   // 跳過全空白列
+    .map(r => {
+      const obj = {};
+      headers.forEach((h, i) => { obj[h] = (r[i] || '').trim(); });
+      return obj;
+    });
+}
+
+function transformRow(r) {
+  const cd  = (r['Cd']   || '').trim();
+  const no  = (r['No.']  || '').trim();
+  const num = cd + no;
+
+  const genus    = (r['Genus']    || '').trim();
+  const subgenus = (r['Subgenus'] || '').trim();
+  const species  = (r['Species']  || '').trim();
+  const sciName  = [genus, subgenus ? `(${subgenus})` : '', species].filter(Boolean).join(' ');
+
+  const lat = (r['LATDD'] || '').trim();
+  const lon = (r['LONDD'] || '').trim();
+
+  // 翅斑型態欄位（Wing_type，舊資料可能仍用 Complex/Group 命名）大小寫/命名常變動，改用彈性比對；NA/空白視為無
+  const grpKey = Object.keys(r).find(k => /wing.?type|complex|group/i.test(k));
+  let grp = grpKey ? (r[grpKey] || '').trim() : '';
+  if (/^na$/i.test(grp)) grp = '';
+
+  const obj = {
+    id: num, number: num,
+    name:     `${(r['中文名'] || '').trim()} ${num}`.trim(),
+    sciName,
+    category: genus,
+    subgenus, species,
+    speciesGroup: grp.toLowerCase(),
+    date:     (r['Col. Date'] || '').trim(),
+    emoji:    '🦟',
+    image:    num,
+    全身照:   (r['全身照'] || '').trim(),
+    _sex:     (r['sex']    || '').trim(),
+    _zh:      (r['中文名']  || '').trim(),
+  };
+
+  const fields = {
+    '採集地': r['Locality'],
+    '採集者': r['Collector'],
+    'GPS':    lat && lon ? `${lat}, ${lon}` : '',
+    '寄主':   r['Host'],
+    '性別':   r['sex'],
+    '鑑定者': r['det.'],
+  };
+  Object.entries(fields).forEach(([k, v]) => {
+    if (v && v.trim()) obj[k] = v.trim();
+  });
+  return obj;
+}
+
+const grid            = document.getElementById('grid');
+const searchInput     = document.getElementById('searchInput');
+const categoryFilter  = document.getElementById('categoryFilter');
+const subgenusFilter  = document.getElementById('subgenusFilter');
+const groupFilter     = document.getElementById('groupFilter');
+const speciesFilter   = document.getElementById('speciesFilter');
+const genderFilter    = document.getElementById('genderFilter');
+const wholeshotFilter = document.getElementById('wholeshotFilter');
+const clearBtn        = document.getElementById('clearBtn');
+const resultsInfo     = document.getElementById('resultsInfo');
+
+let DATA = [], MANIFEST = {};
+
+function getImages(d) {
+  if (!d.image) return [];
+  const key = d.image.trim();
+  if (MANIFEST[key]) return MANIFEST[key];
+  // 後備：僅當值本身就像圖片路徑（含 / 或圖片副檔名）或以 | 分隔多張時才採用；
+  // 否則（純標本編號但無對應圖片資料夾）視為無圖，顯示 emoji 佔位而非破圖。
+  if (/[|/]/.test(key) || /\.(png|jpe?g|gif|webp|bmp|tiff?)$/i.test(key)) {
+    return key.split('|').map(s => s.trim()).filter(Boolean);
+  }
+  return [];
+}
+
+// values 可為字串，或 {value, label}（顯示文字與實際值不同時用）
+function fillSelect(el, values, placeholder, keep) {
+  const map = new Map();   // value -> 顯示文字
+  values.forEach(v => {
+    if (!v) return;
+    const val   = typeof v === 'object' ? v.value : v;
+    const label = typeof v === 'object' ? v.label : v;
+    if (val && !map.has(val)) map.set(val, label);
+  });
+  if (keep && !map.has(keep)) map.set(keep, keep);   // 保留目前選擇，即使已無交集
+  const entries = [...map.entries()].sort((a, b) => a[1].localeCompare(b[1], 'zh-Hant'));
+  el.innerHTML = `<option value="">${placeholder}</option>`;
+  entries.forEach(([val, label]) => {
+    const opt = document.createElement('option');
+    opt.value = val; opt.textContent = label;
+    el.appendChild(opt);
+  });
+  el.value = keep || '';
+}
+
+function currentFilters() {
+  return {
+    q:   searchInput.value.trim().toLowerCase(),
+    cat: categoryFilter.value,
+    sub: subgenusFilter.value,
+    grp: groupFilter.value,
+    sp:  speciesFilter.value,
+    ws:  wholeshotFilter.value,
+    gen: genderFilter.value,
+  };
+}
+
+// 判斷某筆是否符合篩選；ignore 指定要略過的某個條件（用於計算該下拉的可選項）
+function rowMatches(d, f, ignore) {
+  if (ignore !== 'q'   && f.q   && !(d.name.toLowerCase().includes(f.q) || (d.sciName||'').toLowerCase().includes(f.q))) return false;
+  if (ignore !== 'cat' && f.cat && d.category !== f.cat) return false;
+  if (ignore !== 'sub' && f.sub && d.subgenus !== f.sub) return false;
+  if (ignore !== 'grp' && f.grp && d.speciesGroup !== f.grp) return false;
+  if (ignore !== 'sp'  && f.sp  && `${d.category} ${d.species}` !== f.sp) return false;
+  if (ignore !== 'ws'  && f.ws  && d.全身照 !== 'Y') return false;
+  if (ignore !== 'gen' && f.gen && d._sex !== f.gen) return false;
+  return true;
+}
+
+// 連動式篩選：每個下拉只列出「套用其他條件後」仍存在的選項（交集）
+function refreshFilterOptions() {
+  const f = currentFilters();
+  fillSelect(categoryFilter, DATA.filter(d => rowMatches(d, f, 'cat')).map(d => d.category),      '全部屬',   f.cat);
+  fillSelect(subgenusFilter, DATA.filter(d => rowMatches(d, f, 'sub')).map(d => d.subgenus),      '全部亞屬', f.sub);
+  fillSelect(groupFilter,    DATA.filter(d => rowMatches(d, f, 'grp')).map(d => d.speciesGroup),  '全部翅斑型態', f.grp);
+  fillSelect(speciesFilter,  DATA.filter(d => rowMatches(d, f, 'sp')).map(d => d.species
+    ? { value: `${d.category} ${d.species}`,
+        label: d._zh ? `${d._zh}（${d.category} ${d.species}）` : `${d.category} ${d.species}` }
+    : ''), '全部種', f.sp);
+  fillSelect(genderFilter,   DATA.filter(d => rowMatches(d, f, 'gen')).map(d => d._sex),          '全部',     f.gen);
+}
+
+function initCategories() {
+  refreshFilterOptions();
+}
+
+function renderGrid() {
+  refreshFilterOptions();           // 先依目前選擇重算各下拉的可選項（交集）
+  const f = currentFilters();
+  const filtered = DATA.filter(d => rowMatches(d, f, null));
+
+  clearBtn.classList.toggle('visible', !!(f.q || f.cat || f.sub || f.grp || f.sp || f.ws || f.gen));
+  resultsInfo.textContent = `共 ${filtered.length} 筆`;
+  grid.innerHTML = '';
+
+  if (!filtered.length) {
+    grid.innerHTML = '<div class="empty">找不到符合的標本</div>';
+    return;
+  }
+
+  filtered.forEach(d => {
+    const imgs = getImages(d);
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <div class="card-img">
+        ${imgs[0] ? `<img src="${imgs[0]}" alt="${d.name}" loading="lazy">` : d.emoji || '📦'}
+      </div>
+      <div class="card-body">
+        <div class="card-name">${d.name}</div>
+        <div class="card-sci">${d.sciName || ''}</div>
+        <div class="card-meta">
+          <span class="tag">${d.category}</span>
+          ${d._sex ? `<span class="tag">${d._sex}</span>` : ''}
+          <span class="card-date">${d.date || ''}</span>
+        </div>
+      </div>`;
+    card.addEventListener('click', () => openWindow(d));
+    grid.appendChild(card);
+  });
+}
+
+// ── 比對浮動視窗：可同時開多個（上限 4）、可拖曳並排比對 ──────────────
+const CMP_MAX   = 4;
+const cmpWindows = new Map();   // specimen id -> 視窗元素
+let cmpTopZ = 200;
+
+function _windowBody(d) {
+  // 預設只顯示圖片；詳細資訊放在 .cmp-info（預設隱藏，按 ⓘ 展開）
+  const images = getImages(d);
+  let html;
+  if (!images.length) {
+    html = `<div class="modal-img">${d.emoji || '📦'}</div>`;
+  } else {
+    html = `<div class="modal-img"><img src="${images[0]}" alt="${d.name}"></div>`;
+    if (images.length > 1) {
+      html += `<div class="modal-thumbs">${images.map((s, i) =>
+        `<img src="${s}" class="thumb${i === 0 ? ' active' : ''}" data-src="${s}">`).join('')}</div>`;
+    }
+  }
+  const FIXED = new Set(['id','name','sciName','category','subgenus','species',
+                         'date','emoji','image','number','全身照','_sex']);
+  let sections = '';
+  Object.keys(d).forEach(k => { if (!FIXED.has(k) && d[k]) sections += `<div class="modal-section"><h4>${k}</h4><p>${d[k]}</p></div>`; });
+  const tags = `<span class="tag">${d.category}</span>${d._sex ? `<span class="tag">${d._sex}</span>` : ''}<span class="tag">${d.date || ''}</span>`;
+  html += `<div class="cmp-info"><div class="modal-body"><p class="modal-sci">${d.sciName || ''}</p><div class="modal-tags">${tags}</div>${sections}</div></div>`;
+  return html;
+}
+
+// 一鍵方格平鋪：多個視窗固定排成 2×2 格局；只開 1 個時該視窗放大滿版
+function tileWindows() {
+  const wins = [...cmpWindows.values()];
+  const n = wins.length;
+  if (!n) return;
+  const gap = 8, top0 = 60, bottomReserve = 70;   // 底部留給 #cmp-toolbar，避免蓋住視窗內縮圖
+  const cols = n === 1 ? 1 : 2, rows = n === 1 ? 1 : 2;   // 只開 1 個視窗時滿版，否則固定 2×2
+  const cellW = Math.max(150, Math.floor((window.innerWidth  - (cols + 1) * gap) / cols));
+  const cellH = Math.max(140, Math.floor((window.innerHeight - top0 - bottomReserve - (rows + 1) * gap) / rows));
+  wins.forEach((win, i) => {
+    const c = i % cols, r = Math.floor(i / cols);
+    win.classList.add('tiled');
+    win.style.left   = (gap + c * (cellW + gap)) + 'px';
+    win.style.top    = (top0 + gap + r * (cellH + gap)) + 'px';
+    win.style.width  = cellW + 'px';
+    win.style.height = cellH + 'px';
+    win.style.maxHeight = 'none';
+    win.style.zIndex = ++cmpTopZ;
+  });
+}
+
+let _cmpToolbar = null;
+function _updateCmpToolbar() {
+  if (!_cmpToolbar) {
+    _cmpToolbar = document.createElement('div');
+    _cmpToolbar.id = 'cmp-toolbar';
+    _cmpToolbar.innerHTML =
+      '<button type="button" id="cmp-tile">⊞ 並排平鋪</button>' +
+      '<button type="button" id="cmp-closeall">✕ 全部關閉</button>';
+    document.body.appendChild(_cmpToolbar);
+    _cmpToolbar.querySelector('#cmp-tile').addEventListener('click', tileWindows);
+    _cmpToolbar.querySelector('#cmp-closeall').addEventListener('click', () => {
+      cmpWindows.forEach(w => w.remove());
+      cmpWindows.clear();
+      _updateCmpToolbar();
+    });
+  }
+  _cmpToolbar.style.display = cmpWindows.size ? 'flex' : 'none';
+}
+
+function _focusWindow(win) { win.style.zIndex = ++cmpTopZ; }
+
+function openWindow(d) {
+  if (cmpWindows.has(d.id)) { _focusWindow(cmpWindows.get(d.id)); return; }
+  if (cmpWindows.size >= CMP_MAX) {
+    alert(`最多同時開啟 ${CMP_MAX} 個比對視窗，請先關閉一個。`);
+    return;
+  }
+  const win = document.createElement('div');
+  win.className = 'cmp-window';
+  const n = cmpWindows.size;
+  win.style.left = Math.max(8, Math.min(60 + n * 34, window.innerWidth - 380)) + 'px';
+  win.style.top  = (84 + n * 30) + 'px';
+  win.style.zIndex = ++cmpTopZ;
+  win.innerHTML =
+    `<div class="cmp-head"><span class="cmp-title">${d.name}</span>` +
+    `<button class="cmp-info-btn" title="詳細資訊">ⓘ</button>` +
+    `<button class="cmp-close" title="關閉">×</button></div>` +
+    `<div class="cmp-scroll">${_windowBody(d)}</div>`;
+  document.body.appendChild(win);
+  cmpWindows.set(d.id, win);
+
+  // 縮圖切換主圖
+  const imgWrap = win.querySelector('.modal-img');
+  win.querySelectorAll('.modal-thumbs .thumb').forEach(t => {
+    t.addEventListener('click', () => {
+      imgWrap.innerHTML = `<img src="${t.dataset.src}" alt="${d.name}">`;
+      win.querySelectorAll('.modal-thumbs .thumb').forEach(x => x.classList.remove('active'));
+      t.classList.add('active');
+    });
+  });
+
+  win.querySelector('.cmp-info-btn').addEventListener('click', e => { e.stopPropagation(); win.classList.toggle('info-open'); });
+  win.querySelector('.cmp-close').addEventListener('click', () => { win.remove(); cmpWindows.delete(d.id); _updateCmpToolbar(); });
+  win.addEventListener('pointerdown', () => _focusWindow(win));
+  _makeDraggable(win, win.querySelector('.cmp-head'));
+  _updateCmpToolbar();
+}
+
+function _makeDraggable(win, handle) {
+  let sx, sy, ox, oy, dragging = false;
+  handle.addEventListener('pointerdown', e => {
+    if (e.target.closest('.cmp-close, .cmp-info-btn')) return;
+    dragging = true;
+    try { handle.setPointerCapture(e.pointerId); } catch (_) {}
+    const r = win.getBoundingClientRect();
+    ox = r.left; oy = r.top; sx = e.clientX; sy = e.clientY;
+    e.preventDefault();
+  });
+  handle.addEventListener('pointermove', e => {
+    if (!dragging) return;
+    let nx = ox + (e.clientX - sx), ny = oy + (e.clientY - sy);
+    nx = Math.max(0, Math.min(nx, window.innerWidth  - win.offsetWidth));
+    ny = Math.max(0, Math.min(ny, window.innerHeight - 40));
+    win.style.left = nx + 'px'; win.style.top = ny + 'px';
+  });
+  const stop = e => { dragging = false; try { handle.releasePointerCapture(e.pointerId); } catch (_) {} };
+  handle.addEventListener('pointerup', stop);
+  handle.addEventListener('pointercancel', stop);
+}
+
+// Esc：關閉最上層（最近聚焦）的視窗
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Escape' || !cmpWindows.size) return;
+  let top = null, tz = -1, topId = null;
+  cmpWindows.forEach((w, id) => { const z = +w.style.zIndex || 0; if (z >= tz) { tz = z; top = w; topId = id; } });
+  if (top) { top.remove(); cmpWindows.delete(topId); _updateCmpToolbar(); }
+});
+
+searchInput.addEventListener('input', renderGrid);
+[categoryFilter, subgenusFilter, groupFilter, speciesFilter, wholeshotFilter, genderFilter]
+  .forEach(el => el.addEventListener('change', renderGrid));
+
+clearBtn.addEventListener('click', () => {
+  searchInput.value = '';
+  [categoryFilter, subgenusFilter, groupFilter, speciesFilter, wholeshotFilter, genderFilter]
+    .forEach(el => { el.value = ''; });
+  renderGrid();
+});
+
+// ── 資料載入 ──────────────────────────────────────────────────────────
+
+function decodeBuf(buf) {
+  const b = new Uint8Array(buf);
+  if (b[0] === 0xEF && b[1] === 0xBB && b[2] === 0xBF)
+    return new TextDecoder('utf-8').decode(buf.slice(3));
+  try   { return new TextDecoder('utf-8', { fatal: true }).decode(buf); }
+  catch { return new TextDecoder('big5').decode(buf); }
+}
+
+const GS_CSV_URL =
+  'https://docs.google.com/spreadsheets/d/1n8A-wMmJxdwwFjKDfL1jsj-Llcz3QQDXrHnJ2fNMNJ8/export?format=csv';
+
+grid.innerHTML = '<div class="empty">載入中…</div>';
+
+const isOffline = window.location.protocol === 'file:';
+let dataReady;
+if (isOffline && window.EMBEDDED_DATA) {
+  dataReady = Promise.resolve([window.EMBEDDED_DATA.manifest, window.EMBEDDED_DATA.csv]);
+} else {
+  const fetchManifest =
+    fetch('manifest.json').then(r => r.ok ? r.json() : {}).catch(() => ({}));
+  const fetchCSV = fetch(GS_CSV_URL)
+    .then(r => { if (!r.ok) throw new Error('無法載入 Google Sheets 資料'); return r.arrayBuffer(); })
+    .then(buf => decodeBuf(buf));
+  dataReady = Promise.all([fetchManifest, fetchCSV]);
+}
+
+dataReady
+  .then(([manifest, csvText]) => {
+    MANIFEST = manifest;
+    DATA     = parseCSV(csvText).map(transformRow);
+    initCategories();
+    renderGrid();
+  })
+  .catch(err => {
+    grid.innerHTML = `<div class="empty">資料載入失敗：${err.message}</div>`;
+  });
+
+// ── 頁尾最後更新日期：由 lastupdated.js（推送時自動產生）提供 ──────────
+//    純本機同源檔，不對外發送任何請求，離線亦可顯示。
+if (window.LAST_UPDATED) {
+  document.getElementById('foot-updated').textContent = window.LAST_UPDATED;
+  document.getElementById('foot-updated-wrap').hidden = false;
+}
+</script>
+</body>
+</html>
