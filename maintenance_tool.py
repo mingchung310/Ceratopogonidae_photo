@@ -57,6 +57,58 @@ def rebuild_manifest():
     return len(manifest)
 
 
+def fix_case_mismatches() -> list[str]:
+    """
+    修正 git 索引裡 images/、species_photos/ 路徑的大小寫，
+    和磁碟上實際檔名／資料夾名不一致的情況。
+
+    起因：Windows 檔案系統不分大小寫，若資料夾整個改過大小寫
+    （例如 cer158 → Cer158），一般的 `git add` 在 Windows 上偵測不到
+    純大小寫的差異，git 內部仍會記成舊的大小寫。本機測試因為系統不分
+    大小寫所以看起來正常，但 GitHub Pages 伺服器分大小寫，會導致圖片
+    顯示不出來（曾在 Cer158／Cer173／Cer178 發生過）。
+
+    每次同步到 GitHub 前自動執行，回傳修正過的路徑清單（供記錄用），
+    沒有問題時回傳空清單。
+    """
+    tracked = subprocess.run(
+        ["git", "-c", "core.quotepath=false", "ls-files", "--",
+         "images", "species_photos"],
+        capture_output=True, text=True, encoding="utf-8", errors="replace",
+        cwd=str(BASE)
+    ).stdout.splitlines()
+
+    # 建立「小寫路徑 → 磁碟上實際大小寫路徑」對照表
+    disk_by_lower = {}
+    for root_name in ("images", "species_photos"):
+        root = BASE / root_name
+        if not root.exists():
+            continue
+        for p in root.rglob("*"):
+            if p.is_file():
+                rel = p.relative_to(BASE).as_posix()
+                disk_by_lower[rel.lower()] = rel
+
+    fixed = []
+    for git_path in tracked:
+        if not git_path:
+            continue
+        disk_path = disk_by_lower.get(git_path.lower())
+        if disk_path is None or disk_path == git_path:
+            continue   # 磁碟上找不到對應檔案，或大小寫本來就一致
+        # 大小寫不一致：Windows 不能一步把大小寫改回去，用兩段式改名
+        tmp_path = disk_path + ".casefix_tmp"
+        r1 = subprocess.run(["git", "mv", git_path, tmp_path],
+                            capture_output=True, text=True, cwd=str(BASE))
+        if r1.returncode != 0:
+            continue
+        r2 = subprocess.run(["git", "mv", tmp_path, disk_path],
+                            capture_output=True, text=True, cwd=str(BASE))
+        if r2.returncode == 0:
+            fixed.append(f"{git_path} → {disk_path}")
+    return fixed
+
+
 # ── 檔名衝突對話框 ────────────────────────────────────────────────────────────
 
 class ConflictDialog(tk.Toplevel):
@@ -602,6 +654,16 @@ class App(tk.Tk):
                 self._log("  [提醒] build.ps1 失敗，改僅重建 manifest.json（data.js 未更新）")
                 n = rebuild_manifest()
                 self._log(f"  manifest.json 已更新（{n} 個資料夾）")
+
+            # ── 1.5 檢查大小寫（Windows 不分大小寫，GitHub Pages 會分）──
+            self._log("  檢查 images/ 路徑大小寫是否與 git 記錄一致…")
+            case_fixed = fix_case_mismatches()
+            if case_fixed:
+                self._log(f"  [已修正] {len(case_fixed)} 個路徑大小寫與 git 記錄不符（修好才不會線上顯示不出來）：")
+                for f in case_fixed:
+                    self._log(f"    {f}")
+            else:
+                self._log("  大小寫檢查正常")
 
             # ── 2. 暫存所有變更（50%）──────────────────────────────────
             self._set_progress(2, TOTAL, "2/4 暫存變更…")

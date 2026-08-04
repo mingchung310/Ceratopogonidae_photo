@@ -20,7 +20,7 @@ python maintenance_tool.py
 - **同步 Google Sheets** — 即時下載最新資料，更新 `data.js`
 - **使用本地 CSV** — 離線時從本地 CSV 更新 `data.js`
 - **推送資料更新** — `git add data.js manifest.json` → commit → push
-- **新增圖片** — 選取資料夾 → 重複偵測 → 壓縮 → 放入 `images/` → 上傳 GitHub
+- **新增圖片** — 選取資料夾 → 重複偵測 → 壓縮 → 放入 `images/` → 上傳 GitHub（推送前會自動檢查並修正 `images/` 路徑大小寫，見下方注意事項）
 - **匯出可攜版** — robocopy 把離線運作所需檔案複製到指定位置（排除 `RAW image/` 等），供搬到離線電腦
 - **預覽網站** — 直接開啟 `index.html`
 
@@ -92,6 +92,8 @@ images\Cer55\head.png
 欄位：Cd、No.、中文名、Genus、Subgenus、Species、Col. Date 等
 
 ### 6. 推上 GitHub
+建議透過 `maintenance_tool.py` 的「同步到 GitHub」按鈕推送（會自動檢查並
+修正資料夾大小寫問題，見下方注意事項）。若要手動推送：
 ```powershell
 git add images/ manifest.json data.js
 git commit -m "新增標本 Cer55"
@@ -171,4 +173,10 @@ git push
 - 比例尺參考圖 `RAW image\IMG_7000.JPG` 不要移動或刪除
 - 封面圖邏輯：同資料夾內名稱最小的檔案自動為封面；加 `0.` 前綴可強制指定
 - 標本編號大小寫需和 Google Sheets 完全一致
+- **大小寫陷阱**：Windows 檔案系統不分大小寫，若手動把 `images/` 底下資料夾改過大小寫
+  （例如 `cer158` → `Cer158`），一般的 `git add` 在 Windows 上偵測不到這種純大小寫差異，
+  本機測試看起來正常，但 GitHub Pages 伺服器分大小寫，會導致該標本圖片線上顯示不出來
+  （曾在 Cer158／Cer173／Cer178 發生過）。`maintenance_tool.py` 的「新增圖片」／
+  「同步到 GitHub」流程已內建 `fix_case_mismatches()` 自動偵測並修正，日常操作
+  透過此工具即可；只有直接手動下 git 指令時才需要自行留意
 - 網站分成 `index.html`／`taxonomy.html`／`specimens.html` 三個獨立頁面，共用 `style.css`；改樣式只需要改 `style.css`，改某一頁內容只需要改對應的那個檔案
