@@ -250,6 +250,8 @@
                   "images/Cer13/Cer13 Thorax 1.png",
                   "images/Cer13/Cer13 Thorax.png",
                   "images/Cer13/Cer13 Wings.png",
+                  "images/Cer13/cer13_gen_20x.png",
+                  "images/Cer13/cer13_gen_20x_1.png",
                   "images/Cer13/gen_10x.png",
                   "images/Cer13/hea_10x.png",
                   "images/Cer13/hea_10x_1.png"
@@ -706,6 +708,9 @@
                ],
     "Cer104":  [
                    "images/Cer104/0.win_10x_2.png",
+                   "images/Cer104/cer104_gen_20x.png",
+                   "images/Cer104/cer104_gen_20x_1.png",
+                   "images/Cer104/cer104_gen_20x_2.png",
                    "images/Cer104/win_10x.png",
                    "images/Cer104/win_10x_1.png",
                    "images/Cer104/win_10x_2.png",
@@ -752,6 +757,8 @@
                ],
     "Cer103":  [
                    "images/Cer103/0.win_4x_1.png",
+                   "images/Cer103/cer103_spe_10x.png",
+                   "images/Cer103/cer103_spe_10x_1.png",
                    "images/Cer103/hea_4x.png",
                    "images/Cer103/hea_4x_1.png",
                    "images/Cer103/man_20x.png",
@@ -783,9 +790,14 @@
                   "images/Cer42/win_4x_DF.png"
               ],
     "Cer184":  [
+                   "images/Cer184/cer184_leg_4x.png",
                    "images/Cer184/cer184_win_4x.png",
                    "images/Cer184/cer184_win_4x_1.png",
                    "images/Cer184/cer184_win_4x_DF.png"
+               ],
+    "Cer146":  [
+                   "images/Cer146/body.tif.png",
+                   "images/Cer146/head.png"
                ],
     "HM2-1":  [
                   "images/HM2-1/01.png",
@@ -849,9 +861,14 @@
                   "images/Cer22/Cer22 Thorax.png",
                   "images/Cer22/Cer22 Wings.png"
               ],
-    "Cer146":  [
-                   "images/Cer146/body.tif.png",
-                   "images/Cer146/head.png"
+    "Cer170":  [
+                   "images/Cer170/cer170_leg_4x.png",
+                   "images/Cer170/cer170_spe_10x.png",
+                   "images/Cer170/cer170_spe_10x_1.png",
+                   "images/Cer170/cer170_spe_10x_2.png",
+                   "images/Cer170/cer170_win_4x.png",
+                   "images/Cer170/cer170_win_4x_1.png",
+                   "images/Cer170/cer170_win_4x_DF.png"
                ],
     "Cer148":  [
                    "images/Cer148/body.png",
@@ -996,6 +1013,7 @@
                ],
     "Cer135":  [
                    "images/Cer135/0.win_4x.png",
+                   "images/Cer135/cer135_leg_4x.png",
                    "images/Cer135/win_4x.png",
                    "images/Cer135/win_4x_1.png",
                    "images/Cer135/win_4x_2.png",
