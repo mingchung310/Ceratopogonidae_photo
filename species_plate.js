@@ -31,6 +31,11 @@ window.SPECIES_PLATE = [
   "zh": "疑念庫蠓"
  },
  {
+  "id": "guttifer",
+  "sci": "Culicoides guttifer",
+  "zh": "滴斑庫蠓"
+ },
+ {
   "id": "homotomus",
   "sci": "Culicoides homotomus",
   "zh": "原野庫蠓"
@@ -46,6 +51,11 @@ window.SPECIES_PLATE = [
   "zh": "加氏庫蠓"
  },
  {
+  "id": "kinabuluensis",
+  "sci": "Culicoides kinabuluensis",
+  "zh": "洋島/神山庫蠓"
+ },
+ {
   "id": "lungchiensis",
   "sci": "Culicoides lungchiensis",
   "zh": "龍溪庫蠓"
@@ -58,7 +68,12 @@ window.SPECIES_PLATE = [
  {
   "id": "mcdonaldi",
   "sci": "Culicoides mcdonaldi",
-  "zh": "棲山庫蠓/麥氏庫蠓"
+  "zh": "棲山/麥氏庫蠓"
+ },
+ {
+  "id": "morisitai",
+  "sci": "Culicoides morisitai",
+  "zh": "森下庫蠓"
  },
  {
   "id": "orientalis",
@@ -84,6 +99,11 @@ window.SPECIES_PLATE = [
   "id": "tamada",
   "sci": "Culicoides tamada",
   "zh": "平淡庫蠓"
+ },
+ {
+  "id": "toshiokai",
+  "sci": "Culicoides toshiokai",
+  "zh": "利岡庫蠓"
  },
  {
   "id": "verbosus",
