@@ -53,17 +53,17 @@ window.SPECIES_PLATE = [
  {
   "id": "kinabuluensis",
   "sci": "Culicoides kinabuluensis",
-  "zh": "洋島/神山庫蠓"
+  "zh": "神山庫蠓"
+ },
+ {
+  "id": "lanyuensis",
+  "sci": "Culicoides lanyuensis",
+  "zh": "蘭嶼庫蠓"
  },
  {
   "id": "lungchiensis",
   "sci": "Culicoides lungchiensis",
   "zh": "龍溪庫蠓"
- },
- {
-  "id": "malayae__kinabaluensis__cameronensis",
-  "sci": "Culicoides malayae / kinabaluensis / cameronensis",
-  "zh": "近似馬來庫蠓"
  },
  {
   "id": "mcdonaldi",
@@ -91,6 +91,11 @@ window.SPECIES_PLATE = [
   "zh": "蘇島庫蠓"
  },
  {
+  "id": "tahemanensis",
+  "sci": "Culicoides tahemanensis",
+  "zh": "塔合曼庫蠓 new record"
+ },
+ {
   "id": "tainanus",
   "sci": "Culicoides tainanus",
   "zh": "台南庫蠓"
@@ -109,6 +114,11 @@ window.SPECIES_PLATE = [
   "id": "verbosus",
   "sci": "Culicoides verbosus",
   "zh": "婆娑庫蠓"
+ },
+ {
+  "id": "yamii",
+  "sci": "Culicoides yamii",
+  "zh": "雅美庫蠓"
  },
  {
   "id": "應該是帶鬚",

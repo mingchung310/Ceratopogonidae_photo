@@ -30,6 +30,12 @@
                   "images/HM3-1/leg2.png",
                   "images/HM3-1/leg3.png"
               ],
+    "Cer66":  [
+                  "images/Cer66/0.cer66_win_4x_1.png",
+                  "images/Cer66/cer66_win_4x.png",
+                  "images/Cer66/cer66_win_4x_1.png",
+                  "images/Cer66/cer66_win_4x_DF.png"
+              ],
     "Cer273":  [
                    "images/Cer273/cer273_win_10x.png",
                    "images/Cer273/cer273_win_10x_1.png",
@@ -108,6 +114,12 @@
                   "images/Cer52/cer52_win_4x_1.png",
                   "images/Cer52/cer52_win_4x_DF.png"
               ],
+    "Cer321":  [
+                   "images/Cer321/cer321_spe_20x.png",
+                   "images/Cer321/cer321_spe_20x_1.png",
+                   "images/Cer321/cer321_win_4x.png",
+                   "images/Cer321/cer321_win_4x_1.png"
+               ],
     "Cer90":  [
                   "images/Cer90/0.win_4x_3.png",
                   "images/Cer90/hea_4x.png",
@@ -320,12 +332,11 @@
                   "images/Cer20/cer20_win_4x_1.png",
                   "images/Cer20/cer20_win_4x_DF.png"
               ],
-    "Cer33":  [
-                  "images/Cer33/0.win_4x.png",
-                  "images/Cer33/win_4x.png",
-                  "images/Cer33/win_4x_1.png",
-                  "images/Cer33/win_4x_2.png",
-                  "images/Cer33/win_4x_3.png"
+    "Cer16":  [
+                  "images/Cer16/0.cer16_win_4x.png",
+                  "images/Cer16/cer16_win_4x.png",
+                  "images/Cer16/cer16_win_4x_1.png",
+                  "images/Cer16/cer16_win_4x_DF.png"
               ],
     "Cer109":  [
                    "images/Cer109/win_10x.png",
@@ -525,12 +536,14 @@
                    "images/Cer185/cer185_win_10x_1.png",
                    "images/Cer185/cer185_win_10x_DF.png"
                ],
-    "Cer16":  [
-                  "images/Cer16/0.cer16_win_4x.png",
-                  "images/Cer16/cer16_win_4x.png",
-                  "images/Cer16/cer16_win_4x_1.png",
-                  "images/Cer16/cer16_win_4x_DF.png"
-              ],
+    "Cer302":  [
+                   "images/Cer302/cer302_win_10x.png",
+                   "images/Cer302/cer302_win_10x_1.png",
+                   "images/Cer302/cer302_win_10x_2.png",
+                   "images/Cer302/cer302_win_10x_3.png",
+                   "images/Cer302/cer302_win_10x_DF.png",
+                   "images/Cer302/cer302_win_10x_DF_1.png"
+               ],
     "Cer117":  [
                    "images/Cer117/Cer117.jpg.png"
                ],
@@ -606,6 +619,12 @@
                    "images/Cer153/win_4x_1.png",
                    "images/Cer153/win_4x_DF.png"
                ],
+    "Cer326":  [
+                   "images/Cer326/cer326_eye_20x.png",
+                   "images/Cer326/cer326_eye_20x_1.png",
+                   "images/Cer326/cer326_win_4x.png",
+                   "images/Cer326/cer326_win_4x_1.png"
+               ],
     "Cer110":  [
                    "images/Cer110/0.bod_4x.png",
                    "images/Cer110/ant_20x.png",
@@ -649,6 +668,10 @@
                  "images/Cer7/Cer7 Legs 3.png",
                  "images/Cer7/Cer7 Wings.png"
              ],
+    "Cer315":  [
+                   "images/Cer315/cer315_win_4x.png",
+                   "images/Cer315/cer315_win_4x_1.png"
+               ],
     "Cer269":  [
                    "images/Cer269/cer269_gen_20x.png",
                    "images/Cer269/cer269_gen_20x_1.png",
@@ -680,6 +703,7 @@
               ],
     "Cer281":  [
                    "images/Cer281/cer281_win_10x.png",
+                   "images/Cer281/cer281_win_10x_0.png",
                    "images/Cer281/cer281_win_10x_1.png",
                    "images/Cer281/cer281_win_4x_DF.png"
                ],
@@ -943,6 +967,7 @@
                    "images/Cer274/cer274_win_10x.png",
                    "images/Cer274/cer274_win_10x_1.png",
                    "images/Cer274/cer274_win_4x.png",
+                   "images/Cer274/cer274_win_4x_0.png",
                    "images/Cer274/cer274_win_4x_1tif.png",
                    "images/Cer274/cer274_win_4x_DF.png"
                ],
@@ -989,12 +1014,17 @@
                    "images/Cer127/hea_10x_1.png",
                    "images/Cer127/head.png"
                ],
-    "Cer81":  [
-                  "images/Cer81/win_4x.png",
-                  "images/Cer81/win_4x_1.png",
-                  "images/Cer81/win_4x_2.png",
-                  "images/Cer81/win_4x_DF.png"
+    "Cer33":  [
+                  "images/Cer33/0.win_4x.png",
+                  "images/Cer33/win_4x.png",
+                  "images/Cer33/win_4x_1.png",
+                  "images/Cer33/win_4x_2.png",
+                  "images/Cer33/win_4x_3.png"
               ],
+    "Cer320":  [
+                   "images/Cer320/cer320_win_4x.png",
+                   "images/Cer320/cer320_win_4x_1.png"
+               ],
     "Cer22":  [
                   "images/Cer22/0.Cer22 Wings.png",
                   "images/Cer22/Cer22 Abdomen.png",
@@ -1215,6 +1245,14 @@
                    "images/Cer131/win_4x_1.png",
                    "images/Cer131/win_4x_DF.png"
                ],
+    "Cer300":  [
+                   "images/Cer300/cer300_win_10x.png",
+                   "images/Cer300/cer300_win_10x_1.png",
+                   "images/Cer300/cer300_win_10x_2.png",
+                   "images/Cer300/cer300_win_10x_3.png",
+                   "images/Cer300/cer300_win_10x_DF.png",
+                   "images/Cer300/cer300_win_10x_DF_1.png"
+               ],
     "Cer35":  [
                   "images/Cer35/Cer35.jpg.png",
                   "images/Cer35/IMG_6999.png"
@@ -1233,12 +1271,14 @@
                  "images/Cer8/cer8_win_4x_1.png",
                  "images/Cer8/cer8_win_4x_DF.png"
              ],
-    "Cer66":  [
-                  "images/Cer66/0.cer66_win_4x_1.png",
-                  "images/Cer66/cer66_win_4x.png",
-                  "images/Cer66/cer66_win_4x_1.png",
-                  "images/Cer66/cer66_win_4x_DF.png"
-              ],
+    "Cer323":  [
+                   "images/Cer323/cer323_win_4x.png",
+                   "images/Cer323/cer323_win_4x_1.png"
+               ],
+    "Cer325":  [
+                   "images/Cer325/cer325_win_4x.png",
+                   "images/Cer325/cer325_win_4x_1.png"
+               ],
     "Cer86":  [
                   "images/Cer86/win_4x.png",
                   "images/Cer86/win_4x_1.png",
@@ -1359,6 +1399,10 @@
                   "images/Cer59/Cer59.jpg.png",
                   "images/Cer59/IMG_7010.png"
               ],
+    "Cer324":  [
+                   "images/Cer324/cer324_win_4x.png",
+                   "images/Cer324/cer324_win_4x_1.png"
+               ],
     "Cer29":  [
                   "images/Cer29/0.Cer29 Wings.png",
                   "images/Cer29/Cer29 Abdomen.png",
@@ -1711,6 +1755,14 @@
                  "images/Cer9/Cer9.jpg.png",
                  "images/Cer9/IMG_7011.png"
              ],
+    "Cer322":  [
+                   "images/Cer322/cer322_spe_20x.png",
+                   "images/Cer322/cer322_spe_20x_1.png",
+                   "images/Cer322/cer322_spe_20x_2.png",
+                   "images/Cer322/cer322_spe_20x_3.png",
+                   "images/Cer322/cer322_win_4x.png",
+                   "images/Cer322/cer322_win_4x_1.png"
+               ],
     "Cer73":  [
                   "images/Cer73/0.win_10x_1.png",
                   "images/Cer73/abd_10x.png",
@@ -1774,7 +1826,11 @@
     "Cer311":  [
                    "images/Cer311/cer311_win_4x.png",
                    "images/Cer311/cer311_win_4x_1.png",
-                   "images/Cer311/cer311_win_4x_DF.png"
+                   "images/Cer311/cer311_win_4x_2_DF.png",
+                   "images/Cer311/cer311_win_4x_3.png",
+                   "images/Cer311/cer311_win_4x_4.png",
+                   "images/Cer311/cer311_win_4x_DF.png",
+                   "images/Cer311/cer311_win_4x_DF_1.png"
                ],
     "Cer41":  [
                   "images/Cer41/0.win_4x.png",
@@ -1939,6 +1995,12 @@
                   "images/Cer93/win_10x_1tif.png",
                   "images/Cer93/win_10x_2.png",
                   "images/Cer93/win_10x_DF.png"
+              ],
+    "Cer81":  [
+                  "images/Cer81/win_4x.png",
+                  "images/Cer81/win_4x_1.png",
+                  "images/Cer81/win_4x_2.png",
+                  "images/Cer81/win_4x_DF.png"
               ],
     "Cer115":  [
                    "images/Cer115/Cer115.jpg.jpg.jpg.jpg.jpg.png"
