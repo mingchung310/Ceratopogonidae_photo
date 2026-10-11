@@ -1415,6 +1415,19 @@
                   "images/Cer29/Cer29 Thorax.png",
                   "images/Cer29/Cer29 Wings.png"
               ],
+    "SCer1":  [
+                  "images/SCer1/hea_20x.png",
+                  "images/SCer1/hea_20x-2.png",
+                  "images/SCer1/plp_40x.png",
+                  "images/SCer1/plp_40x-2.png",
+                  "images/SCer1/plp_40x-3.png",
+                  "images/SCer1/plp_40x-4.png",
+                  "images/SCer1/plp_40x-5.png",
+                  "images/SCer1/plp_40x-6.png",
+                  "images/SCer1/wing10x.png",
+                  "images/SCer1/wing20x.png",
+                  "images/SCer1/wing20x-2.png"
+              ],
     "Cer168":  [
                    "images/Cer168/0.win_10x_1.png",
                    "images/Cer168/cer168_hea_20x.png",
