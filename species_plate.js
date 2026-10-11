@@ -18,12 +18,12 @@ window.SPECIES_PLATE = [
  {
   "id": "clavipalpis",
   "sci": "Culicoides clavipalpis",
-  "zh": "棒鬚庫蠓"
+  "zh": "棒鬚"
  },
  {
   "id": "dentiformis",
   "sci": "Culicoides dentiformis",
-  "zh": "齒紋庫蠓"
+  "zh": "齒紋"
  },
  {
   "id": "dubius",
@@ -39,6 +39,11 @@ window.SPECIES_PLATE = [
   "id": "homotomus",
   "sci": "Culicoides homotomus",
   "zh": "原野庫蠓"
+ },
+ {
+  "id": "huffi",
+  "sci": "Culicoides huffi",
+  "zh": "哈氏庫蠓"
  },
  {
   "id": "innoxius",
@@ -139,5 +144,10 @@ window.SPECIES_PLATE = [
   "id": "n.sp",
   "sci": "Forcipomyia n.sp",
   "zh": "盲蛛鋏蠓"
+ },
+ {
+  "id": "taiwana",
+  "sci": "Forcipomyia taiwana",
+  "zh": "台灣鋏蠓"
  }
 ];
